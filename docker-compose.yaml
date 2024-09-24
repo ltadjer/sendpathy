@@ -1,0 +1,47 @@
+services:
+  node:
+    build: .
+    container_name: sendpathy_node
+    entrypoint: "tail -f /dev/null"
+    labels:
+      caddy_0: sendpathy.aaa
+      caddy_0.tls: internal
+      caddy_0.reverse_proxy: "{{upstreams 5173}}"
+      caddy_1: api.sendpathy.aaa
+      caddy_1.tls: internal
+      caddy_1.reverse_proxy: "{{upstreams 3000}}"
+      caddy_2: prisma.sendpathy.aaa
+      caddy_2.tls: internal
+      caddy_2.reverse_proxy: "{{upstreams 5555}}"
+
+    networks:
+      - default
+      - global_reverse_proxy
+    volumes:
+      - ./:/home/node/sendpathy
+    working_dir: /home/node/sendpathy
+
+  # ------------------------------------------------------
+  # PostgreSQL database
+  # ------------------------------------------------------
+  database:
+    container_name: sendpathy_database
+    environment:
+      POSTGRES_USER: "stb"
+      POSTGRES_PASSWORD: "stb"
+      POSTGRES_DB: "sendpathy"
+    image: postgres:16.0
+    networks:
+      - default
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  default:
+    driver: bridge
+  global_reverse_proxy:
+    external: true
+
+volumes:
+  postgres_data: {}
