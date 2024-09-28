@@ -4,6 +4,9 @@ PNPM := NODE + " pnpm"
 pnpm *args:
     {{PNPM}} {{args}}
 
+install *args:
+    {{PNPM}} -F "backend" install {{args}}
+
 back *args:
     {{PNPM}} -F "backend" {{args}}
 
@@ -14,4 +17,4 @@ shell:
     docker compose exec -it node bash
 
 nest *args:
-    {{NODE}} bash -c "cd apps/backend && nest {{args}}" 
+    {{NODE}} bash -c "cd apps/backend && nest {{args}}"
