@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -15,7 +16,6 @@ export class UserService {
   }
 
   async findOneByEmail(email: string) {
-    console.log(email);
     return this.prisma.user.findUnique({
       where: { email }
     });
@@ -28,11 +28,13 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
+    const confirmationToken = uuidv4();
 
     const user = await this.prisma.user.create({
       data: {
         ...createUserDto,
         password: hashedPassword,
+        confirmationToken,
       },
     });
 
@@ -50,6 +52,21 @@ export class UserService {
   async delete(id: string) {
     return this.prisma.user.delete({
       where: { id }
+    });
+  }
+
+  async confirmEmail(token: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { confirmationToken: token }
+    });
+    
+    if (!user) {
+      throw new Error('Invalid confirmation token');
+    }
+
+    return this.prisma.user.update({
+      where: { id: user.id },
+      data: { isActive: true, confirmationToken: null },
     });
   }
 }
