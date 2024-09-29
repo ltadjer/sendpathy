@@ -51,4 +51,17 @@ export class AuthService {
     // Sauvegarder les modifications
     await this.userService.update(user.id,  { isActive: true, confirmationToken: null });
   }
+
+  async requestPasswordReset(email: string) {
+    const resetToken = await this.userService.requestPasswordReset(email);
+    const emailSent = await this.mailerService.sendPasswordResetEmail(email, resetToken);
+    if (!emailSent) {
+      throw new Error('Failed to send password reset email');
+    }
+    return { message: 'Password reset email sent' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    return await this.userService.resetPassword(token, newPassword);
+  }
 }

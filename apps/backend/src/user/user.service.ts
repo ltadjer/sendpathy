@@ -61,4 +61,43 @@ export class UserService {
     });
   
   }
+
+  async findByResetPasswordToken(token: string) {
+    return await this.prisma.user.findFirst({
+      where: { resetPasswordToken: token }
+    });
+  }
+
+
+  async requestPasswordReset(email: string) {
+    const user = await this.findOneByEmail(email);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const resetPasswordToken = uuidv4();
+    await this.prisma.user.update({
+      where: { email },
+      data: { resetPasswordToken },
+    });
+
+    return resetPasswordToken;
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.findByResetPasswordToken(token);
+    if (!user) {
+      throw new Error('Invalid token');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword, resetPasswordToken: null },
+    });
+
+    return { message: 'Password reset successful' };
+  }
 }
