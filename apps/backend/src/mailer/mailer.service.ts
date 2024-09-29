@@ -34,7 +34,7 @@ export class MailerService {
     sendSmtpEmail.to = [{ email: email }];
     sendSmtpEmail.sender = { email: 'sendpathy@gmail.com', name: 'Sendpathy' };
     sendSmtpEmail.subject = 'Réinitialisation de votre mot de passe';
-    sendSmtpEmail.htmlContent = `<html><body><h1>Réinitialisation de votre mot de passe</h1><p>Veuillez réinitialiser votre mot de passe en cliquant sur le lien suivant: <a href="https://api.sendpathy.aaa/api/auth/reset-password?token=${token}">Réinitialiser</a></p></body></html>`;
+    sendSmtpEmail.htmlContent = `<html><body><h1>Réinitialisation de votre mot de passe</h1><p>Veuillez réinitialiser votre mot de passe en cliquant sur le lien suivant: <a href="https://sendpathy.aaa/reset-password?token=${token}">Réinitialiser</a></p></body></html>`;
 
     try {
       const response = await this.brevoClient.sendTransacEmail(sendSmtpEmail);
