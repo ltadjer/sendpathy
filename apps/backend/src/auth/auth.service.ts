@@ -42,6 +42,13 @@ export class AuthService {
   }
 
   async confirmEmail(token: string) {
-    return this.userService.confirmEmail(token);
+    // Récupérer l'utilisateur correspondant au token
+    const user = await this.userService.findByToken(token);
+    if (!user) {
+      throw new Error('Invalid token');
+    }
+
+    // Sauvegarder les modifications
+    await this.userService.update(user.id,  { isActive: true, confirmationToken: null });
   }
 }

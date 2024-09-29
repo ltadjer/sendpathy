@@ -10,7 +10,7 @@ class AuthService {
     }
   }
 
-  async login(user: ant) {
+  async login(user: any) {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, user);
       return response.data;

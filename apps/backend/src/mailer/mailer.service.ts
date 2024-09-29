@@ -17,7 +17,7 @@ export class MailerService {
     sendSmtpEmail.to = [{ email: email }];
     sendSmtpEmail.sender = { email: 'sendpathy@gmail.com', name: 'Sendpathy' };
     sendSmtpEmail.subject = 'Confirmation de votre inscription';
-    sendSmtpEmail.htmlContent = `<html><body><h1>Merci pour votre inscription!</h1><p>Veuillez confirmer votre adresse email en cliquant sur le lien suivant: <a href="https://sendpathy.aaa/api/confirm-email?token=${token}">Confirmer</a></p></body></html>`;
+    sendSmtpEmail.htmlContent = `<html><body><h1>Merci pour votre inscription!</h1><p>Veuillez confirmer votre adresse email en cliquant sur le lien suivant: <a href="https://api.sendpathy.aaa/api/auth/confirm-email?token=${token}">Confirmer</a></p></body></html>`;
 
     try {
       const response = await this.brevoClient.sendTransacEmail(sendSmtpEmail);

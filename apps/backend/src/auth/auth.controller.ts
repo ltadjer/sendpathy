@@ -20,12 +20,11 @@ export class AuthController {
   @Get('confirm-email')
   async confirmEmail(@Query('token') token: string, @Res() res: Response) {
     try {
+      console.log('token', token);
       await this.authService.confirmEmail(token);
-      //regiriger vers le login avec un message disant que l'email a été confirmé
-      res.redirect('https://sendpathy.aaa/api/login');
- 
+      return res.redirect('https://sendpathy.aaa/login?message=email_confirmed');
     } catch (error) {
-      return { message: 'Failed to confirm' };
+      return res.status(400).send({ message: 'Failed to confirm' });
     }
   }
 }

@@ -55,18 +55,10 @@ export class UserService {
     });
   }
 
-  async confirmEmail(token: string) {
-    const user = await this.prisma.user.findFirst({
+  async findByToken(token: string) {
+    return await this.prisma.user.findFirst({
       where: { confirmationToken: token }
     });
-    
-    if (!user) {
-      throw new Error('Invalid confirmation token');
-    }
-
-    return this.prisma.user.update({
-      where: { id: user.id },
-      data: { isActive: true, confirmationToken: null },
-    });
+  
   }
 }
