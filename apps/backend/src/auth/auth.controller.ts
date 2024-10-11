@@ -9,7 +9,7 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() req) {
-    return this.authService.login(req);
+    return this.authService.login(req.email, req.password);
   }
 
   @Post('register')
