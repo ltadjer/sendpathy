@@ -2,6 +2,8 @@ import {
   Injectable,
   ConflictException,
   UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -18,11 +20,17 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userService.findOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (!user.isActive) {
+      throw new UnauthorizedException('User not verified');
+    }
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
     }
-    return null;
+    throw new UnauthorizedException('Invalid credentials');
   }
 
   async login(email: string, password: string) {
@@ -36,19 +44,33 @@ export class AuthService {
     };
   }
 
+  validateRegistrationData(email: string, password: string) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    console.log(emailRegex.test(email));
+    if (!emailRegex.test(email)) {
+      throw new BadRequestException('Invalid email format');
+    }
+    if (password.length < 12) {
+      throw new BadRequestException('Password must be at least 12 characters long');
+    }
+    //TODO: Add more validation rules to the other fields 
+  }
+
   async register(email: string, password: string) {
+    this.validateRegistrationData(email, password);
     const user = await this.userService.findOneByEmail(email);
     if (user) {
       throw new ConflictException('User already exists');
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await this.userService.create({
       email: email,
-      password: password,
+      password: hashedPassword,
     });
     const emailSent = await this.mailerService.sendConfirmationEmail(
       email,
       newUser.confirmationToken,
-    ); // Envoyer l'email de confirmation
+    );
     if (!emailSent) {
       throw new Error('Failed to send confirmation email');
     }
