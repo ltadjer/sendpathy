@@ -9,22 +9,41 @@ import { v4 as uuidv4 } from 'uuid';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Trouve un utilisateur par son ID.
+   * @param id - L'ID de l'utilisateur.
+   * @returns L'utilisateur correspondant à l'ID.
+   */
   async findOne(id: string) {
     return this.prisma.user.findUnique({
       where: { id }
     });
   }
 
+  /**
+   * Trouve un utilisateur par son email.
+   * @param email - L'email de l'utilisateur.
+   * @returns L'utilisateur correspondant à l'email.
+   */
   async findOneByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email }
     });
   }
 
+  /**
+   * Trouve tous les utilisateurs.
+   * @returns Une liste de tous les utilisateurs.
+   */
   async findAll() {
     return this.prisma.user.findMany();
   }
 
+  /**
+   * Crée un nouvel utilisateur.
+   * @param createUserDto - Les données pour créer un nouvel utilisateur.
+   * @returns Les informations de l'utilisateur créé sans le mot de passe.
+   */
   async create(createUserDto: CreateUserDto) {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
@@ -42,6 +61,12 @@ export class UserService {
     return result;
   }
 
+  /**
+   * Met à jour un utilisateur.
+   * @param id - L'ID de l'utilisateur à mettre à jour.
+   * @param updateUserDto - Les nouvelles données de l'utilisateur.
+   * @returns Les informations de l'utilisateur mis à jour.
+   */
   async update(id: string, updateUserDto: UpdateUserDto) {
     return this.prisma.user.update({
       where: { id },
@@ -49,26 +74,45 @@ export class UserService {
     });
   }
 
+  /**
+   * Supprime un utilisateur.
+   * @param id - L'ID de l'utilisateur à supprimer.
+   * @returns Les informations de l'utilisateur supprimé.
+   */
   async delete(id: string) {
     return this.prisma.user.delete({
       where: { id }
     });
   }
 
+  /**
+   * Trouve un utilisateur par son token de confirmation.
+   * @param token - Le token de confirmation.
+   * @returns L'utilisateur correspondant au token de confirmation.
+   */
   async findByToken(token: string) {
     return await this.prisma.user.findFirst({
       where: { confirmationToken: token }
     });
-  
   }
 
+  /**
+   * Trouve un utilisateur par son token de réinitialisation de mot de passe.
+   * @param token - Le token de réinitialisation de mot de passe.
+   * @returns L'utilisateur correspondant au token de réinitialisation de mot de passe.
+   */
   async findByResetPasswordToken(token: string) {
     return await this.prisma.user.findFirst({
       where: { resetPasswordToken: token }
     });
   }
 
-
+  /**
+   * Demande une réinitialisation de mot de passe pour un utilisateur.
+   * @param email - L'email de l'utilisateur.
+   * @returns Le token de réinitialisation de mot de passe.
+   * @throws Error si l'utilisateur n'est pas trouvé.
+   */
   async requestPasswordReset(email: string) {
     const user = await this.findOneByEmail(email);
     if (!user) {
@@ -84,6 +128,13 @@ export class UserService {
     return resetPasswordToken;
   }
 
+  /**
+   * Réinitialise le mot de passe de l'utilisateur.
+   * @param token - Le token de réinitialisation de mot de passe.
+   * @param newPassword - Le nouveau mot de passe.
+   * @returns Un message indiquant que le mot de passe a été réinitialisé avec succès.
+   * @throws Error si le token est invalide.
+   */
   async resetPassword(token: string, newPassword: string) {
     const user = await this.findByResetPasswordToken(token);
     if (!user) {
@@ -99,5 +150,27 @@ export class UserService {
     });
 
     return { message: 'Password reset successful' };
+  }
+
+  /**
+   * Met à jour le refresh token de l'utilisateur.
+   * @param userId - L'ID de l'utilisateur.
+   * @param refreshToken - Le nouveau refresh token.
+   * @returns Les informations de l'utilisateur mis à jour.
+   */
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken },
+    });
+  }
+
+  /**
+   * Trouve un utilisateur par son refresh token.
+   * @param refreshToken - Le refresh token.
+   * @returns L'utilisateur correspondant au refresh token.
+   */
+  async findByRefreshToken(refreshToken: string) {
+    return this.prisma.user.findFirst({ where: { refreshToken } });
   }
 }

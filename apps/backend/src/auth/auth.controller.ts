@@ -37,4 +37,9 @@ export class AuthController {
   async resetPassword(@Body('token') token: string, @Body('newPassword') newPassword: string) {
     return this.authService.resetPassword(token, newPassword);
   }
+
+  @Post('refresh-token')
+  async refreshToken(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
+  }
 }

@@ -42,6 +42,8 @@ export default {
         };
         const response = await AuthService.login(user);
         console.log('Login successful:', response);
+        localStorage.setItem('access_token', response.access_token);
+        localStorage.setItem('refresh_token', response.refresh_token);
       } catch (error) {
         console.error('Login failed:', error);
       }
