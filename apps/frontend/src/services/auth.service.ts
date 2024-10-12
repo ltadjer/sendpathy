@@ -54,7 +54,7 @@ apiClient.interceptors.response.use(
         // Affiche une erreur si le rafraîchissement du token échoue
         console.error('Refresh token failed:', refreshError)
         // Redirige l'utilisateur vers la page de connexion
-        window.location.href = '/login'
+        window.location.href = '/connexion'
       }
     }
     // Rejette la promesse avec l'erreur si la réponse n'est pas une 401 ou si le rafraîchissement du token échoue

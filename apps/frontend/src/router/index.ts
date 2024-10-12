@@ -13,8 +13,8 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
-    { path: '/register', component: RegisterForm },
-    { path: '/login', component: LoginForm },
+    { path: '/inscription', component: RegisterForm },
+    { path: '/connexion', component: LoginForm },
     { path: '/request-password-reset', component: RequestPasswordResetForm },
   { path: '/reset-password', component: ResetPasswordForm },
 

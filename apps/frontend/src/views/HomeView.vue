@@ -3,10 +3,9 @@
 
 <template>
   <main>
-    <h1>Home</h1>
-    <p>Welcome to the Home page!</p>
+    <h1>Bienvenue</h1>
     <p>
-      <router-link to="/register">Register</router-link> or <router-link to="/login">Login</router-link>
+      <router-link to="/inscription">Inscription</router-link> ou <router-link to="/connexion">Connexion</router-link>
     </p>
 </main>
 </template>

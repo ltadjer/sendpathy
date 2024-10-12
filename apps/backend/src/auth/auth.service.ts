@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { MailerService } from 'src/mailer/mailer.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     private userService: UserService,
     private mailerService: MailerService,
   ) {}
- /**
+  /**
    * Valide les informations d'identification de l'utilisateur.
    * @param email - L'email de l'utilisateur.
    * @param password - Le mot de passe de l'utilisateur.
@@ -27,7 +28,6 @@ export class AuthService {
    */
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findOneByEmail(email);
-    console.log('user before', user)
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -38,7 +38,6 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    console.log(user);
     return user;
   }
   /**
@@ -58,7 +57,7 @@ export class AuthService {
       refresh_token: refreshToken,
     };
   }
-/**
+  /**
    * Rafraîchit le jeton d'accès en utilisant le refresh token.
    * @param token - Le refresh token.
    * @returns Un objet contenant le nouveau jeton d'accès.
@@ -66,18 +65,23 @@ export class AuthService {
    */
   async refreshToken(token: string) {
     try {
-      const payload = this.jwtService.verify(token, { secret: process.env.JWT_SECRET });
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET,
+      });
       const user = await this.userService.findByRefreshToken(token);
       if (!user) {
         throw new UnauthorizedException('Invalid refresh token');
       }
-      const newAccessToken = this.jwtService.sign({ email: payload.email, sub: payload.sub }, { expiresIn: '3600s' });
+      const newAccessToken = this.jwtService.sign(
+        { email: payload.email, sub: payload.sub },
+        { expiresIn: '3600s' },
+      );
       return { access_token: newAccessToken };
     } catch (e) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
-/**
+  /**
    * Valide les données d'enregistrement de l'utilisateur.
    * @param email - L'email de l'utilisateur.
    * @param password - Le mot de passe de l'utilisateur.
@@ -89,12 +93,23 @@ export class AuthService {
     if (!emailRegex.test(email)) {
       throw new BadRequestException('Invalid email format');
     }
+
     if (password.length < 12) {
-      throw new BadRequestException('Password must be at least 12 characters long');
+      throw new BadRequestException(
+        'Password must be at least 12 characters long',
+      );
     }
-    //TODO: Add more validation rules to the other fields 
+
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    if (!specialCharRegex.test(password)) {
+      throw new BadRequestException(
+        'Password must contain at least one special character',
+      );
+    }
+
+    //TODO: Add more validation rules to the other fields
   }
- /**
+  /**
    * Enregistre un nouvel utilisateur.
    * @param email - L'email de l'utilisateur.
    * @param password - Le mot de passe de l'utilisateur.
@@ -102,15 +117,23 @@ export class AuthService {
    * @throws ConflictException si l'utilisateur existe déjà.
    * @throws Error si l'envoi de l'email de confirmation échoue.
    */
-  async register(email: string, password: string) {
+  async register(data: any) {
+    console.log('data', data)
+    const { email, username, password, age, nativeLanguage} = data;
     this.validateRegistrationData(email, password);
     const user = await this.userService.findOneByEmail(email);
     if (user) {
       throw new ConflictException('User already exists');
     }
+    const slug = this.generateSlug(username);
+    console.log('slug', slug)
     const newUser = await this.userService.create({
-      email: email,
-      password: password,
+      email,
+      username,
+      password,
+      age,
+      nativeLanguage,
+      slug,
     });
     const emailSent = await this.mailerService.sendConfirmationEmail(
       email,
@@ -121,7 +144,7 @@ export class AuthService {
     }
     return { message: 'User created' };
   }
- /**
+  /**
    * Confirme l'email de l'utilisateur.
    * @param token - Le token de confirmation.
    * @throws Error si le token est invalide.
@@ -139,7 +162,7 @@ export class AuthService {
       confirmationToken: null,
     });
   }
-/**
+  /**
    * Demande une réinitialisation de mot de passe pour un utilisateur.
    * @param email - L'email de l'utilisateur.
    * @returns Un message indiquant que l'email de réinitialisation a été envoyé.
@@ -156,7 +179,7 @@ export class AuthService {
     }
     return { message: 'Password reset email sent' };
   }
-/**
+  /**
    * Réinitialise le mot de passe de l'utilisateur.
    * @param token - Le token de réinitialisation.
    * @param newPassword - Le nouveau mot de passe.
@@ -164,5 +187,15 @@ export class AuthService {
    */
   async resetPassword(token: string, newPassword: string) {
     return await this.userService.resetPassword(token, newPassword);
+  }
+
+  /**
+   * Génére un slug à partir de l'username
+   * @param username 
+   * @returns un slug
+   */ 
+
+  generateSlug(username: string): string {
+    return username.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }
 }

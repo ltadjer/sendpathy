@@ -4,14 +4,14 @@
     <div v-if="message" class="alert alert-success">{{ message }}</div>
     <form @submit.prevent="login">
       <div>
-        <label>Email:</label>
+        <label>Email :</label>
         <input type="email" v-model="email" required />
       </div>
       <div>
-        <label>Password:</label>
+        <label>Mot de passe :</label>
         <input type="password" v-model="password" required />
       </div>
-      <button type="submit">Login</button>
+      <button type="submit">Se connecter</button>
     </form>
   </div>
 </template>

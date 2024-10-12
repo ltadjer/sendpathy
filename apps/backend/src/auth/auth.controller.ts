@@ -14,7 +14,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() req) {
-    return this.authService.register(req.email, req.password);
+    return this.authService.register(req);
   }
 
   @Get('confirm-email')
@@ -22,7 +22,7 @@ export class AuthController {
     try {
       console.log('token', token);
       await this.authService.confirmEmail(token);
-      return res.redirect('https://sendpathy.aaa/login?message=email_confirmed');
+      return res.redirect('https://sendpathy.aaa/connexion?message=email_confirmed');
     } catch (error) {
       return res.status(400).send({ message: 'Failed to confirm' });
     }
