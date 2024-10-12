@@ -24,4 +24,17 @@ model User {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   deletedAt         DateTime? 
+  posts             Post[]   
+}
+
+model Post {
+  d                String   @id @default(cuid())
+  content           String
+  userId            String
+  originalLanguage  String
+  slug              String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  deletedAt         DateTime?
+  user              User     @relation(fields: [userId], references: [id])
 }
