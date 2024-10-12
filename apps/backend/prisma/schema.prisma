@@ -28,7 +28,7 @@ model User {
 }
 
 model Post {
-  d                String   @id @default(cuid())
+  id                String   @id @default(cuid())
   content           String
   userId            String
   originalLanguage  String
@@ -36,5 +36,5 @@ model Post {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   deletedAt         DateTime?
-  user              User     @relation(fields: [userId], references: [id])
+  user              User?     @relation(fields: [userId], references: [id])
 }
