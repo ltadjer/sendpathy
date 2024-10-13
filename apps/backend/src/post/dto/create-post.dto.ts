@@ -1,18 +1,18 @@
 import { IsString, IsNotEmpty, IsNumber, IsOptional, IsJSON, IsDateString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePostDto {
+    @ApiProperty({ description: 'Content of the post' })
     @IsString()
     @IsNotEmpty()
     content: string;
 
-    @IsOptional()
-    @IsJSON()
-    translatedContent?: object;
-
+    @ApiProperty({ description: 'Original language of the post' })
     @IsString()
     @IsNotEmpty()
     originalLanguage: string;
 
+    @ApiProperty({ description: 'Slug for the post' })
     @IsString()
     @IsNotEmpty()
     slug: string;
