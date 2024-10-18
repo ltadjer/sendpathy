@@ -12,7 +12,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * Validates the JWT payload and returns the user information.
+   * @param payload - The JWT payload.
+   */
   async validate(payload: any) {
-    return { userId: payload.sub, email: payload.email };
+    return { id: payload.id, email: payload.email };
   }
 }

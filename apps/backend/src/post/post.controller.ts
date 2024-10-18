@@ -32,7 +32,7 @@ export class PostController {
   @ApiResponse({ status: 201, description: 'The post has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async create(@Body() createPostDto: CreatePostDto, @User() user: any) {
-    return this.postService.create(createPostDto, user.userId);
+    return this.postService.create(createPostDto, user.id);
   }
 
   @UseGuards(JwtAuthGuard)

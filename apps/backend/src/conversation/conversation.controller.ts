@@ -18,13 +18,13 @@ export class ConversationController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@User() user: any) {
-        return this.conversationService.findAll(user.userId);
+        return this.conversationService.findAll(user.id);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get(':id')
     async findOne(@Param('id') id: string, @User() user: any) {
-        return this.conversationService.findOne(id, user.userId);
+        return this.conversationService.findOne(id, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -34,12 +34,12 @@ export class ConversationController {
         @Body() updateConversationDto: UpdateConversationDto,
         @User() user: any
     ) {
-        return this.conversationService.update(id, updateConversationDto, user.userId);
+        return this.conversationService.update(id, updateConversationDto, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
     @Delete(':id')
     async delete(@Param('id') id: string, @User() user: any) {
-        return this.conversationService.delete(id, user.userId);
+        return this.conversationService.delete(id, user.id);
     }
 }

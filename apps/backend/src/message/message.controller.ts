@@ -32,7 +32,8 @@ export class MessageController {
     @ApiResponse({ status: 201, description: 'The message has been successfully created.' })
     @ApiResponse({ status: 400, description: 'Bad request.' })
     async create(@Body() createMessageDto: CreateMessageDto, @User() user: any) {
-        return this.messageService.create(createMessageDto, user.userId);
+        console.log('user', user);
+        return this.messageService.create(createMessageDto, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -45,7 +46,7 @@ export class MessageController {
         @Body() updateMessageDto: UpdateMessageDto,
         @User() user: any
     ){
-        return this.messageService.update(id, updateMessageDto, user.userId);
+        return this.messageService.update(id, updateMessageDto, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -60,6 +61,6 @@ export class MessageController {
     @UseGuards(JwtAuthGuard)
     @Delete(':id/user')
     async deleteForUser(@Param('id') id: string, @User() user: any) {
-        return this.messageService.deleteForUser(id, user.userId);
+        return this.messageService.deleteForUser(id, user.id);
     }
 }

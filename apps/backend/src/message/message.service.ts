@@ -48,7 +48,7 @@ export class MessageService {
             throw new ForbiddenException('No friendship exists between these users.');
         }
 
-        const message =  await this.prisma.message.create({
+        const message = await this.prisma.message.create({
             data: {
                 ...createMessageDto,
                 senderId: senderId,

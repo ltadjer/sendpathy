@@ -1,17 +1,20 @@
-import { Controller, Post, Body, UseGuards, Get, Query, Res } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Response } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiProperty } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refreshToken.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  /**
+   * Logs in a user and returns JWT tokens.
+   * @param req - The login request data.
+   */
   @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
@@ -21,6 +24,10 @@ export class AuthController {
     return this.authService.login(req.email, req.password);
   }
 
+  /**
+   * Registers a new user.
+   * @param createUserDto - The data transfer object containing user details.
+   */
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully.' })
@@ -31,6 +38,11 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
+  /**
+   * Confirms a user's email.
+   * @param token - The email confirmation token.
+   * @param res - The response object.
+   */
   @Get('confirm-email')
   @ApiOperation({ summary: 'Confirm user email' })
   @ApiResponse({ status: 200, description: 'Email confirmed successfully.' })
@@ -45,6 +57,10 @@ export class AuthController {
     }
   }
 
+  /**
+   * Requests a password reset for a user.
+   * @param email - The email of the user.
+   */
   @Post('request-password-reset')
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Password reset email sent.' })
@@ -54,6 +70,11 @@ export class AuthController {
     return this.authService.requestPasswordReset(email);
   }
 
+  /**
+   * Resets a user's password.
+   * @param token - The password reset token.
+   * @param newPassword - The new password.
+   */
   @Post('reset-password')
   @ApiOperation({ summary: 'Reset user password' })
   @ApiResponse({ status: 200, description: 'Password reset successfully.' })
@@ -63,6 +84,10 @@ export class AuthController {
     return this.authService.resetPassword(token, newPassword);
   }
 
+  /**
+   * Refreshes the JWT token using a refresh token.
+   * @param refreshTokenDto - The data transfer object containing the refresh token.
+   */
   @Post('refresh-token')
   @ApiOperation({ summary: 'Refresh JWT token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully.' })
