@@ -16,6 +16,16 @@
     "ncu": "ncu -iu"
   },
   "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/camera": "^6.1.0",
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/geolocation": "^6.0.1",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/push-notifications": "^6.0.2",
+    "@ionic/cli": "^7.2.0",
+    "@ionic/core": "^8.3.3",
+    "@ionic/vue": "^8.3.3",
     "axios": "^1.7.7",
     "pinia": "^2.2.4",
     "socket.io-client": "^4.8.1",

@@ -1,0 +1,8 @@
+{
+  "name": "SendPathy",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue",
+  "id": ""
+}

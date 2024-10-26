@@ -1,16 +1,25 @@
 <template>
-  <div>
-    <ul>
-      <li v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation)">
-        {{ conversation.name }}
-      </li>
-    </ul>
-  </div>
+  <ion-page>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Conversations</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item v-for="conversation in conversations" :key="conversation.id" @click="selectConversation(conversation)">
+          {{ conversation.name }}
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-page>
 </template>
 
 <script lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem } from '@ionic/vue';
+
 import conversationService from '@/services/conversation.service';
 
 export default {
@@ -19,6 +28,15 @@ export default {
     return {
       conversations: [],
     };
+  },
+  components: {
+    IonPage,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonItem
   },
   methods: {
     /**
