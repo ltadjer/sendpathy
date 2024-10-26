@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SendPathy</string>
+    <string name="title_activity_main">SendPathy</string>
+    <string name="package_name">fr.sendpathy.app</string>
+    <string name="custom_url_scheme">fr.sendpathy.app</string>
+</resources>
