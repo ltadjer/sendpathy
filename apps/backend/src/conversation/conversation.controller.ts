@@ -4,10 +4,13 @@ import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/user/decorators/user.decorator';
+import {MessageService} from "../message/message.service";
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('conversations')
 @Controller('conversations')
 export class ConversationController {
-    constructor(private readonly conversationService: ConversationService) {}
+    constructor(private readonly conversationService: ConversationService, private readonly messageService: MessageService) {}
 
     @UseGuards(JwtAuthGuard)
     @Post()
@@ -21,10 +24,13 @@ export class ConversationController {
         return this.conversationService.findAll(user.id);
     }
 
+
     @UseGuards(JwtAuthGuard)
-    @Get(':id')
-    async findOne(@Param('id') id: string, @User() user: any) {
-        return this.conversationService.findOne(id, user.id);
+    @Get(':id/messages')
+    @ApiResponse({ status: 200, description: 'Return messages for the conversation.' })
+    @ApiResponse({ status: 404, description: 'Conversation not found.' })
+    async findMessagesByConversation(@Param('id') id: string) {
+        return this.messageService.findByConversation(id);
     }
 
     @UseGuards(JwtAuthGuard)

@@ -6,26 +6,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import WebSocketService from '@/services/websocket.service';
 
 export default defineComponent({
   name: 'MessageForm',
-  setup() {
-    const messageContent = ref('');
-
-    const sendMessage = () => {
+  data() {
+    return {
+      messageContent: ''
+    };
+  },
+  emits: ['newMessage'],
+  methods: {
+    /**
+     * Send a new message via WebSocket.
+     */
+    sendMessage() {
       const message = {
-        content: messageContent.value,
+        content: this.messageContent,
         receiverId: 'cm2dcwo180001kv4ocppo62ws', // Replace with actual receiver ID
         senderName: "titis",
         conversationId: "cm2eic9ot0000vl8hvcu2t76a"
       };
       WebSocketService.emit('message', message);
-      messageContent.value = '';
-    };
-
-    return { messageContent, sendMessage };
+      this.messageContent = '';
+      this.$emit('newMessage', message);
+    }
   }
 });
 </script>

@@ -19,6 +19,13 @@ export class MessageService {
         return this.prisma.message.findMany();
     }
 
+    async findByConversation(conversationId: string) {
+        return this.prisma.message.findMany({
+            where: { conversationId: conversationId },
+            orderBy: { createdAt: 'asc' },
+        });
+    }
+
     async create(createMessageDto: CreateMessageDto, senderId: string) {
         // Check if a conversation exists between the users
         console.log('senderId', senderId);

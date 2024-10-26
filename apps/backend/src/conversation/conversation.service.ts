@@ -57,26 +57,39 @@ export class ConversationService {
 
 
     async findAll(userId: string) {
-        return this.prisma.conversation.findMany({
+        const conversations = await this.prisma.conversation.findMany({
             where: {
                 users: {
                     some: { id: userId },
                 },
             },
+            include: { users: true, messages: { orderBy: { createdAt: 'desc' }, take: 1 } },
+        });
+
+        return conversations.map(conversation => {
+            const receiver = conversation.users.find(user => user.id !== userId);
+            return {
+                ...conversation,
+                name: receiver ? receiver.username : 'Unknown',
+            };
         });
     }
 
     async findOne(id: string, userId: string) {
         const conversation = await this.prisma.conversation.findUnique({
             where: { id },
-            include: { users: true },
+            include: { users: true, messages: true },
         });
 
         if (!conversation || !conversation.users.some(user => user.id === userId)) {
             throw new NotFoundException('Conversation not found or you are not a participant.');
         }
 
-        return conversation;
+        const receiver = conversation.users.find(user => user.id !== userId);
+        return {
+            ...conversation,
+            name: receiver ? receiver.username : 'Unknown',
+        };
     }
 
     async update(id: string, updateConversationDto: UpdateConversationDto, userId: string) {
