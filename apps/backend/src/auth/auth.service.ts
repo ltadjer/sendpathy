@@ -9,7 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { MailerService } from 'src/mailer/mailer.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -48,7 +47,7 @@ export class AuthService {
    */
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
-    const payload = { email: user.email, sub: user.id };
+    const payload = { email: user.email, id: user.id };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '3600s' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     await this.userService.updateRefreshToken(user.id, refreshToken);

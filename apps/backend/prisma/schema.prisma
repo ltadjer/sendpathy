@@ -8,20 +8,101 @@ datasource db {
 }
 
 model User {
-  id                String   @id @default(cuid())
-  email             String   @unique
-  username          String?
-  password          String
-  age               Int?
-  nativeLanguage    String?
-  avatar            String?
-  biography         String?
-  slug              String?
-  confirmationToken String?
+  id                 String         @id @default(cuid())
+  email              String         @unique
+  username           String?
+  password           String
+  age                Int?
+  nativeLanguage     String?
+  avatar             String?
+  biography          String?
+  slug               String?
+  confirmationToken  String?
   resetPasswordToken String?
-  refreshToken String?
-  isActive          Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  deletedAt         DateTime? 
+  refreshToken       String?
+  isActive           Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  deletedAt          DateTime?
+  posts              Post[]
+  conversations      Conversation[] @relation("ConversationUsers")
+  // Relation for messages sent by the user
+  sentMessages       Message[]      @relation("SentMessages")
+  // Relation for messages received by the user
+  receivedMessages   Message[]      @relation("ReceivedMessages")
+
+  // Relation to the friendships the user has sent
+  friendshipsSent     Friendship[] @relation("friendshipsSent")
+  // Relation to the friendships the user has received
+  friendshipsReceived Friendship[] @relation("friendshipsReceived")
+}
+
+model Post {
+  id               String    @id @default(cuid())
+  content          String
+  userId           String
+  originalLanguage String
+  slug             String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+  // Relation to the user who created the post
+  user             User?     @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id         String    @id @default(cuid())
+  senderId   String
+  receiverId String
+  senderName String
+  content    String
+  read       Boolean?  @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  deletedBy  String?
+
+  // Relation to the conversation the message belongs to
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String
+  // Relation to the user who sent the message
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
+  // Relation to the user who received the message
+  receiver       User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+enum ConversationType {
+  PRIVATE
+  GROUP
+}
+
+model Conversation {
+  id               String           @id @default(cuid())
+  users            User[]           @relation("ConversationUsers")
+  conversationType ConversationType @default(PRIVATE)
+  messages         Message[] // A conversation contains multiple messages
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requester   User             @relation("friendshipsSent", fields: [requesterId], references: [id])
+  requesterId String
+  receiver    User             @relation("friendshipsReceived", fields: [receiverId], references: [id])
+  receiverId  String
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
+  startedAt   DateTime?
+  status      FriendshipStatus @default(PENDING)
+
+  @@unique([requesterId, receiverId]) // Assure qu'il n'y ait qu'une seule relation d'amitié entre deux utilisateurs
 }
