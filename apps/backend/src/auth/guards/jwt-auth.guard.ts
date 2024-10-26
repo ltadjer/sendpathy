@@ -1,6 +1,6 @@
 import { Injectable, ExecutionContext, CanActivate, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { CustomSocket } from 'src/events/types/custom-socket';
+import { CustomSocket } from '../../message/dto/custom-socket';
 import { verify } from 'jsonwebtoken';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class JwtAuthGuard implements CanActivate {
      */
     private validateWsRequest(context: ExecutionContext): boolean {
         const client: CustomSocket = context.switchToWs().getClient();
-        const token = this.extractTokenFromHeader(client.handshake.headers.authorization);
+        const token = client.handshake.auth.token;
         if (!token) {
             throw new UnauthorizedException('Token not found');
         }

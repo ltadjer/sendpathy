@@ -2,12 +2,12 @@ import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/commo
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
-import { EventsGateway } from 'src/events/events.gateway';
+import { MessageGateway } from './message.gateway';
 
 
 @Injectable()
 export class MessageService {
-    constructor(private prisma: PrismaService, private eventGateway: EventsGateway) {}
+    constructor(private prisma: PrismaService, private messageGateway: MessageGateway) {}
 
     async findOne(id: string) {
         return this.prisma.message.findUnique({
@@ -21,6 +21,7 @@ export class MessageService {
 
     async create(createMessageDto: CreateMessageDto, senderId: string) {
         // Check if a conversation exists between the users
+        console.log('senderId', senderId);
         const conversation = await this.prisma.conversation.findFirst({
             where: {
                 AND: [
@@ -55,7 +56,7 @@ export class MessageService {
                 conversationId: conversation.id, // Link the message to the conversation
             },
         });
-        this.eventGateway.sendMessage(message);
+        this.messageGateway.sendMessage(message);
         return message;
     }
 

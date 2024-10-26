@@ -6,13 +6,12 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PostModule } from './post/post.module';
-import { EventsModule } from './events/events.module';
 import { MessageModule } from './message/message.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { FriendshipModule } from './friendship/friendship.module';
 
 @Module({
-  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, EventsModule, MessageModule, ConversationModule, FriendshipModule],
+  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, MessageModule, ConversationModule, FriendshipModule],
   controllers: [AppController],
   providers: [AppService],
 })

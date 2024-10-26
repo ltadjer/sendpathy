@@ -4,6 +4,8 @@ import RegisterForm from '../components/RegisterForm.vue'
 import LoginForm from '../components/LoginForm.vue'
 import RequestPasswordResetForm from '../components/RequestResetPasswordForm.vue'
 import ResetPasswordForm from '../components/ResetPasswordForm.vue'
+import MessageView from "@/views/MessageView.vue";
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,6 +19,7 @@ const router = createRouter({
     { path: '/connexion', component: LoginForm },
     { path: '/request-password-reset', component: RequestPasswordResetForm },
   { path: '/reset-password', component: ResetPasswordForm },
+    {path: '/messages', component: MessageView},
 
   ]
 })
