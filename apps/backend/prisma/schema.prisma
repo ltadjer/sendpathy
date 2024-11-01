@@ -35,6 +35,8 @@ model User {
   friendshipsSent     Friendship[] @relation("friendshipsSent")
   // Relation to the friendships the user has received
   friendshipsReceived Friendship[] @relation("friendshipsReceived")
+  likes               Like[] // Relation to the likes made by the user
+  comments            Comment[] // Relation to the comments made by the user
 }
 
 model Post {
@@ -42,6 +44,7 @@ model Post {
   content          String
   userId           String
   originalLanguage String
+  emotion          String
   slug             String
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
@@ -49,6 +52,45 @@ model Post {
   // Relation to the user who created the post
   user             User?     @relation(fields: [userId], references: [id])
   comments         Comment[] // A post contains multiple comments
+  tags             tag[]     @relation("PostTags")
+  triggers         trigger[] @relation("PostTriggers")
+  likes            Like[] // A post can have multiple likes
+}
+
+model tag {
+  id        String    @id @default(cuid())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  deletedAt DateTime?
+  // Relation to the posts that have this tag
+  posts     Post[]    @relation("PostTags")
+}
+
+model trigger {
+  id        String    @id @default(cuid())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  deletedAt DateTime?
+  // Relation to the posts that have this trigger
+  posts     Post[]    @relation("PostTriggers")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String?
+  commentId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relation to the user who liked the post or comment
+  user    User     @relation(fields: [userId], references: [id])
+  // Relation to the post that was liked
+  post    Post?    @relation(fields: [postId], references: [id])
+  // Relation to the comment that was liked
+  comment Comment? @relation(fields: [commentId], references: [id])
 }
 
 model Comment {
@@ -68,6 +110,7 @@ model Comment {
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
   // Self-referential relation to the replies
   replies   Comment[] @relation("CommentReplies")
+  likes     Like[] // A comment can have multiple likes
 }
 
 model Message {
