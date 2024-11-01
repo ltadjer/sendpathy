@@ -16,4 +16,9 @@ export class CreatePostDto {
     @IsString()
     @IsNotEmpty()
     slug: string;
+
+    @ApiProperty({ description: 'Emotion of the post' })
+    @IsString()
+    @IsNotEmpty()
+    emotion: string;
 }

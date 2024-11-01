@@ -26,31 +26,38 @@ export class CommentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post()
+  @Post(':postId')
   @ApiResponse({ status: 201, description: 'The comment has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
-  async create(@Body() createCommentDto: any, @User() user: any) {
-    return this.commentService.create(createCommentDto, user.id);
+  async addCommentToPost(@Param('postId') postId: string, @Body() createCommentDto: any, @User() user: any) {
+    return this.commentService.addCommentToPost(postId, createCommentDto, user.id);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update a comment by ID' })
-  @ApiResponse({ status: 200, description: 'The comment has been successfully updated.' })
-  @ApiResponse({ status: 404, description: 'Comment not found.' })
-  async update(
-    @Param('id') id: string,
-    @Body() updateCommentDto: any,
-  ){
-    return this.commentService.update(id, updateCommentDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Delete(':postId/:commentId')
   @ApiOperation({ summary: 'Delete a comment by ID' })
   @ApiResponse({ status: 200, description: 'The comment has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Comment not found.' })
-  async delete(@Param('id') id: string) {
-    return this.commentService.delete(id);
+  async removeCommentFromPost(@Param('postId') postId: string, @Param('commentId') commentId: string) {
+    return this.commentService.removeCommentFromPost(postId, commentId);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':parentCommentId/replies')
+  @ApiResponse({ status: 201, description: 'The comment has been successfully created.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  async addCommentToComment(@Param('parentCommentId') parentCommentId: string, @Body() createCommentDto: any, @User() user: any) {
+    return this.commentService.addCommentToComment(parentCommentId, createCommentDto, user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':parentCommentId/replies/:commentId')
+  @ApiOperation({ summary: 'Delete a comment by ID' })
+  @ApiResponse({ status: 200, description: 'The comment has been successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Comment not found.' })
+  async removeCommentFromComment(@Param('parentCommentId') parentCommentId: string, @Param('commentId') commentId: string) {
+    return this.commentService.removeCommentFromComment(parentCommentId, commentId);
+  }
+
+
 }

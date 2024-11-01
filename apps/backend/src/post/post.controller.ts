@@ -55,5 +55,41 @@ export class PostController {
   async delete(@Param('id') id: string) {
     return this.postService.delete(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':postId/tags/:tagId')
+  @ApiOperation({ summary: 'Add a tag to a post' })
+  @ApiResponse({ status: 200, description: 'The tag has been successfully added to the post.' })
+  @ApiResponse({ status: 404, description: 'Post or tag not found.' })
+  async addTagToPost(@Param('postId') postId: string, @Param('tagId') tagId: string) {
+    return this.postService.addTagToPost(postId, tagId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':postId/tags/:tagId')
+  @ApiOperation({ summary: 'Remove a tag from a post' })
+  @ApiResponse({ status: 200, description: 'The tag has been successfully removed from the post.' })
+  @ApiResponse({ status: 404, description: 'Post or tag not found.' })
+  async removeTagFromPost(@Param('postId') postId: string, @Param('tagId') tagId: string) {
+    return this.postService.removeTagFromPost(postId, tagId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':postId/triggers/:triggerId')
+  @ApiOperation({ summary: 'Add a trigger to a post' })
+  @ApiResponse({ status: 200, description: 'The trigger has been successfully added to the post.' })
+  @ApiResponse({ status: 404, description: 'Post or trigger not found.' })
+  async addTriggerToPost(@Param('postId') postId: string, @Param('triggerId') triggerId: string) {
+    return this.postService.addTriggerToPost(postId, triggerId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':postId/triggers/:triggerId')
+  @ApiOperation({ summary: 'Remove a trigger from a post' })
+  @ApiResponse({ status: 200, description: 'The trigger has been successfully removed from the post.' })
+  @ApiResponse({ status: 404, description: 'Post or trigger not found.' })
+  async removeTriggerFromPost(@Param('postId') postId: string, @Param('triggerId') triggerId: string) {
+    return this.postService.removeTriggerFromPost(postId, triggerId);
+  }
   
 }
