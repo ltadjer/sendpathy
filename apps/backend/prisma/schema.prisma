@@ -48,6 +48,26 @@ model Post {
   deletedAt        DateTime?
   // Relation to the user who created the post
   user             User?     @relation(fields: [userId], references: [id])
+  comments         Comment[] // A post contains multiple comments
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  content   String
+  postId    String
+  userId    String
+  parentId  String? // Optional field to reference the parent comment
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now())
+  deletedAt DateTime?
+  // Relation to the post the comment belongs to
+  post      Post      @relation(fields: [postId], references: [id])
+  // Relation to the user who created the comment
+  user      User      @relation(fields: [userId], references: [id])
+  // Self-referential relation to the parent comment
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  // Self-referential relation to the replies
+  replies   Comment[] @relation("CommentReplies")
 }
 
 model Message {
