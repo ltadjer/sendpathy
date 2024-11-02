@@ -18,6 +18,9 @@ export class PostService {
     }
 
     async create(createPostDto: CreatePostDto, userId: string) {
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
         return await this.prisma.post.create({
             data: {
                 ...createPostDto,
@@ -35,10 +38,10 @@ export class PostService {
     
 
     async delete(id: string) {
-         this.prisma.post.delete({
+         await this.prisma.post.delete({
             where: { id: id }
          });
-            return { message: 'Post deleted' };
+         return { message: 'Post deleted' };
     }
 
     async addTagToPost(postId: string, tagId: string) {
@@ -53,7 +56,7 @@ export class PostService {
     }
 
     async removeTagFromPost(postId: string, tagId: string) {
-        return this.prisma.post.update({
+        await this.prisma.post.update({
             where: { id: postId },
             data: {
                 tags: {
@@ -61,6 +64,7 @@ export class PostService {
                 }
             }
         });
+        return { message: 'Tag removed from post' };
     }
 
     async addTriggerToPost(postId: string, triggerId: string) {
@@ -75,7 +79,7 @@ export class PostService {
     }
 
     async removeTriggerFromPost(postId: string, triggerId: string) {
-        return this.prisma.post.update({
+        await this.prisma.post.update({
             where: { id: postId },
             data: {
                 triggers: {
@@ -83,5 +87,8 @@ export class PostService {
                 }
             }
         });
+        return { message: 'Trigger removed from post' };
     }
+
+
 }

@@ -30,7 +30,7 @@ export class TriggerService {
   }
 
   async delete(id: string) {
-    this.prisma.trigger.delete({
+    await this.prisma.trigger.delete({
       where: { id: id }
     });
     return { message: 'Trigger deleted' };

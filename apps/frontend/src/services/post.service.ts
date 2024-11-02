@@ -1,4 +1,6 @@
 import api from './api.service';
+import { Emojis } from '@/enums/emojis.enum';
+
 
 export default {
   /**
@@ -95,7 +97,9 @@ export default {
   async removeTriggerFromPost(postId, triggerId) {
     const response = await api.delete(`/posts/${postId}/triggers/${triggerId}`);
     return response.data;
+  },
+
+  async getEmojis() {
+    return Object.values(Emojis);
   }
-
-
 }

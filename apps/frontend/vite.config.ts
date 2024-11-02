@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-
+import json from '@rollup/plugin-json'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import VueDevTools from 'vite-plugin-vue-devtools'
@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VueDevTools(),
+    json(),
   ],
   resolve: {
     alias: {
@@ -19,3 +20,4 @@ export default defineConfig({
     host: true
   }
 })
+

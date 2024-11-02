@@ -25,12 +25,13 @@ export class LikeService {
   }
 
   async unlikePost(postId: string, userId: string) {
-    return this.prisma.like.deleteMany({
+    await this.prisma.like.deleteMany({
       where: {
         postId: postId,
         userId: userId,
       },
     });
+    return { message: 'Post unliked' };
   }
 
   async countPostLikes(postId: string) {
@@ -51,12 +52,13 @@ export class LikeService {
   }
 
   async unlikeComment(commentId: string, userId: string) {
-    return this.prisma.like.deleteMany({
+    await this.prisma.like.deleteMany({
       where: {
         commentId: commentId,
         userId: userId,
       },
     });
+    return { message: 'Comment unliked' };
   }
 
   async countCommentLikes(commentId: string) {

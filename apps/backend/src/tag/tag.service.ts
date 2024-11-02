@@ -30,7 +30,7 @@ export class TagService {
   }
 
   async delete(id: string) {
-    this.prisma.tag.delete({
+    await this.prisma.tag.delete({
       where: { id: id }
     });
     return { message: 'Tag deleted' };

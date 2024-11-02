@@ -46,6 +46,7 @@ export class ConversationController {
     @UseGuards(JwtAuthGuard)
     @Delete(':id')
     async delete(@Param('id') id: string, @User() user: any) {
-        return this.conversationService.delete(id, user.id);
+        await this.conversationService.delete(id, user.id);
+        return {message: "Conversation deleted"};
     }
 }

@@ -80,9 +80,10 @@ export class UserService {
    * @returns Les informations de l'utilisateur supprimé.
    */
   async delete(id: string) {
-    return this.prisma.user.delete({
+    await this.prisma.user.delete({
       where: { id }
     });
+    return {message: "Conversation deleted"};
   }
 
   /**

@@ -1,32 +1,33 @@
 <template>
-  <ion-card>
+  <ion-card class="neumorphic-card">
     <ion-card-header>
       <ion-card-title>{{ post ? 'Edit Post' : 'New Post' }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-item>
+      <ion-item class="neumorphic-item">
         <ion-label position="floating">Content</ion-label>
         <ion-textarea v-model="content" placeholder="What's on your mind?"></ion-textarea>
       </ion-item>
-      <ion-item>
-        <ion-label position="floating">Emotion</ion-label>
-        <ion-input v-model="emotion" placeholder="Emotion"></ion-input>
-      </ion-item>
-      <ion-button expand="full" @click="openSettingsModal">
-        <ion-icon name="settings-outline"></ion-icon>
+        <ion-button @click="openEmojiModal" class="neumorphic-button">
+          <ion-icon :icon="happyOutline"></ion-icon>
+        </ion-button>
+      <ion-button @click="openSettingsModal" class="neumorphic-button">
+        <ion-icon :icon="settingsOutline"></ion-icon>
       </ion-button>
-      <ion-button expand="full" @click="submitPost">{{ post ? 'Update' : 'Post' }}</ion-button>
-
+      <ion-button expand="full" @click="submitPost" class="neumorphic-button">{{ post ? 'Update' : 'Post' }}</ion-button>
     </ion-card-content>
   </ion-card>
   <post-settings-modal v-if="isSettingsModalOpen" @close="closeSettingsModal" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers" :selectedTags="selectedTags" :selectedTriggers="selectedTriggers"></post-settings-modal>
+  <post-emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></post-emotions-modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon } from '@ionic/vue';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow } from '@ionic/vue';
 import postService from '@/services/post.service';
 import PostSettingsModal from '@/components/Feed/PostSettingsModal.vue';
+import PostEmotionsModal from '@/components/Feed/PostEmotionsModal.vue';
+import { happyOutline, settingsOutline } from 'ionicons/icons';
 
 export default defineComponent({
   name: 'PostForm',
@@ -41,10 +42,17 @@ export default defineComponent({
     IonInput,
     IonButton,
     IonIcon,
-    PostSettingsModal
+    IonGrid,
+    IonCol,
+    IonRow,
+    PostSettingsModal,
+    PostEmotionsModal
   },
   props: {
     post: Object
+  },
+  setup() {
+    return { happyOutline, settingsOutline };
   },
   emits: ['post-updated'],
   data() {
@@ -53,6 +61,7 @@ export default defineComponent({
       originalLanguage: 'en',
       emotion: '',
       isSettingsModalOpen: false,
+      isEmojiModalOpen: false,
       selectedTags: [],
       selectedTriggers: []
     };
@@ -117,7 +126,35 @@ export default defineComponent({
     },
     updateSelectedTriggers(triggers) {
       this.selectedTriggers = triggers;
+    },
+    updateEmotion(emoji) {
+      console.log('emoji:', emoji);
+      this.emotion = emoji;
+    },
+    openEmojiModal() {
+      this.isEmojiModalOpen = true;
     }
   },
 });
 </script>
+<style scoped>
+.neumorphic-card {
+  border-radius: 20px;
+  background: #e0e0e0;
+  box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+}
+
+.neumorphic-item {
+  border-radius: 10px;
+  background: #e0e0e0;
+  box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
+  margin-bottom: 20px;
+}
+
+.neumorphic-button {
+  border-radius: 10px;
+  background: #e0e0e0;
+  box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+  margin: 10px 0;
+}
+</style>
