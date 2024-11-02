@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Message" ALTER COLUMN "read" DROP NOT NULL,
-ALTER COLUMN "read" SET DEFAULT false;

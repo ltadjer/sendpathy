@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsNumber, IsOptional, IsJSON, IsDateString } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePostDto {
@@ -16,4 +16,9 @@ export class CreatePostDto {
     @IsString()
     @IsNotEmpty()
     slug: string;
+
+    @ApiProperty({ description: 'Emotion of the post' })
+    @IsString()
+    @IsNotEmpty()
+    emotion: string;
 }

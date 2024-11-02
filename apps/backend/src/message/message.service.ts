@@ -91,7 +91,7 @@ export class MessageService {
     }
 
     async delete(id: string) {
-        this.prisma.message.delete({
+        await this.prisma.message.delete({
             where: { id: id }
         });
         return { message: 'Message deleted successfully' };

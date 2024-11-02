@@ -31,8 +31,8 @@ export default {
     /**
      * Fetch messages for the selected conversation.
      */
-    async fetchMessages() {
-      const response = await conversationService.fetchMessages(this.conversationId);
+    async fetchAllMessages() {
+      const response = await conversationService.fetchAllMessages(this.conversationId);
       this.messages = response;
     },
     /**
@@ -46,7 +46,7 @@ export default {
   },
   mounted() {
     // Fetch existing messages when the component is mounted
-    this.fetchMessages();
+    this.fetchAllMessages();
 
     // Listen for new messages via WebSocket
     const handleNewMessage = (message) => {

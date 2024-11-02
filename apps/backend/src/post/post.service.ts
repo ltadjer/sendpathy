@@ -18,13 +18,15 @@ export class PostService {
     }
 
     async create(createPostDto: CreatePostDto, userId: string) {
-        const post = await this.prisma.post.create({
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+        return await this.prisma.post.create({
             data: {
                 ...createPostDto,
                 user: { connect: { id: userId } },
             },
         });
-        return post;
     }
 
     async update(id: string, updatePostDto: UpdatePostDto) {
@@ -36,8 +38,57 @@ export class PostService {
     
 
     async delete(id: string) {
-        return this.prisma.post.delete({
+         await this.prisma.post.delete({
             where: { id: id }
-          });
+         });
+         return { message: 'Post deleted' };
     }
+
+    async addTagToPost(postId: string, tagId: string) {
+        return this.prisma.post.update({
+            where: { id: postId },
+            data: {
+                tags: {
+                    connect: { id: tagId }
+                }
+            }
+        });
+    }
+
+    async removeTagFromPost(postId: string, tagId: string) {
+        await this.prisma.post.update({
+            where: { id: postId },
+            data: {
+                tags: {
+                    disconnect: { id: tagId }
+                }
+            }
+        });
+        return { message: 'Tag removed from post' };
+    }
+
+    async addTriggerToPost(postId: string, triggerId: string) {
+        return this.prisma.post.update({
+            where: { id: postId },
+            data: {
+                triggers: {
+                    connect: { id: triggerId }
+                }
+            }
+        });
+    }
+
+    async removeTriggerFromPost(postId: string, triggerId: string) {
+        await this.prisma.post.update({
+            where: { id: postId },
+            data: {
+                triggers: {
+                    disconnect: { id: triggerId }
+                }
+            }
+        });
+        return { message: 'Trigger removed from post' };
+    }
+
+
 }

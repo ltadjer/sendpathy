@@ -52,7 +52,7 @@ export class FriendshipService {
     }
 
     async delete(id: string) {
-        this.prisma.friendship.delete({
+        await this.prisma.friendship.delete({
             where: { id },
         });
         return { message: "Friendship deleted." };
