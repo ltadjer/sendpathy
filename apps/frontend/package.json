@@ -26,6 +26,7 @@
     "@ionic/cli": "^7.2.0",
     "@ionic/core": "^8.3.3",
     "@ionic/vue": "^8.3.3",
+    "@ionic/vue-router": "^8.3.4",
     "axios": "^1.7.7",
     "pinia": "^2.2.4",
     "socket.io-client": "^4.8.1",

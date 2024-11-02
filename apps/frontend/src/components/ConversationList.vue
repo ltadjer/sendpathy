@@ -16,13 +16,13 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+
+import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem } from '@ionic/vue';
 
 import conversationService from '@/services/conversation.service';
 
-export default {
+export default defineComponent({
   name: 'ConversationList',
   data() {
     return {
@@ -42,8 +42,8 @@ export default {
     /**
      * Fetch conversations from the server.
      */
-    async fetchConversations() {
-      const response = await conversationService.fetchConversations();
+    async fetchAllConversations() {
+      const response = await conversationService.fetchAllConversations();
       this.conversations = response;
     },
     /**
@@ -55,7 +55,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchConversations();
+    this.fetchAllConversations();
   },
-};
+});
 </script>
