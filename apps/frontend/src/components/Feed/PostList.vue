@@ -18,7 +18,7 @@
             <ion-icon :icon="post.isLiked ? heart : heartOutline"></ion-icon>
             <span>{{ post.likeCount }}</span>
           </ion-button>
-          <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :user-id="userId" :postId="post.id"></post-comment-modal>
+          <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" @update-comments="fetchComments" :post-id="selectedPostId"></post-comment-modal>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon } from '@ionic/vue';
 import postService from '@/services/post.service';
 import commentService from '@/services/comment.service';
@@ -74,13 +74,19 @@ export default defineComponent({
     },
     async openCommentModal(postId) {
       this.selectedPostId = postId;
+      this.selectedPost = this.posts.find(post => post.id === postId);
+      console.log('this.selectedPostId',this.selectedPostId);
       this.isCommentModalOpen = true;
-      this.comments = await commentService.fetchAllCommentOfPost(postId);
+      this.comments = this.selectedPost.comments;
     },
     closeCommentModal() {
       this.isCommentModalOpen = false;
       this.selectedPostId = null;
       this.comments = [];
+    },
+    async fetchComments() {
+      const updatedPost = await postService.fetchOnePostById(this.selectedPostId);
+      this.comments = updatedPost.comments;
     },
     async toggleLike(post) {
       if (post.isLiked) {

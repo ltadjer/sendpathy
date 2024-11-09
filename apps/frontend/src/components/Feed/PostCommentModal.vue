@@ -10,16 +10,13 @@
     </ion-header>
     <ion-content>
       <ion-list>
-        <ion-item v-for="comment in comments" :key="comment.id">
-          <p>{{ comment.content }}</p>
-          <ion-button @click="editComment(comment)">Edit</ion-button>
-          <ion-button @click="deleteComment(comment.id)">Delete</ion-button>
-          <ion-list v-if="comment.replies">
-            <ion-item v-for="reply in comment.replies" :key="reply.id">
-              <p>{{ reply.content }}</p>
-            </ion-item>
-          </ion-list>
-        </ion-item>
+        <comment-item
+          v-for="comment in comments"
+          :key="comment.id"
+          :comment="comment"
+          :post-id="postId"
+          @update-comments="fetchComments"
+        ></comment-item>
       </ion-list>
       <ion-item>
         <ion-input v-model="newComment" placeholder="Add a comment..."></ion-input>
@@ -30,12 +27,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent } from 'vue';
 import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput } from '@ionic/vue';
 import commentService from '@/services/comment.service';
+import CommentItem from './CommentItem.vue';
 
 export default defineComponent({
-  name: 'CommentModal',
+  name: 'PostCommentModal',
   components: {
     IonModal,
     IonHeader,
@@ -46,7 +44,8 @@ export default defineComponent({
     IonContent,
     IonList,
     IonItem,
-    IonInput
+    IonInput,
+    CommentItem
   },
   props: {
     comments: Array,
@@ -54,32 +53,21 @@ export default defineComponent({
   },
   data() {
     return {
-      newComment: '',
-      editingComment: null
+      newComment: ''
     };
   },
+  emits: ['close', 'update-comments'],
   methods: {
     closeModal() {
       this.$emit('close');
     },
-    async deleteComment(commentId) {
-      await commentService.deleteCommentFromPost(this.postId, commentId);
-      this.comments = this.comments.filter(comment => comment.id !== commentId);
-    },
-    editComment(comment) {
-      this.editingComment = comment;
-      this.newComment = comment.content;
-    },
     async addComment() {
-      if (this.editingComment) {
-        await commentService.updateComment(this.editingComment.id, { content: this.newComment });
-        this.editingComment.content = this.newComment;
-        this.editingComment = null;
-      } else {
-        await commentService.addCommentToPost(this.postId, { content: this.newComment });
-      }
+      await commentService.addCommentToPost(this.postId, { content: this.newComment });
       this.newComment = '';
-      this.comments = await commentService.fetchAllCommentOfPost(this.postId); // Update comments after adding
+      await this.fetchComments();
+    },
+    async fetchComments() {
+      await this.$emit('update-comments');
     }
   }
 });

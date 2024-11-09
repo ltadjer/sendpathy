@@ -1,21 +1,6 @@
 import api from './api.service';
 
 export default {
-  /*
-    * Fetch all comments of a post.
-   */
-  async fetchAllCommentOfPost(postId) {
-    const response = await api.get(`/comments/post/${postId}`);
-    return response.data;
-  },
-
-  /*
-    * Fetch all comments of a comment.
-   */
-  async fetchAllCommentOfComment(parentId) {
-    const response = await api.get(`/comments/comment/${parentId}`);
-    return response.data;
-  },
 
   /*
     * Create a new comment to a post.
@@ -24,6 +9,7 @@ export default {
     * @param {object} formData The data for the new comment.
    */
   async addCommentToPost(postId, formData) {
+    console.log('formData', formData);
     return api.post(`/comments/post/${postId}`, formData);
   },
 

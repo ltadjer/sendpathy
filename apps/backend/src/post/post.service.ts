@@ -8,13 +8,63 @@ export class PostService {
     constructor(private prisma: PrismaService) {}
 
     async findOne(id: string) {
-        return this.prisma.post.findUnique({
-            where: { id: id }
-        })
+        const post = await this.prisma.post.findUnique({
+            where: { id: id },
+            include: {
+                comments: {
+                    where: { parentId: null },
+                    include: {
+                        user: true,
+                    },
+                },
+                triggers: true,
+                tags: true,
+                user: true,
+            },
+        });
+
+        if (post) {
+            post.comments = await this.fetchReplies(post.comments);
+        }
+
+        return post;
     }
 
     async findAll() {
-        return this.prisma.post.findMany();
+        const posts = await this.prisma.post.findMany({
+            include: {
+                comments: {
+                    where: { parentId: null },
+                    include: {
+                        user: true,
+                    },
+                },
+                triggers: true,
+                tags: true,
+                user: true,
+            },
+        });
+
+        for (const post of posts) {
+            post.comments = await this.fetchReplies(post.comments);
+        }
+
+        return posts;
+    }
+
+    private async fetchReplies(comments: any[]): Promise<any[]> {
+        for (const comment of comments) {
+            const replies = await this.prisma.comment.findMany({
+                where: { parentId: comment.id },
+                include: {
+                    user: true,
+                },
+            });
+
+            comment.replies = await this.fetchReplies(replies);
+        }
+
+        return comments;
     }
 
     async create(createPostDto: CreatePostDto, userId: string) {
@@ -30,7 +80,7 @@ export class PostService {
     }
 
     async update(id: string, updatePostDto: UpdatePostDto) {
-        return this.prisma.post.update({
+        return await this.prisma.post.update({
           where: { id },
           data: updatePostDto,
         });
@@ -45,7 +95,7 @@ export class PostService {
     }
 
     async addTagToPost(postId: string, tagId: string) {
-        return this.prisma.post.update({
+        return await this.prisma.post.update({
             where: { id: postId },
             data: {
                 tags: {
@@ -68,7 +118,7 @@ export class PostService {
     }
 
     async addTriggerToPost(postId: string, triggerId: string) {
-        return this.prisma.post.update({
+        return await this.prisma.post.update({
             where: { id: postId },
             data: {
                 triggers: {

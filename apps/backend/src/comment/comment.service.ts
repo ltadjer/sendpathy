@@ -5,17 +5,6 @@ import { PrismaService } from '../prisma/prisma.service'
 export class CommentService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(id: string) {
-    return this.prisma.comment.findUnique({
-      where: { id: id }
-    })
-  }
-
-  async findAll() {
-    return this.prisma.comment.findMany();
-  }
-
-
   async addCommentToPost(postId: string, createCommentDto: any, userId: string) {
     // Check if the post exists
     const postExists = await this.prisma.post.findUnique({
@@ -27,7 +16,7 @@ export class CommentService {
     }
 
     // Create the comment if the post exists
-    return this.prisma.comment.create({
+    return await this.prisma.comment.create({
       data: {
         ...createCommentDto,
         post: { connect: { id: postId } },
@@ -48,7 +37,7 @@ export class CommentService {
     }
 
     // Create the comment with the associated post ID
-    return this.prisma.comment.create({
+    return await this.prisma.comment.create({
       data: {
         ...createCommentDto,
         parent: { connect: { id: parentCommentId } },
