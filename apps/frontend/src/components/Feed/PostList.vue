@@ -16,7 +16,7 @@
           </ion-button>
           <ion-button slot="end" @click.stop="toggleLike(post)">
             <ion-icon :icon="post.isLiked ? heart : heartOutline"></ion-icon>
-            <span>{{ post.likeCount }}</span>
+            <span v-if="post.likes">{{ post.likes.length }}</span>
           </ion-button>
           <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" @update-comments="fetchComments" :post-id="selectedPostId"></post-comment-modal>
         </ion-item>
@@ -29,7 +29,6 @@
 import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon } from '@ionic/vue';
 import postService from '@/services/post.service';
-import commentService from '@/services/comment.service';
 import likeService from '@/services/like.service';
 import PostForm from '@/components/Feed/PostForm.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
@@ -69,13 +68,12 @@ export default defineComponent({
     editPost(post) {
       this.selectedPost = post;
     },
-    async deletePost(postId) {
+    async deleteOnePost(postId) {
       await postService.deleteOnePost(postId);
     },
     async openCommentModal(postId) {
       this.selectedPostId = postId;
       this.selectedPost = this.posts.find(post => post.id === postId);
-      console.log('this.selectedPostId',this.selectedPostId);
       this.isCommentModalOpen = true;
       this.comments = this.selectedPost.comments;
     },
@@ -88,6 +86,13 @@ export default defineComponent({
       const updatedPost = await postService.fetchOnePostById(this.selectedPostId);
       this.comments = updatedPost.comments;
     },
+    async fetchPost(postId) {
+      const updatedPost = await postService.fetchOnePostById(postId);
+      const index = this.posts.findIndex(post => post.id === postId);
+      if (index !== -1) {
+        this.posts[index] = updatedPost;
+      }
+    },
     async toggleLike(post) {
       if (post.isLiked) {
         await likeService.unlikePost(post.id);
@@ -96,7 +101,7 @@ export default defineComponent({
         await likeService.likePost(post.id);
         post.isLiked = true;
       }
-      this.likeCount = await likeService.countPostLikes(post.id);
+      await this.fetchPost(post.id);
     }
   },
 });

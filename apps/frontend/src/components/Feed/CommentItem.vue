@@ -9,6 +9,10 @@
             <ion-button slot="end" @click="toggleReplies">
               {{ comment.showReplies ? 'Hide Replies' : 'Show Replies' }}
             </ion-button>
+            <ion-button slot="end" @click="toggleLike">
+              <ion-icon :icon="comment.isLiked ? heart : heartOutline"></ion-icon>
+              <span v-if="comment.likes">{{ comment.likes.length }}</span>
+            </ion-button>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -39,8 +43,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IonItem, IonButton, IonInput, IonList, IonGrid, IonRow, IonCol } from '@ionic/vue';
+import { IonItem, IonButton, IonInput, IonList, IonGrid, IonRow, IonCol, IonIcon } from '@ionic/vue';
 import commentService from '@/services/comment.service';
+import likeService from '@/services/like.service';
+import { heart, heartOutline } from 'ionicons/icons';
 
 export default defineComponent({
   name: 'CommentItem',
@@ -51,7 +57,8 @@ export default defineComponent({
     IonList,
     IonGrid,
     IonRow,
-    IonCol
+    IonCol,
+    IonIcon
   },
   props: {
     comment: Object,
@@ -59,7 +66,9 @@ export default defineComponent({
   },
   data() {
     return {
-      replyContent: ''
+      replyContent: '',
+      heart,
+      heartOutline
     };
   },
   methods: {
@@ -74,6 +83,16 @@ export default defineComponent({
     },
     toggleReplies() {
       this.comment.showReplies = !this.comment.showReplies;
+    },
+    async toggleLike() {
+      if (this.comment.isLiked) {
+        await likeService.unlikeComment(this.comment.id);
+        this.comment.isLiked = false;
+      } else {
+        await likeService.likeComment(this.comment.id);
+        this.comment.isLiked = true;
+      }
+      await this.$emit('update-comments');
     }
   },
   created() {
