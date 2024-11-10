@@ -53,6 +53,24 @@ export default  {
     } catch (error) {
       throw error
     }
+  },
+
+  async updateAccessCode(token: string, accessCode: string) {
+    try {
+      const response = await api.patch(`/users/access-code`, { token, accessCode });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async validateAccessCode(token: string, accessCode: string) {
+    try {
+      const response = await api.post(`/users/validate-access-code`, { token, accessCode });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

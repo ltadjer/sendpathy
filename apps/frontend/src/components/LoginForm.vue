@@ -17,8 +17,7 @@
 </template>
 
 <script>
-import AuthService from '../services/auth.service';
-
+import { useAccountStore } from '@/stores/account';
 export default {
   data() {
     return {
@@ -40,10 +39,7 @@ export default {
           email: this.email,
           password: this.password
         };
-        const response = await AuthService.login(user);
-        console.log('Login successful:', response);
-        localStorage.setItem('access_token', response.access_token);
-        localStorage.setItem('refresh_token', response.refresh_token);
+        await useAccountStore().login(user);
       } catch (error) {
         console.error('Login failed:', error);
       }

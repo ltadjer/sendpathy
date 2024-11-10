@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ContentService } from '../content/content.service';
 
@@ -10,36 +10,49 @@ export class LifeMomentService {
   ) {}
 
   async findAll(userId: string) {
+    console.log('userId', userId);
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user.accessCode) {
+      throw new BadRequestException('Please set an access code before accessing life moments');
+    }
+
     return await this.prisma.lifeMoment.findMany({
-      where: {
-        userId: userId
-      },
-      include: {
-        contents: true,
-      }
+      where: { userId: userId },
+      include: { contents: true },
     });
   }
 
   async findOne(id: string, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user.accessCode) {
+      throw new BadRequestException('Please set an access code before accessing life moments');
+    }
+
     return await this.prisma.lifeMoment.findUnique({
-      where: {
-        id: id,
-        userId: userId
-      },
-      include: {
-        contents: true,
-      }
+      where: { id: id, userId: userId },
+      include: { contents: true },
     });
   }
 
   async create(createLifeMomentDto: any, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user.accessCode) {
+      throw new BadRequestException('Please set an access code before creating a life moment');
+    }
+
     const { contents, ...lifeMomentData } = createLifeMomentDto;
 
     const lifeMoment = await this.prisma.lifeMoment.create({
-      data: {
-        ...lifeMomentData,
-        userId: userId
-      }
+      data: { ...lifeMomentData, userId: userId },
     });
 
     if (contents && contents.length > 0) {
@@ -52,14 +65,19 @@ export class LifeMomentService {
   }
 
   async update(id: string, updateLifeMomentDto: any, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user.accessCode) {
+      throw new BadRequestException('Please set an access code before updating a life moment');
+    }
+
     const { contents, ...lifeMomentData } = updateLifeMomentDto;
 
     const lifeMoment = await this.prisma.lifeMoment.update({
-      where: {
-        id: id,
-        userId: userId
-      },
-      data: lifeMomentData
+      where: { id: id, userId: userId },
+      data: lifeMomentData,
     });
 
     if (contents && contents.length > 0) {
@@ -72,19 +90,22 @@ export class LifeMomentService {
   }
 
   async delete(id: string, userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user.accessCode) {
+      throw new BadRequestException('Please set an access code before deleting a life moment');
+    }
+
     // Delete related contents first
     await this.prisma.content.deleteMany({
-      where: {
-        lifeMomentId: id,
-      },
+      where: { lifeMomentId: id },
     });
 
     // Then delete the life moment
     await this.prisma.lifeMoment.delete({
-      where: {
-        id: id,
-        userId: userId,
-      },
+      where: { id: id, userId: userId },
     });
 
     return { message: 'Life moment deleted successfully' };

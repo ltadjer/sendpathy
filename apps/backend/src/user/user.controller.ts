@@ -6,8 +6,8 @@ import {
   Param,
   Delete,
   Patch,
-  UseGuards
-} from '@nestjs/common';
+  UseGuards, NotFoundException
+} from '@nestjs/common'
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -73,4 +73,44 @@ export class UserController {
   async delete(@Param('id') id: string) {
     return this.userService.delete(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/access-code')
+  @ApiOperation({ summary: 'Set the access code for a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'The access code has been successfully set.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async setAccessCode(@Body('token') token: string, @Body('accessCode') accessCode: string) {
+    console.log('token', token);
+    const user = await this.userService.findByRefreshToken(token);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userService.updateAccessCode(user.id, accessCode);
+    return { message: 'Access code set successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/validate-access-code')
+  @ApiOperation({ summary: 'Validate the access code for a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'The access code is valid.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found or invalid access code.' })
+  async validateAccessCode(@Body('token') token: string, @Body('accessCode') accessCode: string) {
+    console.log('token', token);
+    const user = await this.userService.findByRefreshToken(token);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const isValid = await this.userService.validateAccessCode(user.id, accessCode);
+    if (!isValid) {
+      throw new NotFoundException('Invalid access code');
+    }
+    return { message: 'Access code is valid' };
+  }
+
 }

@@ -14,6 +14,7 @@ export class LifeMomentController {
   @ApiOperation({ summary: 'Get all life moments' })
   @ApiResponse({ status: 200, description: 'Return all life moments.' })
   async findAll(@User() user: any) {
+    console.log('user', user);
     return this.lifeMomentService.findAll(user.id);
   }
 

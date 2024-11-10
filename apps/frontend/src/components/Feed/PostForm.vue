@@ -18,7 +18,7 @@
     </ion-card-content>
   </ion-card>
   <post-settings-modal v-if="isSettingsModalOpen" @close="closeSettingsModal" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers" :selectedTags="selectedTags" :selectedTriggers="selectedTriggers"></post-settings-modal>
-  <post-emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></post-emotions-modal>
+  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></emotions-modal>
 </template>
 
 <script lang="ts">
@@ -26,7 +26,7 @@ import { defineComponent, ref, watch } from 'vue';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow } from '@ionic/vue';
 import postService from '@/services/post.service';
 import PostSettingsModal from '@/components/Feed/PostSettingsModal.vue';
-import PostEmotionsModal from '@/components/Feed/PostEmotionsModal.vue';
+import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
 import { happyOutline, settingsOutline } from 'ionicons/icons';
 
 export default defineComponent({
@@ -46,7 +46,7 @@ export default defineComponent({
     IonCol,
     IonRow,
     PostSettingsModal,
-    PostEmotionsModal
+    EmotionsModal
   },
   props: {
     post: Object

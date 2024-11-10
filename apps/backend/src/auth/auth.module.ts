@@ -9,11 +9,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { UserModule } from 'src/user/user.module';
-
+import { CodeAuthMiddleware } from 'src/life-moment/middleware/code-auth.middleware';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, UserService, JwtStrategy, PrismaService, UserService],
+  providers: [AuthService, UserService, JwtStrategy, PrismaService, UserService, CodeAuthMiddleware],
   imports: [
     PassportModule,
     JwtModule.register({

@@ -7,6 +7,7 @@ import ResetPasswordForm from '../components/ResetPasswordForm.vue'
 import MessageView from "@/views/MessageView.vue";
 import ConversationView from "@/views/ConversationView.vue";
 import FeedView from '@/views/FeedView.vue'
+import LifeMomentView from "@/views/LifeMomentView.vue";
 
 
 const router = createRouter({
@@ -23,7 +24,8 @@ const router = createRouter({
     { path: '/reset-password', component: ResetPasswordForm },
     { path: '/conversations', component: ConversationView },
     { path: '/conversations/:id', component: MessageView },
-    { path: '/feed', component: FeedView }
+    { path: '/feed', component: FeedView },
+    {path: '/life-moments', component: LifeMomentView}
 
   ]
 })
