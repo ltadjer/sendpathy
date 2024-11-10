@@ -16,16 +16,16 @@ export class PostController {
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
   @ApiResponse({ status: 200, description: 'Return all posts.' })
-  async findAll() {
-    return this.postService.findAll();
+  async findAll(@User() user: any) {
+    return this.postService.findAll(user.id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Return the post.' })
   @ApiResponse({ status: 404, description: 'Post not found.' })
-  async findOne(@Param('id') id: string) {
-    return this.postService.findOne(id);
+  async findOne(@Param('id') id: string,  @User() user: any) {
+    return this.postService.findOne(id, user.id);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -10,23 +10,7 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  @ApiOperation({ summary: 'Get all comments' })
-  @ApiResponse({ status: 200, description: 'Return all comments.' })
-  async findAll() {
-    return this.commentService.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  @ApiResponse({ status: 200, description: 'Return the comment.' })
-  @ApiResponse({ status: 404, description: 'Comment not found.' })
-  async findOne(@Param('id') id: string) {
-    return this.commentService.findOne(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post(':postId')
+  @Post('post/:postId')
   @ApiResponse({ status: 201, description: 'The comment has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async addCommentToPost(@Param('postId') postId: string, @Body() createCommentDto: any, @User() user: any) {
@@ -34,7 +18,7 @@ export class CommentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':postId/:commentId')
+  @Delete('post/:postId/:commentId')
   @ApiOperation({ summary: 'Delete a comment by ID' })
   @ApiResponse({ status: 200, description: 'The comment has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Comment not found.' })
@@ -43,7 +27,7 @@ export class CommentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post(':parentCommentId/replies')
+  @Post('comment/:parentCommentId/replies')
   @ApiResponse({ status: 201, description: 'The comment has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async addCommentToComment(@Param('parentCommentId') parentCommentId: string, @Body() createCommentDto: any, @User() user: any) {
@@ -51,7 +35,7 @@ export class CommentController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':parentCommentId/replies/:commentId')
+  @Delete('comment/:parentCommentId/replies/:commentId')
   @ApiOperation({ summary: 'Delete a comment by ID' })
   @ApiResponse({ status: 200, description: 'The comment has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Comment not found.' })

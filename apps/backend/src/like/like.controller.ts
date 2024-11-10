@@ -10,22 +10,6 @@ export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
   @UseGuards(JwtAuthGuard)
-  @Get()
-  @ApiOperation({ summary: 'Get all likes' })
-  @ApiResponse({ status: 200, description: 'Return all likes.' })
-  async findAll() {
-    return this.likeService.findAll();
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  @ApiResponse({ status: 200, description: 'Return the like.' })
-  @ApiResponse({ status: 404, description: 'Like not found.' })
-  async findOne(@Param('id') id: string) {
-    return this.likeService.findOne(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Post('like/post/:postId')
   @ApiOperation({ summary: 'Like a post' })
   @ApiResponse({ status: 201, description: 'The post has been successfully liked.' })
@@ -44,15 +28,6 @@ export class LikeController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('count/post/:postId')
-  @ApiOperation({ summary: 'Count likes on a post' })
-  @ApiResponse({ status: 200, description: 'Return the number of likes on the post.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  async countPostLikes(@Param('postId') postId: string) {
-    return this.likeService.countPostLikes(postId);
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Post('like/comment/:commentId')
   @ApiOperation({ summary: 'Like a comment' })
   @ApiResponse({ status: 201, description: 'The comment has been successfully liked.' })
@@ -68,15 +43,6 @@ export class LikeController {
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async unlikeComment(@Param('commentId') commentId: string, @User() user: any) {
     return this.likeService.unlikeComment(commentId, user.id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('count/comment/:commentId')
-  @ApiOperation({ summary: 'Count likes on a comment' })
-  @ApiResponse({ status: 200, description: 'Return the number of likes on the comment.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  async countCommentLikes(@Param('commentId') commentId: string) {
-    return this.likeService.countCommentLikes(commentId);
   }
 
 }

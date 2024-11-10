@@ -2,19 +2,78 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ExtendedPost } from './dto/extended-post.dto';
 
 @Injectable()
 export class PostService {
     constructor(private prisma: PrismaService) {}
 
-    async findOne(id: string) {
-        return this.prisma.post.findUnique({
-            where: { id: id }
-        })
+    async findOne(id: string, userId: string): Promise<ExtendedPost | null> {
+        const post = await this.prisma.post.findUnique({
+            where: { id: id },
+            include: {
+                comments: {
+                    where: { parentId: null },
+                    include: {
+                        user: true,
+                        likes: true,
+                    },
+                },
+                likes: true,
+                triggers: true,
+                tags: true,
+                user: true,
+            },
+        }) as ExtendedPost | null;
+
+        if (post) {
+            post.comments = await this.fetchReplies(post.comments, userId);
+            post.isLiked = post.likes.some((like: any) => like.userId === userId);
+        }
+
+        return post;
     }
 
-    async findAll() {
-        return this.prisma.post.findMany();
+    async findAll(userId: string): Promise<ExtendedPost[]> {
+        const posts = await this.prisma.post.findMany({
+            include: {
+                comments: {
+                    where: { parentId: null },
+                    include: {
+                        user: true,
+                        likes: true,
+                    },
+                },
+                likes: true,
+                triggers: true,
+                tags: true,
+                user: true,
+            },
+        }) as ExtendedPost[];
+
+        for (const post of posts) {
+            post.comments = await this.fetchReplies(post.comments, userId);
+            post.isLiked = post.likes.some((like: any) => like.userId === userId);
+        }
+
+        return posts;
+    }
+
+    private async fetchReplies(comments: any[], userId: string): Promise<any[]> {
+        for (const comment of comments) {
+            const replies = await this.prisma.comment.findMany({
+                where: { parentId: comment.id },
+                include: {
+                    user: true,
+                    likes: true,
+                },
+            });
+
+            comment.replies = await this.fetchReplies(replies, userId);
+            comment.isLiked = comment.likes.some((like: any) => like.userId === userId);
+        }
+
+        return comments;
     }
 
     async create(createPostDto: CreatePostDto, userId: string) {
@@ -30,22 +89,22 @@ export class PostService {
     }
 
     async update(id: string, updatePostDto: UpdatePostDto) {
-        return this.prisma.post.update({
-          where: { id },
-          data: updatePostDto,
+        return await this.prisma.post.update({
+            where: { id },
+            data: updatePostDto,
         });
-      }
-    
+    }
+
 
     async delete(id: string) {
-         await this.prisma.post.delete({
+        await this.prisma.post.delete({
             where: { id: id }
-         });
-         return { message: 'Post deleted' };
+        });
+        return { message: 'Post deleted' };
     }
 
     async addTagToPost(postId: string, tagId: string) {
-        return this.prisma.post.update({
+        return await this.prisma.post.update({
             where: { id: postId },
             data: {
                 tags: {
@@ -68,7 +127,7 @@ export class PostService {
     }
 
     async addTriggerToPost(postId: string, triggerId: string) {
-        return this.prisma.post.update({
+        return await this.prisma.post.update({
             where: { id: postId },
             data: {
                 triggers: {
@@ -89,6 +148,4 @@ export class PostService {
         });
         return { message: 'Trigger removed from post' };
     }
-
-
 }

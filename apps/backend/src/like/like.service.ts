@@ -5,23 +5,23 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class LikeService {
   constructor(private prisma: PrismaService) {}
 
-  async findOne(id: string) {
-    return this.prisma.like.findUnique({
-      where: { id: id }
-    })
-  }
-
-  async findAll() {
-    return this.prisma.like.findMany();
-  }
-
   async likePost(postId: string, userId: string) {
-    return this.prisma.like.create({
+    // si l'user n'a pas déjà liké le post
+    if(await this.prisma.like.findFirst({
+      where: {
+        postId: postId,
+        userId: userId,
+      },
+    })) {
+      return { message: 'Post already liked' };
+    }
+    await this.prisma.like.create({
       data: {
         post: { connect: { id: postId } },
         user: { connect: { id: userId } },
       },
     });
+    return { message: 'Post liked' };
   }
 
   async unlikePost(postId: string, userId: string) {
@@ -34,21 +34,22 @@ export class LikeService {
     return { message: 'Post unliked' };
   }
 
-  async countPostLikes(postId: string) {
-    return this.prisma.like.count({
-      where: {
-        postId: postId,
-      },
-    });
-  }
-
   async likeComment(commentId: string, userId: string) {
-    return this.prisma.like.create({
+    if(await this.prisma.like.findFirst({
+      where: {
+        commentId: commentId,
+        userId: userId,
+      },
+    })) {
+      return { message: 'Comment already liked' };
+    }
+    await this.prisma.like.create({
       data: {
         comment: { connect: { id: commentId } },
         user: { connect: { id: userId } },
       },
     });
+    return { message: 'Comment liked' };
   }
 
   async unlikeComment(commentId: string, userId: string) {
@@ -59,13 +60,5 @@ export class LikeService {
       },
     });
     return { message: 'Comment unliked' };
-  }
-
-  async countCommentLikes(commentId: string) {
-    return this.prisma.like.count({
-      where: {
-        commentId: commentId,
-      },
-    });
   }
 }
