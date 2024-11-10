@@ -8,8 +8,8 @@ datasource db {
 }
 
 model User {
-  id                 String         @id @default(cuid())
-  email              String         @unique
+  id                 String  @id @default(cuid())
+  email              String  @unique
   username           String?
   password           String
   age                Int?
@@ -20,70 +20,84 @@ model User {
   confirmationToken  String?
   resetPasswordToken String?
   refreshToken       String?
-  isActive           Boolean        @default(false)
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-  deletedAt          DateTime?
-  posts              Post[]
-  conversations      Conversation[] @relation("ConversationUsers")
+  isActive           Boolean @default(false)
+
+  posts            Post[]
+  conversations    Conversation[] @relation("ConversationUsers")
   // Relation for messages sent by the user
-  sentMessages       Message[]      @relation("SentMessages")
+  sentMessages     Message[]      @relation("SentMessages")
   // Relation for messages received by the user
-  receivedMessages   Message[]      @relation("ReceivedMessages")
+  receivedMessages Message[]      @relation("ReceivedMessages")
 
   // Relation to the friendships the user has sent
-  friendshipsSent     Friendship[] @relation("friendshipsSent")
+  friendshipsSent     Friendship[]   @relation("friendshipsSent")
   // Relation to the friendships the user has received
-  friendshipsReceived Friendship[] @relation("friendshipsReceived")
+  friendshipsReceived Friendship[]   @relation("friendshipsReceived")
   likes               Like[] // Relation to the likes made by the user
   comments            Comment[] // Relation to the comments made by the user
+  tags                tag[]          @relation("UserTags")
+  triggers            trigger[]      @relation("UserTriggers")
+  reservations        Reservation[] // Relation to the reservations made by the user
+  reports             Report[] // Relation to the reports made by the user
+  notifications       Notification[] // Relation to the notifications sent to the user
+  lifeMoments         LifeMoment[] // Relation to the life moments created by the user
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Post {
-  id               String    @id @default(cuid())
+  id               String @id @default(cuid())
   content          String
   userId           String
   originalLanguage String
   emotion          String
   slug             String
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  deletedAt        DateTime?
+
   // Relation to the user who created the post
-  user             User?     @relation(fields: [userId], references: [id])
-  comments         Comment[] // A post contains multiple comments
-  tags             tag[]     @relation("PostTags")
-  triggers         trigger[] @relation("PostTriggers")
-  likes            Like[] // A post can have multiple likes
+  user     User?     @relation(fields: [userId], references: [id])
+  comments Comment[] // A post contains multiple comments
+  tags     tag[]     @relation("PostTags")
+  triggers trigger[] @relation("PostTriggers")
+  likes    Like[] // A post can have multiple likes
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model tag {
-  id        String    @id @default(cuid())
-  name      String
+  id   String @id @default(cuid())
+  name String
+
+  // Relation to the posts that have this tag
+  posts Post[] @relation("PostTags")
+  users User[] @relation("UserTags")
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
-  // Relation to the posts that have this tag
-  posts     Post[]    @relation("PostTags")
 }
 
 model trigger {
-  id        String    @id @default(cuid())
-  name      String
+  id   String @id @default(cuid())
+  name String
+
+  // Relation to the posts that have this trigger
+  posts Post[] @relation("PostTriggers")
+  users User[] @relation("UserTriggers")
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
-  // Relation to the posts that have this trigger
-  posts     Post[]    @relation("PostTriggers")
 }
 
 model Like {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String
   postId    String?
   commentId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   // Relation to the user who liked the post or comment
   user    User     @relation(fields: [userId], references: [id])
@@ -91,39 +105,42 @@ model Like {
   post    Post?    @relation(fields: [postId], references: [id])
   // Relation to the comment that was liked
   comment Comment? @relation(fields: [commentId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Comment {
-  id        String    @id @default(cuid())
-  content   String
-  postId    String
-  userId    String
-  parentId  String? // Optional field to reference the parent comment
+  id       String  @id @default(cuid())
+  content  String
+  postId   String
+  userId   String
+  parentId String? // Optional field to reference the parent comment
+
+  // Relation to the post the comment belongs to
+  post    Post      @relation(fields: [postId], references: [id])
+  // Relation to the user who created the comment
+  user    User      @relation(fields: [userId], references: [id])
+  // Self-referential relation to the parent comment
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  // Self-referential relation to the replies
+  replies Comment[] @relation("CommentReplies")
+  likes   Like[] // A comment can have multiple likes
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
-  // Relation to the post the comment belongs to
-  post      Post      @relation(fields: [postId], references: [id])
-  // Relation to the user who created the comment
-  user      User      @relation(fields: [userId], references: [id])
-  // Self-referential relation to the parent comment
-  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
-  // Self-referential relation to the replies
-  replies   Comment[] @relation("CommentReplies")
-  likes     Like[] // A comment can have multiple likes
 }
 
 model Message {
-  id         String    @id @default(cuid())
+  id         String   @id @default(cuid())
   senderId   String
   receiverId String
   senderName String
   content    String
-  read       Boolean?  @default(false)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
-  deletedBy  String?
+  read       Boolean? @default(false)
+
+  deletedBy String?
 
   // Relation to the conversation the message belongs to
   conversation   Conversation @relation(fields: [conversationId], references: [id])
@@ -132,6 +149,10 @@ model Message {
   sender         User         @relation("SentMessages", fields: [senderId], references: [id])
   // Relation to the user who received the message
   receiver       User         @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 enum ConversationType {
@@ -161,11 +182,99 @@ model Friendship {
   requesterId String
   receiver    User             @relation("friendshipsReceived", fields: [receiverId], references: [id])
   receiverId  String
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  deletedAt   DateTime?
   startedAt   DateTime?
   status      FriendshipStatus @default(PENDING)
 
   @@unique([requesterId, receiverId]) // Assure qu'il n'y ait qu'une seule relation d'amitié entre deux utilisateurs
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+enum ContentTypes {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+}
+
+model LifeMoment {
+  id        String    @id @default(cuid())
+  content   String    @db.Text
+  userId    String
+  emotion   String
+  slug      String
+  contents  Content[]
+  // Relation to the user who created the life moment
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model Content {
+  id           String       @id @default(cuid())
+  lifeMomentId String
+  type         ContentTypes @default(TEXT)
+  order        Int
+  content      String
+  size         Int?
+  duration     Int?
+  lifeMoment   LifeMoment   @relation(fields: [lifeMomentId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+}
+
+model Reservation {
+  id            String    @id @default(cuid())
+  uuid          String
+  title         String
+  date          DateTime
+  userId        String
+  videoCallLink String?
+  isCancelled   Boolean   @default(false)
+  user          User      @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+}
+
+enum TargetType {
+  POST
+  COMMENT
+  USER
+}
+
+model Report {
+  id               String     @id @default(cuid())
+  reporterId       String
+  targetId         String
+  targetType       TargetType
+  reason           String
+  validatedByAdmin Boolean    @default(false)
+  // Relation to the user who reported the content
+  reporter         User       @relation(fields: [reporterId], references: [id])
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @default(now())
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  // Relation to the user who receives the notification
+  user      User             @relation(fields: [userId], references: [id])
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @default(now())
+}
+
+enum NotificationType {
+  MESSAGE
+  FRIEND_REQUEST
+  LIKE
+  COMMENT
 }
