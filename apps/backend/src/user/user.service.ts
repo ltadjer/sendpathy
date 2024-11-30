@@ -195,4 +195,5 @@ export class UserService {
     }
     return bcrypt.compare(accessCode, user.accessCode);
   }
+
 }

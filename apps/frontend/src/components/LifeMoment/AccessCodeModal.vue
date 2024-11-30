@@ -1,11 +1,8 @@
 <template>
-  <ion-modal :is-open="isOpen" @did-dismiss="closeModal">
+  <ion-modal :is-open="isOpen" :backdrop-dismiss="false">
     <ion-header>
       <ion-toolbar>
         <ion-title>{{ hasAccessCode ? 'Enter Access Code' : 'Set Access Code' }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="closeModal">Close</ion-button>
-        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content>
@@ -19,7 +16,17 @@
 </template>
 
 <script>
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonItem, IonLabel, IonInput } from '@ionic/vue';
+import {
+  IonModal,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonButton,
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput
+} from '@ionic/vue';
 import authService from '@/services/auth.service.ts'
 
 export default {
@@ -29,7 +36,6 @@ export default {
     IonHeader,
     IonToolbar,
     IonTitle,
-    IonButtons,
     IonButton,
     IonContent,
     IonItem,
@@ -67,7 +73,7 @@ export default {
             console.error('Invalid access code');
           }
         } else {
-          await authService.updateAccessCode(this.token, this.accessCode);
+          await authService.setAccessCode(this.token, this.accessCode);
           localStorage.setItem('access_code', this.accessCode);
           this.$emit('access-code-set');
           this.closeModal();

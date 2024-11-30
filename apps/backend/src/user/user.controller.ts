@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from 'src/user/decorators/user.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -107,10 +108,8 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
     const isValid = await this.userService.validateAccessCode(user.id, accessCode);
-    if (!isValid) {
-      throw new NotFoundException('Invalid access code');
-    }
-    return { message: 'Access code is valid' };
+    return isValid;
   }
+
 
 }

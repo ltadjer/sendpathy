@@ -40,6 +40,7 @@ export default {
           password: this.password
         };
         await useAccountStore().login(user);
+        this.$router.push('/feed');
       } catch (error) {
         console.error('Login failed:', error);
       }

@@ -8,7 +8,7 @@
         <ion-label position="floating">Content</ion-label>
         <ion-textarea v-model="content" placeholder="What's on your mind?"></ion-textarea>
       </ion-item>
-        <ion-button @click="openEmojiModal" class="neumorphic-button">
+        <ion-button color="primary" @click="openEmojiModal" class="neumorphic-button">
           <ion-icon :icon="happyOutline"></ion-icon>
         </ion-button>
       <ion-button @click="openSettingsModal" class="neumorphic-button">
@@ -139,22 +139,27 @@ export default defineComponent({
 </script>
 <style scoped>
 .neumorphic-card {
-  border-radius: 20px;
-  background: #e0e0e0;
-  box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+  border-radius: 18px;
+  background: #F5F5FA;
+  box-shadow:
+    -5px -5px 10px rgba(255, 255, 255, 0.9), /* Light shadow */
+    10px 10px 20px rgba(214, 200, 223, 0.7); /* Dark shadow */
 }
 
 .neumorphic-item {
   border-radius: 10px;
-  background: #e0e0e0;
-  box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
-  margin-bottom: 20px;
+  background: #F5F5FA;
+  box-shadow:
+    -5px -5px 10px rgba(255, 255, 255, 0.9), /* Light shadow */
+    10px 10px 20px rgba(214, 200, 223, 0.7); /* Dark shadow */  margin-bottom: 20px;
 }
 
 .neumorphic-button {
   border-radius: 10px;
-  background: #e0e0e0;
-  box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
+  background: #F5F5FA;
+  box-shadow:
+    -5px -5px 10px rgba(255, 255, 255, 0.9), /* Light shadow */
+    10px 10px 20px rgba(214, 200, 223, 0.7); /* Dark shadow */
   margin: 10px 0;
 }
 </style>
