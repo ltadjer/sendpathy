@@ -77,7 +77,7 @@ export default  {
 
   async setAccessCode(token: string, accessCode: string) {
     try {
-      const response = await api.patch(`/users/access-code`, { token, accessCode });
+      const response = await api.post(`/users/access-code`, { token, accessCode });
       console.log('setAccessCode', response);
       return response.data;
     } catch (error) {

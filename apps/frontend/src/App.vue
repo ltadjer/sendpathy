@@ -1,15 +1,15 @@
 <template>
-  <RouterView />
-  <main-header />
+  <ion-app>
+    <ion-router-outlet></ion-router-outlet>
+  </ion-app>
 </template>
 
-
 <script lang="ts">
+import { IonApp, IonRouterOutlet } from '@ionic/vue';
+
 import { defineComponent } from 'vue';
-import MainHeader from '@/components/Commun/MainHeader.vue';
 export default defineComponent({
-  components: {
-    MainHeader
-  }
+  name: 'App',
+  components: { IonApp, IonRouterOutlet },
 });
 </script>

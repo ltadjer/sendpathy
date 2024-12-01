@@ -3,19 +3,18 @@
     :is-open="isAccessCodeModalOpen"
     :token="getAccessToken"
     :has-access-code="hasAccessCode"
-    @update:isOpen="isAccessCodeModalOpen = $event"
+    @update:isOpen="(value) => isAccessCodeModalOpen = value"
     @access-code-set="fetchLifeMoments"
     @access-code-validated="fetchLifeMoments">
   </access-code-modal>
-  <life-moment-list v-if="!isAccessCodeModalOpen" :life-moments="lifeMoments" />
+  <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import LifeMomentList from '@/components/LifeMoment/LifeMomentList.vue';
 import AccessCodeModal from '@/components/LifeMoment/AccessCodeModal.vue';
-import lifeMomentService from '@/services/lifeMoment.service';
-import { useAccountStore } from '@/stores/account';
+import { useLifeMomentStore } from '@/stores/lifeMoment';
 
 export default defineComponent({
   name: 'LifeMomentView',
@@ -26,41 +25,46 @@ export default defineComponent({
   data() {
     return {
       isAccessCodeModalOpen: false,
-      lifeMoments: [],
       hasAccessCode: false,
     };
+  },
+  async created() {
+    await useLifeMomentStore.fetchLifeMoments();
   },
   computed: {
     getAccessToken() {
       return localStorage.getItem('refresh_token');
+    },
+    lifeMoments() {
+      return useLifeMomentStore().lifeMoments;
     }
   },
   methods: {
     async fetchLifeMoments() {
-      try {
-        this.lifeMoments = await lifeMomentService.fetchAllLifeMoments();
-      } catch (error) {
-        if (error.response && error.response.data.message === 'Please set an access code before accessing life moments') {
-          this.isAccessCodeModalOpen = true;
-        } else {
-          console.error('Error fetching life moments:', error);
-        }
-      }
+      await useLifeMomentStore().fetchLifeMoments();
     },
-    checkAccessCode() {
+    async checkAccessCode() {
+      if (this.isAccessCodeModalOpen) {
+        console.log('Access code modal is already open');
+        return;
+      }
       const accessCode = localStorage.getItem('access_code');
       console.log('access_code', accessCode);
-      if (!accessCode) {
+      if (!accessCode || accessCode === 'null') {
+        console.log('No access code');
         this.isAccessCodeModalOpen = true;
         this.hasAccessCode = false;
       } else {
+        console.log('Access code found');
         this.isAccessCodeModalOpen = true;
         this.hasAccessCode = true;
       }
     }
   },
-  mounted() {
-    this.checkAccessCode();
-  }
+  async mounted() {
+    if (!this.isAccessCodeModalOpen) {
+      console.log('mounted');
+      await this.checkAccessCode();
+    }  }
 });
 </script>

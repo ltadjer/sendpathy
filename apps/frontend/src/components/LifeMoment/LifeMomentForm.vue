@@ -5,10 +5,23 @@
     </ion-card-header>
     <ion-card-content>
       <ion-item class="neumorphic-item">
-        <ion-label position="floating">Content</ion-label>
+        <ion-label position="static">Content</ion-label>
         <ion-textarea v-model="content" placeholder="What's on your mind?"></ion-textarea>
       </ion-item>
-      <ion-button @click="openEmojiModal" class="neumorphic-button">
+      <ion-item class="neumorphic-item">
+        <ion-label position="static">Image/Video</ion-label>
+        <input type="file" @change="onFileChange" accept="image/*,video/*" />
+      </ion-item>
+      <ion-item class="neumorphic-item" v-if="base64Image">
+        <ion-label position="static">Preview</ion-label>
+        <img :src="'data:image/jpeg;base64,' + base64Image" alt="Image Preview" />
+      </ion-item>
+      <ion-item class="neumorphic-item">
+        <ion-label position="floating">Audio</ion-label>
+        <ion-button @click="startRecording" :disabled="isRecording">Start Recording</ion-button>
+        <ion-button @click="stopRecording" :disabled="!isRecording">Stop Recording</ion-button>
+      </ion-item>
+      <ion-button color="primary" @click="openEmojiModal" class="neumorphic-button">
         <ion-icon :icon="happyOutline"></ion-icon>
       </ion-button>
       <ion-button expand="full" @click="submitLifeMoment" class="neumorphic-button">{{ lifeMoment ? 'Update' : 'LifeMoment' }}</ion-button>
@@ -18,15 +31,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonButton, IonIcon } from '@ionic/vue';
+import { defineComponent, ref } from 'vue';
+import { IonIcon, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonButton } from '@ionic/vue';
+import { useLifeMomentStore } from '@/stores/lifeMoment';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
 import { happyOutline } from 'ionicons/icons';
-import lifeMomentService from '@/services/lifeMoment.service';
 
 export default defineComponent({
   name: 'LifeMomentForm',
   components: {
+    IonIcon,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -35,57 +49,87 @@ export default defineComponent({
     IonLabel,
     IonTextarea,
     IonButton,
-    IonIcon,
     EmotionsModal
   },
   props: {
     lifeMoment: Object
   },
-  setup() {
-    return { happyOutline };
-  },
-  emits: ['lifeMoment-updated'],
   data() {
     return {
       content: '',
-      emotion: '',
+      file: null,
+      base64Image: '',
+      isRecording: false,
+      audioBlob: null,
+      mediaRecorder: null,
       isEmojiModalOpen: false,
     };
   },
-  watch: {
-    lifeMoment: {
-      immediate: true,
-      handler(newLifeMoment) {
-        if (newLifeMoment) {
-          this.content = newLifeMoment.content;
-          this.emotion = newLifeMoment.emotion;
-        } else {
-          this.resetForm();
-        }
-      }
-    }
+  setup() {
+    return { happyOutline };
   },
   methods: {
     async submitLifeMoment() {
+      const base64Content = await this.getFileBase64(this.file);
       const formData = {
         content: this.content,
-        emotion: this.emotion,
+        emotion: this.emotion ? this.emotion : '😐',
+        contents: [
+          {
+            type: this.file ? this.file.type : null,
+            content: base64Content,
+            originalName: this.file ? this.file.name : null,
+            size: this.file ? this.file.size : null,
+            order: 1
+          }
+        ]
       };
-
       if (this.lifeMoment && this.lifeMoment.id) {
-        await lifeMomentService.updateOneLifeMoment(this.lifeMoment.id, formData);
+        await useLifeMomentStore().updateLifeMoment(this.lifeMoment.id, formData);
       } else {
-        await lifeMomentService.createOneLifeMoment(formData);
+        await useLifeMomentStore().addLifeMoment(formData);
       }
-
-      this.resetForm();
-      this.$emit('lifeMoment-updated');
     },
-    resetForm() {
-      this.content = '';
-      this.emotion = '';
+    onFileChange(event) {
+      this.file = event.target.files[0];
+      this.getFileBase64(this.file).then(base64 => {
+        this.base64Image = base64;
+      });
+    },
+    getFileBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64Content = reader.result.split(',')[1]; // Get the base64 part of the result
+          resolve(base64Content);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    },
+    startRecording() {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          this.mediaRecorder = new MediaRecorder(stream);
+          this.mediaRecorder.start();
+          this.isRecording = true;
+
+          const audioChunks = [];
+          this.mediaRecorder.addEventListener('dataavailable', event => {
+            audioChunks.push(event.data);
+          });
+
+          this.mediaRecorder.addEventListener('stop', () => {
+            this.audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          });
+        });
+    },
+    stopRecording() {
+      this.mediaRecorder.stop();
+      this.isRecording = false;
     },
     updateEmotion(emoji) {
+      console.log('emoji:', emoji);
       this.emotion = emoji;
     },
     openEmojiModal() {
@@ -94,25 +138,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.neumorphic-card {
-  border-radius: 20px;
-  background: #e0e0e0;
-  box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
-}
-
-.neumorphic-item {
-  border-radius: 10px;
-  background: #e0e0e0;
-  box-shadow: inset 5px 5px 10px #bebebe, inset -5px -5px 10px #ffffff;
-  margin-bottom: 20px;
-}
-
-.neumorphic-button {
-  border-radius: 10px;
-  background: #e0e0e0;
-  box-shadow: 5px 5px 10px #bebebe, -5px -5px 10px #ffffff;
-  margin: 10px 0;
-}
-</style>

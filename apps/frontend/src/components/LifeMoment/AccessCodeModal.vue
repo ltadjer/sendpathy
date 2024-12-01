@@ -65,6 +65,7 @@ export default {
     async handleAccessCode() {
       try {
         if (this.hasAccessCode) {
+          console.log('Validating access code');
           const isValid = await authService.validateAccessCode(this.token, this.accessCode);
           if (isValid) {
             this.$emit('access-code-validated');
@@ -73,7 +74,7 @@ export default {
             console.error('Invalid access code');
           }
         } else {
-          await authService.setAccessCode(this.token, this.accessCode);
+         this.accessCode =  await authService.setAccessCode(this.token, this.accessCode);
           localStorage.setItem('access_code', this.accessCode);
           this.$emit('access-code-set');
           this.closeModal();
@@ -84,11 +85,8 @@ export default {
     },
     closeModal() {
       this.$emit('update:isOpen', false);
+      console.log('Closing modal', this.isOpen);
     }
   }
 };
 </script>
-
-<style scoped>
-/* Add your styles here */
-</style>

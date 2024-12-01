@@ -2,7 +2,8 @@ import { LifeMomentService } from './life-moment.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/user/decorators/user.decorator';
-import { Controller, Post, Body, UseGuards, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Patch, Delete, UseGuards } from '@nestjs/common';
+import slugify from 'slugify';
 
 @ApiTags('life-moments')
 @Controller('life-moments')
@@ -14,7 +15,6 @@ export class LifeMomentController {
   @ApiOperation({ summary: 'Get all life moments' })
   @ApiResponse({ status: 200, description: 'Return all life moments.' })
   async findAll(@User() user: any) {
-    console.log('user', user);
     return this.lifeMomentService.findAll(user.id);
   }
 
@@ -22,16 +22,8 @@ export class LifeMomentController {
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Return the life moment.' })
   @ApiResponse({ status: 404, description: 'Life moment not found.' })
-  async findOne(@Param('id') id: string,  @User() user: any) {
+  async findOne(@Param('id') id: string, @User() user: any) {
     return this.lifeMomentService.findOne(id, user.id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  @ApiResponse({ status: 201, description: 'The life moment has been successfully created.' })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  async create(@Body() createLifeMomentDto: any, @User() user: any) {
-    return this.lifeMomentService.create(createLifeMomentDto, user.id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -39,12 +31,41 @@ export class LifeMomentController {
   @ApiOperation({ summary: 'Update a life moment by ID' })
   @ApiResponse({ status: 200, description: 'The life moment has been successfully updated.' })
   @ApiResponse({ status: 404, description: 'Life moment not found.' })
-  async update(
-    @Param('id') id: string,
-    @Body() updateLifeMomentDto: any,
-    @User() user: any
-  ){
+  async update(@Param('id') id: string, @Body() updateLifeMomentDto: any, @User() user: any) {
+    if (updateLifeMomentDto.contents && updateLifeMomentDto.contents.length > 0) {
+      updateLifeMomentDto.contents = updateLifeMomentDto.contents.map(content => {
+        if (content.content) {
+          return {
+            ...content,
+            fileUrl: `data:${content.type};base64,${content.content}`,
+          };
+        }
+        return content;
+      });
+    }
+
+    let slug = slugify(updateLifeMomentDto.content, { lower: true });
+    slug = slug.substring(0, 50); // Limit the slug to 50 characters
+    updateLifeMomentDto.slug = slug;
     return this.lifeMomentService.update(id, updateLifeMomentDto, user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  @ApiResponse({ status: 201, description: 'The life moment has been successfully created.' })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  async create(@Body() createLifeMomentDto: any, @User() user: any) {
+    createLifeMomentDto.contents = createLifeMomentDto.contents.map(content => {
+      return {
+        ...content,
+        fileUrl: `data:${content.type};base64,${content.content}`,
+      };
+    });
+
+    let slug = slugify(createLifeMomentDto.content, { lower: true });
+    slug = slug.substring(0, 50); // Limit the slug to 50 characters
+    createLifeMomentDto.slug = slug;
+    return this.lifeMomentService.create(createLifeMomentDto, user.id);
   }
 
   @UseGuards(JwtAuthGuard)

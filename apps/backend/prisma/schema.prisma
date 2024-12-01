@@ -214,16 +214,18 @@ model LifeMoment {
 }
 
 model Content {
-  id           String       @id @default(cuid())
+  id           String     @id @default(cuid())
   lifeMomentId String
-  type         ContentTypes @default(TEXT)
+  type         String
   order        Int
+  originalName String
+  fileUrl      String     @unique
   content      String
   size         Int?
   duration     Int?
-  lifeMoment   LifeMoment   @relation(fields: [lifeMomentId], references: [id])
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  lifeMoment   LifeMoment @relation(fields: [lifeMomentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   deletedAt    DateTime?
 }
 

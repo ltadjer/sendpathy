@@ -2,22 +2,30 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-    // Enable CORS
-    app.enableCors({  
-      origin: '*',
-      methods: ['GET,HEAD,PUT,PATCH,POST,DELETE'],
-    });
-    // Add prefix /api
-    app.setGlobalPrefix('api', {
-      exclude: [
-        { path: '/', method: RequestMethod.GET },
-      ],
-    });
 
-    const config = new DocumentBuilder()
+  // Enable CORS
+  app.enableCors({
+    origin: '*',
+    methods: ['GET,HEAD,PUT,PATCH,POST,DELETE'],
+  });
+
+  // Add prefix /api
+  app.setGlobalPrefix('api', {
+    exclude: [
+      { path: '/', method: RequestMethod.GET },
+    ],
+  });
+
+  // Increase payload size limit
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+  // Swagger setup
+  const config = new DocumentBuilder()
     .setTitle('Sendpathy')
     .setDescription('The Sendpathy API description')
     .setVersion('1.0')
@@ -25,7 +33,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  app.useGlobalPipes(new ValidationPipe());  
+  // Use global validation pipe
+  app.useGlobalPipes(new ValidationPipe());
+
   await app.listen(3000);
 }
 bootstrap();

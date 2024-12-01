@@ -8,4 +8,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({ description: 'Active status of the user', required: false })
   isActive?: boolean;
+
+  @ApiProperty({ description: 'Access code for the user', required: false })
+  accessCode?: string;
 }

@@ -76,7 +76,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch('/access-code')
+  @Post('/access-code')
   @ApiOperation({ summary: 'Set the access code for a user' })
   @ApiResponse({
     status: 200,
@@ -85,12 +85,14 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found.' })
   async setAccessCode(@Body('token') token: string, @Body('accessCode') accessCode: string) {
     console.log('token', token);
+    console.log('accessCode', accessCode);
     const user = await this.userService.findByRefreshToken(token);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    await this.userService.updateAccessCode(user.id, accessCode);
-    return { message: 'Access code set successfully' };
+    console.log('user', user);
+    return await this.userService.updateAccessCode(user.id, accessCode);
+
   }
 
   @UseGuards(JwtAuthGuard)
@@ -107,8 +109,7 @@ export class UserController {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const isValid = await this.userService.validateAccessCode(user.id, accessCode);
-    return isValid;
+    return await this.userService.validateAccessCode(user.id, accessCode);
   }
 
 

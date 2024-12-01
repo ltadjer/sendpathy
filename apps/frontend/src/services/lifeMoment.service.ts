@@ -7,7 +7,6 @@ export default {
    */
   async fetchAllLifeMoments() {
     const response = await api.get('/life-moments');
-    console.log(response.data);
     return response.data;
   },
 
@@ -29,7 +28,8 @@ export default {
    */
 
   async createOneLifeMoment(lifeMomentData) {
-    const response = await api.lifeMoment('/life-moments', lifeMomentData);
+    console.log('lifeMomentData', lifeMomentData);
+    const response = await api.post('/life-moments', lifeMomentData);
     return response.data;
   },
 

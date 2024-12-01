@@ -10,7 +10,6 @@ export class LifeMomentService {
   ) {}
 
   async findAll(userId: string) {
-    console.log('userId', userId);
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
