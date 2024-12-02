@@ -9,6 +9,8 @@
       <post-form :post="selectedPost" @post-updated="fetchAllPosts"></post-form>
       <ion-list>
         <ion-item v-for="post in posts" :key="post.id" @click="editPost(post)">
+          <span>{{ post.emotion }}</span>
+
           <p>{{ post.content }}</p>
           <ion-button slot="end" color="danger" @click.stop="deletePost(post.id)">Delete</ion-button>
           <ion-button slot="end" @click.stop="openCommentModal(post.id)" class="neumorphic-button">

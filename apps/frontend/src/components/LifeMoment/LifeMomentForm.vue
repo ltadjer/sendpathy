@@ -12,10 +12,6 @@
         <ion-label position="static">Image/Video</ion-label>
         <input type="file" @change="onFileChange" accept="image/*,video/*" />
       </ion-item>
-      <ion-item class="neumorphic-item" v-if="base64Image">
-        <ion-label position="static">Preview</ion-label>
-        <img :src="'data:image/jpeg;base64,' + base64Image" alt="Image Preview" />
-      </ion-item>
       <ion-item class="neumorphic-item">
         <ion-label position="floating">Audio</ion-label>
         <ion-button @click="startRecording" :disabled="isRecording">Start Recording</ion-button>
@@ -63,21 +59,40 @@ export default defineComponent({
       audioBlob: null,
       mediaRecorder: null,
       isEmojiModalOpen: false,
+      contents: [],
     };
   },
   setup() {
     return { happyOutline };
   },
+  watch: {
+    lifeMoment: {
+      immediate: true,
+      handler(newLifeMoment) {
+        if (newLifeMoment) {
+          this.content = newLifeMoment.content;
+          this.emotion = newLifeMoment.emotion;
+          this.contents = newLifeMoment.contents;
+        } else {
+          this.resetForm();
+        }
+      }
+    }
+  },
   methods: {
     async submitLifeMoment() {
-      const base64Content = await this.getFileBase64(this.file);
+      let base64Content = null;
+      if (this.file) {
+        base64Content = await this.getFileBase64(this.file);
+      }
       const formData = {
         content: this.content,
-        emotion: this.emotion ? this.emotion : '😐',
+        emotion: this.emotion ? this.emotion : '',
         contents: [
           {
+            base64Content: base64Content,
             type: this.file ? this.file.type : null,
-            content: base64Content,
+            content: this.content ? this.content : null,
             originalName: this.file ? this.file.name : null,
             size: this.file ? this.file.size : null,
             order: 1
@@ -134,6 +149,16 @@ export default defineComponent({
     },
     openEmojiModal() {
       this.isEmojiModalOpen = true;
+    },
+    resetForm() {
+      this.content = '';
+      this.file = null;
+      this.base64Image = '';
+      this.isRecording = false;
+      this.audioBlob = null;
+      this.mediaRecorder = null;
+      this.emotion = '';
+      this.contents = [];
     }
   },
 });

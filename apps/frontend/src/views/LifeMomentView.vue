@@ -62,9 +62,7 @@ export default defineComponent({
     }
   },
   async mounted() {
-    if (!this.isAccessCodeModalOpen) {
-      console.log('mounted');
       await this.checkAccessCode();
-    }  }
+    }
 });
 </script>
