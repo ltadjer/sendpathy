@@ -106,10 +106,29 @@ export default defineComponent({
       }
     },
     onFileChange(event) {
-      this.file = event.target.files[0];
-      this.getFileBase64(this.file).then(base64 => {
-        this.base64Image = base64;
-      });
+      const file = event.target.files[0];
+      if (this.validateFile(file)) {
+        this.file = file;
+        this.getFileBase64(this.file).then(base64 => {
+          this.base64Image = base64;
+        });
+      }
+    },
+    validateFile(file) {
+      const allowedTypes = ['image/png', 'image/jpeg', 'video/mp4', 'audio/mpeg'];
+      const maxSize = 10 * 1024 * 1024; // 10 MB
+
+      if (!allowedTypes.includes(file.type)) {
+        alert('Invalid file type');
+        return false;
+      }
+
+      if (file.size > maxSize) {
+        alert('File size exceeds the maximum limit of 10 MB');
+        return false;
+      }
+
+      return true;
     },
     getFileBase64(file) {
       return new Promise((resolve, reject) => {

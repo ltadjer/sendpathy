@@ -1,26 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as fs from 'fs';
-import * as path from 'path';
+import { saveFileToServer } from './utils/file.utils';
 
 @Injectable()
 export class ContentService {
   constructor(private prisma: PrismaService) {}
-  async saveFileToServer(file: any): Promise<string> {
-    const uploadPath = path.join(__dirname, '..', '..', 'uploads');
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
 
-    const fileName = `${Date.now()}-${file.originalName}`;
-    const filePath = path.join(uploadPath, fileName);
-    fs.writeFileSync(filePath, Buffer.from(file.base64Content, 'base64'));
-
-    return `/uploads/${fileName}`;
-  }
 
   async create(contentDto: any, lifeMomentId: string) {
-    const fileUrl = await this.saveFileToServer(contentDto);
+    const fileUrl = await saveFileToServer(contentDto);
 
     return await this.prisma.content.create({
       data: {
@@ -52,6 +40,11 @@ export class ContentService {
   }
 
   async update(id: string, updateContentDto: any) {
+    if (updateContentDto.base64Content) {
+      const fileUrl = await saveFileToServer(updateContentDto);
+      updateContentDto.fileUrl = fileUrl;
+    }
+
     return await this.prisma.content.update({
       where: {
         id: id,

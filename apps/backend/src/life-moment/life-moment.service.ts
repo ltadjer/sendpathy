@@ -27,6 +27,7 @@ export class LifeMomentService {
   async findOne(id: string, userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
+      include: { lifeMoments: true },
     });
 
     if (!user.accessCode) {
@@ -60,7 +61,8 @@ export class LifeMomentService {
       }
     }
 
-    return lifeMoment;
+    // Return the created life moment with its contents
+    return await this.findOne(lifeMoment.id, userId);
   }
 
   async update(id: string, updateLifeMomentDto: any, userId: string) {
