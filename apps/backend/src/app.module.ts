@@ -21,9 +21,11 @@ import { TriggerModule } from './trigger/trigger.module';
 import { TagController } from './tag/tag.controller';
 import { TagService } from './tag/tag.service';
 import { TagModule } from './tag/tag.module';
+import { LifeMomentModule } from './life-moment/life-moment.module';
+import { ContentModule } from './content/content.module';
 
 @Module({
-  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, MessageModule, ConversationModule, FriendshipModule, CommentModule, LikeModule, TriggerModule, TagModule],
+  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, MessageModule, ConversationModule, FriendshipModule, CommentModule, LikeModule, TriggerModule, TagModule, LifeMomentModule, ContentModule],
   controllers: [AppController, CommentController, LikeController, TriggerController, TagController],
   providers: [AppService, CommentService, LikeService, TriggerService, TagService],
 })

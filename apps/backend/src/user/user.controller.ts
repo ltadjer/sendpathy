@@ -6,13 +6,14 @@ import {
   Param,
   Delete,
   Patch,
-  UseGuards
-} from '@nestjs/common';
+  UseGuards, NotFoundException
+} from '@nestjs/common'
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from 'src/user/decorators/user.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -73,4 +74,43 @@ export class UserController {
   async delete(@Param('id') id: string) {
     return this.userService.delete(id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/access-code')
+  @ApiOperation({ summary: 'Set the access code for a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'The access code has been successfully set.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async setAccessCode(@Body('token') token: string, @Body('accessCode') accessCode: string) {
+    console.log('token', token);
+    console.log('accessCode', accessCode);
+    const user = await this.userService.findByRefreshToken(token);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    console.log('user', user);
+    return await this.userService.updateAccessCode(user.id, accessCode);
+
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/validate-access-code')
+  @ApiOperation({ summary: 'Validate the access code for a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'The access code is valid.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found or invalid access code.' })
+  async validateAccessCode(@Body('token') token: string, @Body('accessCode') accessCode: string) {
+    console.log('token', token);
+    const user = await this.userService.findByRefreshToken(token);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return await this.userService.validateAccessCode(user.id, accessCode);
+  }
+
+
 }

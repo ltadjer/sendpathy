@@ -19,11 +19,11 @@
 </template>
 
 <script>
-import postService from '@/services/post.service';
+import postService from '@/services/post.service.ts';
 import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent } from '@ionic/vue';
 
 export default {
-  name: 'PostEmotionsModal',
+  name: 'EmotionsModal',
   components: {
     IonModal,
     IonHeader,

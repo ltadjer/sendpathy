@@ -64,7 +64,13 @@ api.interceptors.response.use(
   }
 )
 
-
+api.interceptors.request.use((config) => {
+  const accessCode = localStorage.getItem('access_code');
+  if (accessCode) {
+    config.headers['x-access-code'] = accessCode;
+  }
+  return config;
+});
 
 export default {
   async get(url: string, config = {}) {

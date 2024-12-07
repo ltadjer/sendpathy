@@ -68,6 +68,7 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async update(id: string, updateUserDto: UpdateUserDto) {
+    console.log('updateUserDto', updateUserDto);
     return this.prisma.user.update({
       where: { id },
       data: updateUserDto,
@@ -160,7 +161,7 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async updateRefreshToken(userId: string, refreshToken: string) {
-    return this.prisma.user.update({
+    return await this.prisma.user.update({
       where: { id: userId },
       data: { refreshToken },
     });
@@ -172,6 +173,31 @@ export class UserService {
    * @returns L'utilisateur correspondant au refresh token.
    */
   async findByRefreshToken(refreshToken: string) {
-    return this.prisma.user.findFirst({ where: { refreshToken } });
+    console.log('refreshToken', refreshToken);
+    return await this.prisma.user.findFirst({ where: { refreshToken } });
   }
+
+  async updateAccessCode(userId: string, accessCode: string) {
+    console.log('accessCode', accessCode);
+    const salt = await bcrypt.genSalt();
+    const hashedAccessCode = await bcrypt.hash(accessCode, salt);
+    console.log('hashedAccessCode', hashedAccessCode);
+    const user = await this.prisma.user.update({
+      where: { id: userId },
+      data: { accessCode: hashedAccessCode },
+    });
+    return user.accessCode;
+  }
+
+  async validateAccessCode(userId: string, accessCode: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { accessCode: true },
+    });
+    if (!user || !user.accessCode) {
+      return false;
+    }
+    return bcrypt.compare(accessCode, user.accessCode);
+  }
+
 }
