@@ -231,7 +231,6 @@ model Content {
 
 model Reservation {
   id            String    @id @default(cuid())
-  uuid          String
   title         String
   date          DateTime
   userId        String

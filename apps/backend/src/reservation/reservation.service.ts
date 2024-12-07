@@ -40,14 +40,19 @@ export class ReservationService {
     return reservation;
   }
 
-  async create(createReservationDto: any, userId: string): Promise<any> {
+  async create(createReservationDto: any, userId: string) {
     if (!userId) {
       throw new Error('User ID is required');
     }
+
+    // Ensure the date is in ISO-8601 format
+    const date = new Date(createReservationDto.date).toISOString();
+
     return this.prisma.reservation.create({
       data: {
-        ...createReservationDto,
-        userId: userId,
+        date,
+        title: createReservationDto.title,
+        userId,
       },
       include: {
         user: true,

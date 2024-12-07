@@ -4,7 +4,7 @@ import { User } from '../user/decorators/user.decorator'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Get, Param, Post, Body, Patch, Delete, Controller, UseGuards } from '@nestjs/common';
 @ApiTags('reservations')
-@Controller('reservation')
+@Controller('reservations')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 

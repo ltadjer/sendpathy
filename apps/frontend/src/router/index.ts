@@ -8,7 +8,10 @@ import MessageView from "@/views/MessageView.vue";
 import ConversationView from "@/views/ConversationView.vue";
 import FeedView from '@/views/FeedView.vue';
 import LifeMomentView from "@/views/LifeMomentView.vue";
-import MainHeader from '@/components/Commun/MainHeader.vue'
+import MainHeader from '@/components/Commun/MainHeader.vue';
+import ReservationListView from '@/views/reservation/ReservationListView.vue';
+import NewReservationView from '@/views/reservation/NewReservationView.vue';
+import ReservationSummaryView from '@/views/reservation/ReservationSummaryView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -28,6 +31,9 @@ const routes: Array<RouteRecordRaw> = [
       { path: '/conversations/:id', component: MessageView },
       { path: '/feed', component: FeedView },
       { path: '/life-moments', component: LifeMomentView },
+      { path: '/reservations', component: ReservationListView },
+      {path: '/new-reservation', component: NewReservationView},
+      {path: '/reservations/summary', component: ReservationSummaryView},
     ],
   },
 ];
@@ -42,7 +48,6 @@ const router = createRouter({
 // Garde de navigation globale
 router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('refresh_token');
-  const accessCode = localStorage.getItem('access_code');
 
   if (!isAuthenticated && to.path !== '/connexion' && to.path !== '/inscription') {
     next('/connexion'); // Redirige vers la page de connexion si non authentifié
