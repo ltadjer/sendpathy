@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import lifeMomentService from '@/services/lifeMoment.service';
+import lifeMomentService from '@/services/life-moment.service';
 
 export const useLifeMomentStore = defineStore('lifeMoment', {
   state: () => ({

@@ -83,6 +83,14 @@ export default  {
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  /**
+   * Fetch all users with the role of therapist.
+   */
+  async fetchAllTherapists() {
+    const response = await api.get('/users?role=THERAPIST');
+    return response.data;
+  },
 }
 

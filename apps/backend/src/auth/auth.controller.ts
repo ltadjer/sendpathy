@@ -5,6 +5,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import slugify from 'slugify'
 
 @ApiTags('auth')
 @Controller('auth')
@@ -34,7 +35,8 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'User already exists.' })
   @ApiResponse({ status: 400, description: 'Invalid data.' })
   @ApiBody({ type: CreateUserDto })
-  async register(@Body() createUserDto: CreateUserDto) {
+  async register(@Body() createUserDto: any) {
+    console.log('slug', createUserDto);
     return this.authService.register(createUserDto);
   }
 

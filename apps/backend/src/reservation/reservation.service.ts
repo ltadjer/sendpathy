@@ -40,19 +40,43 @@ export class ReservationService {
     return reservation;
   }
 
+  async isSlotAvailable(date: Date, startTime: Date, endTime: Date, therapistId: string): Promise<boolean> {
+    const overlappingReservations = await this.prisma.reservation.findMany({
+      where: {
+        therapistId: therapistId,
+        date: date,
+        OR: [
+          {
+            startTime: { lte: endTime },
+            endTime: { gte: startTime },
+          },
+        ],
+      },
+    });
+
+    return overlappingReservations.length === 0;
+  }
+
   async create(createReservationDto: any, userId: string) {
     if (!userId) {
       throw new Error('User ID is required');
     }
 
-    // Ensure the date is in ISO-8601 format
-    const date = new Date(createReservationDto.date).toISOString();
+    const { date, startTime, endTime, therapistId } = createReservationDto;
+
+    const isAvailable = await this.isSlotAvailable(date, startTime, endTime, therapistId);
+    if (!isAvailable) {
+      throw new Error('The selected time slot is not available');
+    }
 
     return this.prisma.reservation.create({
       data: {
         date,
+        startTime,
+        endTime,
         title: createReservationDto.title,
         userId,
+        therapistId,
       },
       include: {
         user: true,
@@ -60,8 +84,9 @@ export class ReservationService {
     });
   }
 
+
   async update(id: string, updateReservationDto: any, userId: string): Promise<any> {
-    if(!userId) {
+    if (!userId) {
       throw new Error('User ID is required');
     }
 
@@ -76,6 +101,21 @@ export class ReservationService {
     if (reservation.userId !== userId) {
       throw new Error('You are not authorized to update this reservation');
     }
+
+    const { date, startTime, endTime, therapistId } = updateReservationDto;
+
+    const isAvailable = await this.isSlotAvailable(date, startTime, endTime, therapistId);
+    if (!isAvailable) {
+      throw new Error('The selected time slot is not available');
+    }
+
+    // Mark the previous slot as available
+    await this.prisma.reservation.update({
+      where: { id: id },
+      data: {
+        isCancelled: true,
+      },
+    });
 
     return this.prisma.reservation.update({
       where: { id: id },
@@ -103,8 +143,42 @@ export class ReservationService {
       throw new Error('You are not authorized to delete this reservation');
     }
 
+    // Mark the slot as available
+    await this.prisma.reservation.update({
+      where: { id: id },
+      data: {
+        isCancelled: true,
+      },
+    });
+
     return this.prisma.reservation.delete({
       where: { id: id },
+    });
+  }
+
+  async findAllAvailableSlots(therapistId: string): Promise<any> {
+    return this.prisma.reservation.findMany({
+      where: {
+        therapistId: therapistId,
+        isCancelled: false,
+      },
+      select: {
+        date: true,
+        startTime: true,
+        endTime: true,
+      },
+    });
+  }
+
+  async findAllTherapists(): Promise<any> {
+    return this.prisma.user.findMany({
+      where: {
+        role: 'THERAPIST',
+      },
+      select: {
+        id: true,
+        username: true,
+      },
     });
   }
 }

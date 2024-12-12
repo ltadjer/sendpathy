@@ -1,8 +1,9 @@
 import { ReservationService } from './reservation.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { User } from '../user/decorators/user.decorator'
+import { User } from '../user/decorators/user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { Get, Param, Post, Body, Patch, Delete, Controller, UseGuards } from '@nestjs/common';
+import { Get, Param, Post, Body, Patch, Delete, Query, Controller, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+
 @ApiTags('reservations')
 @Controller('reservations')
 export class ReservationController {
@@ -20,7 +21,7 @@ export class ReservationController {
   @Get(':id')
   @ApiResponse({ status: 200, description: 'Return the reservation.' })
   @ApiResponse({ status: 404, description: 'Reservation not found.' })
-  async findOne(@Param('id') id: string,  @User() user: any) {
+  async findOne(@Param('id') id: string, @User() user: any) {
     return this.reservationService.findOne(id, user.id);
   }
 
@@ -29,7 +30,11 @@ export class ReservationController {
   @ApiResponse({ status: 201, description: 'The reservation has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async create(@Body() createReservationDto: any, @User() user: any) {
-    return this.reservationService.create(createReservationDto, user.id);
+    try {
+      return await this.reservationService.create(createReservationDto, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -41,8 +46,12 @@ export class ReservationController {
     @Param('id') id: string,
     @Body() updateReservationDto: any,
     @User() user: any
-  ){
-    return this.reservationService.update(id, updateReservationDto, user.id);
+  ) {
+    try {
+      return await this.reservationService.update(id, updateReservationDto, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -50,7 +59,35 @@ export class ReservationController {
   @ApiOperation({ summary: 'Delete a reservation by ID' })
   @ApiResponse({ status: 200, description: 'The reservation has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Reservation not found.' })
-  async delete(@Param('id') id: string,  @User() user: any) {
-    return this.reservationService.remove(id, user.id);
+  async delete(@Param('id') id: string, @User() user: any) {
+    try {
+      return await this.reservationService.remove(id, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('available-slots')
+  @ApiOperation({ summary: 'Get available slots for a therapist' })
+  @ApiResponse({ status: 200, description: 'Return available slots.' })
+  async findAllAvailableSlots(@Query('therapistId') therapistId: string) {
+    try {
+      return await this.reservationService.findAllAvailableSlots(therapistId);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('therapists')
+  @ApiOperation({ summary: 'Get all therapists' })
+  @ApiResponse({ status: 200, description: 'Return all therapists.' })
+  async findAllAllTherapists() {
+    try {
+      return await this.reservationService.findAllTherapists();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }
