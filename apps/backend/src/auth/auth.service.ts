@@ -9,6 +9,9 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { MailerService } from 'src/mailer/mailer.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateTherapistDto } from 'src/user/dto/create-therapist.dto';
+import slugify from 'slugify'
 
 @Injectable()
 export class AuthService {
@@ -110,34 +113,23 @@ export class AuthService {
 
     //TODO: Add more validation rules to the other fields
   }
+
   /**
    * Enregistre un nouvel utilisateur.
-   * @param email - L'email de l'utilisateur.
-   * @param password - Le mot de passe de l'utilisateur.
    * @returns Un message indiquant que l'utilisateur a été créé.
    * @throws ConflictException si l'utilisateur existe déjà.
    * @throws Error si l'envoi de l'email de confirmation échoue.
+   * @param data
    */
-  async register(data: any) {
-    console.log('data', data)
-    const { email, username, password, age, nativeLanguage} = data;
-    this.validateRegistrationData(email, password);
-    const user = await this.userService.findOneByEmail(email);
+  async register(data: CreateUserDto | CreateTherapistDto) {
+    this.validateRegistrationData(data.email, data.password);
+    const user = await this.userService.findOneByEmail(data.email);
     if (user) {
       throw new ConflictException('User already exists');
     }
-    const slug = this.generateSlug(username);
-    console.log('slug', slug)
-    const newUser = await this.userService.create({
-      email,
-      username,
-      password,
-      age,
-      nativeLanguage,
-      slug,
-    });
+    const newUser = await this.userService.create(data);
     const emailSent = await this.mailerService.sendConfirmationEmail(
-      email,
+      data.email,
       newUser.confirmationToken,
     );
     if (!emailSent) {
@@ -188,15 +180,5 @@ export class AuthService {
    */
   async resetPassword(token: string, newPassword: string) {
     return await this.userService.resetPassword(token, newPassword);
-  }
-
-  /**
-   * Génére un slug à partir de l'username
-   * @param username 
-   * @returns un slug
-   */ 
-
-  generateSlug(username: string): string {
-    return username.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }
 }

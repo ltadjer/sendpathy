@@ -50,15 +50,6 @@ export default {
     return response.data;
   },
 
-  /**
-   * Fetch available slots for a therapist.
-   *
-   * @param {string} therapistId The ID of the therapist.
-   */
-  async fetchAllAvailableSlots(therapistId) {
-    const response = await api.get(`/reservations/available-slots?therapistId=${therapistId}`);
-    return response.data;
-  },
 
 
 

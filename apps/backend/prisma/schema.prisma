@@ -17,6 +17,8 @@ model User {
   id                 String   @id @default(cuid())
   email              String   @unique
   username           String?
+  firstName          String?
+  lastName           String?
   password           String
   role               UserRole @default(USER)
   age                Int?
@@ -29,21 +31,26 @@ model User {
   refreshToken       String?
   isActive           Boolean  @default(false)
 
-  posts                 Post[]
-  conversations         Conversation[] @relation("ConversationUsers")
-  sentMessages          Message[]      @relation("SentMessages")
-  receivedMessages      Message[]      @relation("ReceivedMessages")
-  friendshipsSent       Friendship[]   @relation("friendshipsSent")
-  friendshipsReceived   Friendship[]   @relation("friendshipsReceived")
-  likes                 Like[]
-  comments              Comment[]
-  tags                  tag[]          @relation("UserTags")
-  triggers              trigger[]      @relation("UserTriggers")
-  reservations          Reservation[]  @relation("UserReservations")
-  therapistReservations Reservation[]  @relation("TherapistReservations")
-  reports               Report[]
-  notifications         Notification[]
-  lifeMoments           LifeMoment[]
+  posts            Post[]
+  conversations    Conversation[] @relation("ConversationUsers")
+  // Relation for messages sent by the user
+  sentMessages     Message[]      @relation("SentMessages")
+  // Relation for messages received by the user
+  receivedMessages Message[]      @relation("ReceivedMessages")
+
+  // Relation to the friendships the user has sent
+  friendshipsSent     Friendship[]    @relation("friendshipsSent")
+  // Relation to the friendships the user has received
+  friendshipsReceived Friendship[]    @relation("friendshipsReceived")
+  likes               Like[] // Relation to the likes made by the user
+  comments            Comment[] // Relation to the comments made by the user
+  tags                tag[]           @relation("UserTags")
+  triggers            trigger[]       @relation("UserTriggers")
+  reservations        Reservation[] // Relation to the reservations made by the user
+  reports             Report[] // Relation to the reports made by the user
+  notifications       Notification[] // Relation to the notifications sent to the user
+  lifeMoments         LifeMoment[] // Relation to the life moments created by the user
+  availableSlots      AvailableSlot[] @relation("UserAvailableSlots") // Add this line
 
   accessCode String?
   createdAt  DateTime  @default(now())
@@ -234,20 +241,34 @@ model Content {
 }
 
 model Reservation {
-  id            String    @id @default(cuid())
-  title         String
+  id            String   @id @default(cuid())
+  uuid          String
   date          DateTime
-  startTime     DateTime
-  endTime       DateTime
-  videoCallLink String?
-  isCancelled   Boolean   @default(false)
-  user          User      @relation(name: "UserReservations", fields: [userId], references: [id])
   userId        String
-  therapist     User      @relation(name: "TherapistReservations", fields: [therapistId], references: [id])
-  therapistId   String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
+  slotId        String?  @unique
+  videoCallLink String?
+  isCancelled   Boolean  @default(false)
+
+  user User           @relation(fields: [userId], references: [id])
+  slot AvailableSlot? @relation(fields: [slotId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model AvailableSlot {
+  id          String   @id @default(cuid())
+  therapistId String
+  startTime   DateTime
+  endTime     DateTime
+  isBooked    Boolean  @default(false)
+
+  therapist   User         @relation("UserAvailableSlots", fields: [therapistId], references: [id])
+  reservation Reservation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum TargetType {

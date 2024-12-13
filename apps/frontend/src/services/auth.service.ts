@@ -89,7 +89,7 @@ export default  {
    * Fetch all users with the role of therapist.
    */
   async fetchAllTherapists() {
-    const response = await api.get('/users?role=THERAPIST');
+    const response = await api.get('/users/therapists');
     return response.data;
   },
 }

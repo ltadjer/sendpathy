@@ -59,35 +59,12 @@ export class ReservationController {
   @ApiOperation({ summary: 'Delete a reservation by ID' })
   @ApiResponse({ status: 200, description: 'The reservation has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Reservation not found.' })
-  async delete(@Param('id') id: string, @User() user: any) {
+  async cancel(@Param('id') id: string, @User() user: any) {
     try {
-      return await this.reservationService.remove(id, user.id);
+      return await this.reservationService.cancel(id, user.id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('available-slots')
-  @ApiOperation({ summary: 'Get available slots for a therapist' })
-  @ApiResponse({ status: 200, description: 'Return available slots.' })
-  async findAllAvailableSlots(@Query('therapistId') therapistId: string) {
-    try {
-      return await this.reservationService.findAllAvailableSlots(therapistId);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('therapists')
-  @ApiOperation({ summary: 'Get all therapists' })
-  @ApiResponse({ status: 200, description: 'Return all therapists.' })
-  async findAllAllTherapists() {
-    try {
-      return await this.reservationService.findAllTherapists();
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-  }
 }

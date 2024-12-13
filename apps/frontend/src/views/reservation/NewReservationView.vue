@@ -2,76 +2,67 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Nouvelle Réservation</ion-title>
+        <ion-title>New Reservation</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
       <ion-list>
         <ion-item>
-          <ion-label>Titre:</ion-label>
-          <ion-input v-model="title" required></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label>Thérapeute:</ion-label>
-          <ion-select v-model="selectedTherapist" @ionChange="fetchAvailableSlots">
-            <ion-select-option v-for="therapist in therapists" :key="therapist.id" :value="therapist">
+          <ion-label>Therapist</ion-label>
+          <ion-select v-model="selectedTherapist" placeholder="Select Therapist">
+            <ion-select-option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id">
               {{ therapist.username }}
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-item v-if="availableSlots.length">
-          <ion-label>Date et Heure:</ion-label>
-          <ion-accordion-group>
-            <ion-accordion v-for="(slots, date) in availableSlots" :key="date">
-              <ion-item slot="header">
-                <ion-label>{{ date }}</ion-label>
-              </ion-item>
-              <ion-list slot="content">
-                <ion-item v-for="slot in slots" :key="slot.startTime" @click="selectSlot(slot)">
+        <ion-accordion-group>
+          <ion-accordion v-for="(slots, date) in availableSlotsByDate" :key="date">
+            <ion-item slot="header">
+              <ion-label>{{ date }}</ion-label>
+            </ion-item>
+            <ion-list slot="content">
+              <ion-radio-group v-model="selectedSlot">
+                <ion-item v-for="slot in slots" :key="slot.id">
                   <ion-label>{{ slot.startTime }} - {{ slot.endTime }}</ion-label>
+                  <ion-radio slot="start" :value="slot.id"></ion-radio>
                 </ion-item>
-              </ion-list>
-            </ion-accordion>
-          </ion-accordion-group>
-        </ion-item>
+              </ion-radio-group>
+            </ion-list>
+          </ion-accordion>
+        </ion-accordion-group>
       </ion-list>
-      <ion-button expand="full" @click="redirectToConfirm">Réserver</ion-button>
+      <ion-button expand="full" @click="submitReservation">Submit</ion-button>
     </ion-content>
   </ion-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion, IonButton, IonInput } from '@ionic/vue';
+<script>
 import reservationService from '@/services/reservation.service';
+import availableSlotService from '@/services/available-slot.service';
 import authService from '@/services/auth.service';
-import { useReservationStore } from '@/stores/reservation';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion, IonRadioGroup, IonRadio, IonButton } from '@ionic/vue';
 
-export default defineComponent({
-  name: 'NewReservationView',
-  components: { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion, IonButton, IonInput },
+export default {
   data() {
     return {
-      title: '',
-      selectedTherapist: null,
+      availableSlotsByDate: {},
+      selectedSlot: null,
       therapists: [],
-      availableSlots: {},
+      selectedTherapist: null,
     };
   },
+  components: {
+    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion, IonRadioGroup, IonRadio, IonButton,
+  },
   async created() {
+    const slots = await availableSlotService.fetchAllAvailableSlots();
+    this.availableSlotsByDate = this.groupSlotsByDate(slots);
     this.therapists = await authService.fetchAllTherapists();
   },
   methods: {
-    async fetchAvailableSlots() {
-      if (this.selectedTherapist) {
-        // Fetch available slots for the selected therapist
-        const slots = await reservationService.fetchAllAvailableSlots(this.selectedTherapist.id);
-        this.availableSlots = this.groupSlotsByDate(slots);
-      }
-    },
     groupSlotsByDate(slots) {
       return slots.reduce((acc, slot) => {
-        const date = slot.date.split('T')[0];
+        const date = new Date(slot.startTime).toLocaleDateString();
         if (!acc[date]) {
           acc[date] = [];
         }
@@ -79,20 +70,17 @@ export default defineComponent({
         return acc;
       }, {});
     },
-    selectSlot(slot) {
-      this.selectedSlot = slot;
-    },
-    redirectToConfirm() {
-      const reservationStore = useReservationStore();
-      reservationStore.setReservation({
-        title: this.title,
-        date: this.selectedSlot.date,
-        startTime: this.selectedSlot.startTime,
-        endTime: this.selectedSlot.endTime,
-        therapistId: this.selectedTherapist.id,
+    async submitReservation() {
+      if (!this.selectedSlot || !this.selectedTherapist) {
+        alert('Please select a slot and a therapist');
+        return;
+      }
+      await reservationService.createOneReservation({
+        slotId: this.selectedSlot,
+        therapistId: this.selectedTherapist,
       });
-      this.$router.push('/reservations/summary');
+      alert('Reservation created successfully');
     },
   },
-});
+};
 </script>

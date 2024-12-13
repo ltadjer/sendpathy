@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateTherapistDto } from './dto/create-therapist.dto'
 
 @Injectable()
 export class UserService {
@@ -44,7 +45,7 @@ export class UserService {
    * @param createUserDto - Les données pour créer un nouvel utilisateur.
    * @returns Les informations de l'utilisateur créé sans le mot de passe.
    */
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto | CreateTherapistDto) {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createUserDto.password, salt);
     const confirmationToken = uuidv4();
@@ -198,6 +199,20 @@ export class UserService {
       return false;
     }
     return bcrypt.compare(accessCode, user.accessCode);
+  }
+
+  async findAllTherapists() {
+    return this.prisma.user.findMany({
+      where: { role: 'THERAPIST' },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        biography: true,
+        email: true,
+        slug: true,
+      },
+    });
   }
 
 }

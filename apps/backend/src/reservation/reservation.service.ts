@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service'
+import { AvailableSlotService } from '../available-slot/available-slot.service'
 
 @Injectable()
 export class ReservationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,
+              private availableSlotService: AvailableSlotService) {}
 
   async findAll(userId: string): Promise<any> {
     if(!userId) {
@@ -40,59 +42,35 @@ export class ReservationService {
     return reservation;
   }
 
-  async isSlotAvailable(date: Date, startTime: Date, endTime: Date, therapistId: string): Promise<boolean> {
-    const overlappingReservations = await this.prisma.reservation.findMany({
-      where: {
-        therapistId: therapistId,
-        date: date,
-        OR: [
-          {
-            startTime: { lte: endTime },
-            endTime: { gte: startTime },
-          },
-        ],
-      },
-    });
-
-    return overlappingReservations.length === 0;
-  }
-
-  async create(createReservationDto: any, userId: string) {
+  async create(createReservationDto: any, userId: string): Promise<any> {
     if (!userId) {
       throw new Error('User ID is required');
     }
 
-    const { date, startTime, endTime, therapistId } = createReservationDto;
+    const slot = await this.availableSlotService.findOne(createReservationDto.slotId);
 
-    const isAvailable = await this.isSlotAvailable(date, startTime, endTime, therapistId);
-    if (!isAvailable) {
-      throw new Error('The selected time slot is not available');
+    if (!slot || slot.isBooked) {
+      throw new Error('Slot is not available');
     }
 
-    return this.prisma.reservation.create({
+    const reservation = await this.prisma.reservation.create({
       data: {
-        date,
-        startTime,
-        endTime,
-        title: createReservationDto.title,
+        ...createReservationDto,
         userId,
-        therapistId,
-      },
-      include: {
-        user: true,
       },
     });
-  }
 
+    await this.availableSlotService.update(createReservationDto.slotId, { isBooked: true });
+
+    return reservation;
+  }
 
   async update(id: string, updateReservationDto: any, userId: string): Promise<any> {
-    if (!userId) {
+    if(!userId) {
       throw new Error('User ID is required');
     }
 
-    const reservation = await this.prisma.reservation.findUnique({
-      where: { id: id },
-    });
+    const reservation = await this.findOne(id, userId);
 
     if (!reservation) {
       throw new Error('Reservation not found');
@@ -101,21 +79,6 @@ export class ReservationService {
     if (reservation.userId !== userId) {
       throw new Error('You are not authorized to update this reservation');
     }
-
-    const { date, startTime, endTime, therapistId } = updateReservationDto;
-
-    const isAvailable = await this.isSlotAvailable(date, startTime, endTime, therapistId);
-    if (!isAvailable) {
-      throw new Error('The selected time slot is not available');
-    }
-
-    // Mark the previous slot as available
-    await this.prisma.reservation.update({
-      where: { id: id },
-      data: {
-        isCancelled: true,
-      },
-    });
 
     return this.prisma.reservation.update({
       where: { id: id },
@@ -126,59 +89,15 @@ export class ReservationService {
     });
   }
 
-  async remove(id: string, userId: string): Promise<any> {
-    if (!userId) {
-      throw new Error('User ID is required');
+  async cancel(id: string, userId: string): Promise<any> {
+    const reservation = await this.findOne(id, userId);
+
+    if (!reservation || reservation.userId !== userId) {
+      throw new Error('Reservation not found or unauthorized');
     }
 
-    const reservation = await this.prisma.reservation.findUnique({
-      where: { id: id },
-    });
+    await this.prisma.reservation.delete({ where: { id } });
 
-    if (!reservation) {
-      throw new Error('Reservation not found');
-    }
-
-    if (reservation.userId !== userId) {
-      throw new Error('You are not authorized to delete this reservation');
-    }
-
-    // Mark the slot as available
-    await this.prisma.reservation.update({
-      where: { id: id },
-      data: {
-        isCancelled: true,
-      },
-    });
-
-    return this.prisma.reservation.delete({
-      where: { id: id },
-    });
-  }
-
-  async findAllAvailableSlots(therapistId: string): Promise<any> {
-    return this.prisma.reservation.findMany({
-      where: {
-        therapistId: therapistId,
-        isCancelled: false,
-      },
-      select: {
-        date: true,
-        startTime: true,
-        endTime: true,
-      },
-    });
-  }
-
-  async findAllTherapists(): Promise<any> {
-    return this.prisma.user.findMany({
-      where: {
-        role: 'THERAPIST',
-      },
-      select: {
-        id: true,
-        username: true,
-      },
-    });
+    await this.availableSlotService.update(reservation.slotId, { isBooked: false });
   }
 }
