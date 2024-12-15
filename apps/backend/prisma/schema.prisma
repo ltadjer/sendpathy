@@ -7,11 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  USER
+  THERAPIST
+  ADMIN
+}
+
 model User {
-  id                 String  @id @default(cuid())
-  email              String  @unique
+  id                 String   @id @default(cuid())
+  email              String   @unique
   username           String?
+  firstName          String?
+  lastName           String?
   password           String
+  role               UserRole @default(USER)
   age                Int?
   nativeLanguage     String?
   avatar             String?
@@ -20,7 +29,7 @@ model User {
   confirmationToken  String?
   resetPasswordToken String?
   refreshToken       String?
-  isActive           Boolean @default(false)
+  isActive           Boolean  @default(false)
 
   posts            Post[]
   conversations    Conversation[] @relation("ConversationUsers")
@@ -30,21 +39,23 @@ model User {
   receivedMessages Message[]      @relation("ReceivedMessages")
 
   // Relation to the friendships the user has sent
-  friendshipsSent     Friendship[]   @relation("friendshipsSent")
+  friendshipsSent     Friendship[]    @relation("friendshipsSent")
   // Relation to the friendships the user has received
-  friendshipsReceived Friendship[]   @relation("friendshipsReceived")
+  friendshipsReceived Friendship[]    @relation("friendshipsReceived")
   likes               Like[] // Relation to the likes made by the user
   comments            Comment[] // Relation to the comments made by the user
-  tags                tag[]          @relation("UserTags")
-  triggers            trigger[]      @relation("UserTriggers")
+  tags                tag[]           @relation("UserTags")
+  triggers            trigger[]       @relation("UserTriggers")
   reservations        Reservation[] // Relation to the reservations made by the user
   reports             Report[] // Relation to the reports made by the user
   notifications       Notification[] // Relation to the notifications sent to the user
   lifeMoments         LifeMoment[] // Relation to the life moments created by the user
-  accessCode          String?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  deletedAt           DateTime?
+  availableSlots      AvailableSlot[] @relation("UserAvailableSlots") // Add this line
+
+  accessCode String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
 }
 
 model Post {
@@ -230,17 +241,34 @@ model Content {
 }
 
 model Reservation {
-  id            String    @id @default(cuid())
+  id            String   @id @default(cuid())
   uuid          String
-  title         String
   date          DateTime
   userId        String
+  slotId        String?  @unique
   videoCallLink String?
-  isCancelled   Boolean   @default(false)
-  user          User      @relation(fields: [userId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
+  isCancelled   Boolean  @default(false)
+
+  user User           @relation(fields: [userId], references: [id])
+  slot AvailableSlot? @relation(fields: [slotId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model AvailableSlot {
+  id          String   @id @default(cuid())
+  therapistId String
+  startTime   DateTime
+  endTime     DateTime
+  isBooked    Boolean  @default(false)
+
+  therapist   User         @relation("UserAvailableSlots", fields: [therapistId], references: [id])
+  reservation Reservation?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum TargetType {

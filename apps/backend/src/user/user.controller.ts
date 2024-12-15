@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Patch,
+  Query,
   UseGuards, NotFoundException
 } from '@nestjs/common'
 import { UserService } from './user.service';
@@ -13,7 +14,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from 'src/user/decorators/user.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -110,6 +110,14 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
     return await this.userService.validateAccessCode(user.id, accessCode);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('therapists')
+  @ApiOperation({ summary: 'Get all therapists' })
+  @ApiResponse({ status: 200, description: 'Return all therapists.' })
+  async findAllTherapists() {
+    return this.userService.findAllTherapists();
   }
 
 

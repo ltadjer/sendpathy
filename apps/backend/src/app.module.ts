@@ -23,10 +23,15 @@ import { TagService } from './tag/tag.service';
 import { TagModule } from './tag/tag.module';
 import { LifeMomentModule } from './life-moment/life-moment.module';
 import { ContentModule } from './content/content.module';
+import { ReservationController } from './reservation/reservation.controller';
+import { ReservationModule } from './reservation/reservation.module';
+import { ReservationService } from './reservation/reservation.service'
+import { AvailableSlotController } from './available-slot/available-slot.controller';
+import { AvailableSlotService } from './available-slot/available-slot.service';
 
 @Module({
-  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, MessageModule, ConversationModule, FriendshipModule, CommentModule, LikeModule, TriggerModule, TagModule, LifeMomentModule, ContentModule],
-  controllers: [AppController, CommentController, LikeController, TriggerController, TagController],
-  providers: [AppService, CommentService, LikeService, TriggerService, TagService],
+  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, MessageModule, ConversationModule, FriendshipModule, CommentModule, LikeModule, TriggerModule, TagModule, LifeMomentModule, ContentModule, ReservationModule],
+  controllers: [AppController, CommentController, LikeController, TriggerController, TagController, ReservationController, AvailableSlotController],
+  providers: [AppService, CommentService, LikeService, TriggerService, TagService, ReservationService, AvailableSlotService],
 })
 export class AppModule {}

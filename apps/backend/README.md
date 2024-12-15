@@ -20,7 +20,8 @@ Before you begin, ensure you have met the following requirements:
 - You have a installed [Docker compose](https://docs.docker.com/compose/)
 - You have installed [Just]()
 - Install Prettier
-
+- Install ESLint
+- Install [local_env](https://github.com/ltadjer/local_env.git)
 > it is recommended to set tabSize to 2
 
 if you want to run the project without docker

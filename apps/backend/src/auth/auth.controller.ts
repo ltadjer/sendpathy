@@ -5,7 +5,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-
+import { CreateTherapistDto } from 'src/user/dto/create-therapist.dto';
+import slugify from 'slugify';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -28,14 +29,31 @@ export class AuthController {
    * Registers a new user.
    * @param createUserDto - The data transfer object containing user details.
    */
-  @Post('register')
+  @Post('register/user')
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 201, description: 'User registered successfully.' })
   @ApiResponse({ status: 409, description: 'User already exists.' })
   @ApiResponse({ status: 400, description: 'Invalid data.' })
   @ApiBody({ type: CreateUserDto })
-  async register(@Body() createUserDto: CreateUserDto) {
+  async register(@Body() createUserDto: any) {
+    createUserDto.slug = slugify(createUserDto.username, { lower: true });
     return this.authService.register(createUserDto);
+  }
+
+  /**
+   * Registers a new therapist.
+   * @param createTherapistDto - The data transfer object containing therapist details.
+   */
+  @Post('register/therapist')
+  @ApiOperation({ summary: 'Register a new therapist' })
+  @ApiResponse({ status: 201, description: 'Therapist registered successfully.' })
+  @ApiResponse({ status: 409, description: 'Therapist already exists.' })
+  @ApiResponse({ status: 400, description: 'Invalid data.' })
+  @ApiBody({ type: CreateTherapistDto })
+  async registerTherapist(@Body() createTherapistDto: CreateTherapistDto) {
+    createTherapistDto.slug = slugify(`${createTherapistDto.firstName} ${createTherapistDto.lastName}`, { lower: true });
+    createTherapistDto.role = 'THERAPIST';
+    return this.authService.register(createTherapistDto);
   }
 
   /**

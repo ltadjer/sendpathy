@@ -6,8 +6,6 @@
 import { defineComponent } from 'vue';
 import PostList from '@/components/Feed/PostList.vue';
 import postService from '@/services/post.service';
-import { useRoute } from 'vue-router';
-import { onIonViewDidEnter, useIonRouter } from '@ionic/vue';
 
 export default defineComponent({
   name: 'FeedView',
@@ -18,11 +16,6 @@ export default defineComponent({
     return {
       posts: [],
     };
-  },
-  setup() {
-    const router = useIonRouter();
-    const route = useRoute();
-    return { router, route };
   },
   mounted() {
     this.fetchAllPosts();
