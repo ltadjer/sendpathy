@@ -30,7 +30,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: '/conversations', component: ConversationView },
       { path: '/conversations/:id', component: MessageView },
       { path: '/feed', component: FeedView },
-      { path: '/life-moments', component: LifeMomentView },
+      { path: '/journal', component: LifeMomentView },
       { path: '/reservations', component: ReservationListView },
       {path: '/new-reservation', component: NewReservationView},
       {path: '/reservations/summary', component: ReservationSummaryView},
@@ -48,7 +48,7 @@ const router = createRouter({
 // Garde de navigation globale
 router.beforeEach((to, from, next) => {
   const isAuthenticated = !!localStorage.getItem('refresh_token');
-
+  console.log('isAuthenticated',isAuthenticated)
   if (!isAuthenticated && to.path !== '/connexion' && to.path !== '/inscription') {
     next('/connexion'); // Redirige vers la page de connexion si non authentifié
   } else {

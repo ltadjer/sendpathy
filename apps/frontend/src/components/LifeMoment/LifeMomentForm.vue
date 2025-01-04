@@ -29,7 +29,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { IonIcon, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonButton } from '@ionic/vue';
-import { useLifeMomentStore } from '@/stores/lifeMoment';
+import { useLifeMomentStore } from '@/stores/life-moment';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
 import { happyOutline } from 'ionicons/icons';
 

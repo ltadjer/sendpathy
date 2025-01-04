@@ -22,6 +22,7 @@ export class CommentService {
         post: { connect: { id: postId } },
         user: { connect: { id: userId } },
       },
+      include: { user: true },
     });
   }
 
@@ -44,6 +45,7 @@ export class CommentService {
         user: { connect: { id: userId } },
         post: { connect: { id: parentComment.postId } },
       },
+      include: { user: true },
     });
   }
 

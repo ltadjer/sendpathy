@@ -14,7 +14,7 @@
 import { defineComponent } from 'vue';
 import LifeMomentList from '@/components/LifeMoment/LifeMomentList.vue';
 import AccessCodeModal from '@/components/LifeMoment/AccessCodeModal.vue';
-import { useLifeMomentStore } from '@/stores/lifeMoment';
+import { useLifeMomentStore } from '@/stores/life-moment';
 
 export default defineComponent({
   name: 'LifeMomentView',

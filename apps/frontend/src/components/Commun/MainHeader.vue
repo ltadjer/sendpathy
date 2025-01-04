@@ -1,45 +1,40 @@
 <template>
-  <ion-page>
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
-      <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="Feed" href="/feed">
-          <ion-icon :icon="chatboxOutline"></ion-icon>
-          <ion-label>Feed</ion-label>
+      <ion-tab-bar slot="bottom" class="ion-margin">
+        <ion-tab-button tab="feed" href="/feed">
+          <ion-icon :icon="homeOutline"></ion-icon>
         </ion-tab-button>
-
-        <ion-tab-button tab="libray" href="/life-moments">
-          <ion-icon :icon="libray" />
-          <ion-label>LifeMoments</ion-label>
+        <ion-tab-button tab="libray" href="/journal">
+          <ion-icon :icon="journalOutline" />
         </ion-tab-button>
-
-        <ion-tab-button tab="radio" href="/conversations">
-          <ion-icon :icon="radio" />
-          <ion-label>Messagerie</ion-label>
+        <ion-tab-button tab="chatbubblesOutline" href="/conversations">
+          <ion-icon :icon="chatbubblesOutline" />
         </ion-tab-button>
-
+        <ion-tab-button tab="reservations" href="/reservations">
+          <ion-icon :icon="todayOutline" />
+        </ion-tab-button>
+        <ion-tab-button tab="settings" href="/parametres">
+          <ion-icon :icon="settingsOutline" />
+        </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
-  </ion-page>
 </template>
 
 <script lang="ts">
-import { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel, IonIcon } from '@ionic/vue';
-
-import { chatboxOutline, radio, library, search } from 'ionicons/icons';
+import { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon } from '@ionic/vue';
+import { settingsOutline, homeOutline, chatbubblesOutline, journalOutline, todayOutline } from 'ionicons/icons';
 
 export default {
-  components: { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonLabel, IonIcon },
+  components: { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon },
   data() {
     return {
-      chatboxOutline,
-      radio,
-      library,
-      search,
+      homeOutline,
+      chatbubblesOutline,
+      journalOutline,
+      settingsOutline,
+      todayOutline
     };
   },
-  created() {
-    console.log('MainHeader component created');
-  }
 };
 </script>

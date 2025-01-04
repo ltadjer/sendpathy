@@ -21,7 +21,7 @@ export class LikeService {
         user: { connect: { id: userId } },
       },
     });
-    return { message: 'Post liked' };
+    return { message: 'Post liked', postId: postId };
   }
 
   async unlikePost(postId: string, userId: string) {
@@ -31,7 +31,7 @@ export class LikeService {
         userId: userId,
       },
     });
-    return { message: 'Post unliked' };
+    return { message: 'Post unliked', postId: postId };
   }
 
   async likeComment(commentId: string, userId: string) {
@@ -49,7 +49,7 @@ export class LikeService {
         user: { connect: { id: userId } },
       },
     });
-    return { message: 'Comment liked' };
+    return { message: 'Comment liked', commentId: commentId };
   }
 
   async unlikeComment(commentId: string, userId: string) {
@@ -59,6 +59,6 @@ export class LikeService {
         userId: userId,
       },
     });
-    return { message: 'Comment unliked' };
+    return { message: 'Comment unliked', commentId: commentId };
   }
 }

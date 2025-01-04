@@ -44,9 +44,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IonItem, IonButton, IonInput, IonList, IonGrid, IonRow, IonCol, IonIcon } from '@ionic/vue';
-import commentService from '@/services/comment.service';
-import likeService from '@/services/like.service';
 import { heart, heartOutline } from 'ionicons/icons';
+import { usePostStore } from '@/stores/post'
 
 export default defineComponent({
   name: 'CommentItem',
@@ -73,26 +72,23 @@ export default defineComponent({
   },
   methods: {
     async deleteComment() {
-      await commentService.deleteCommentFromPost(this.postId, this.comment.id);
-      await this.$emit('update-comments');
+      await usePostStore().deleteCommentFromPost(this.postId, this.comment.id);
     },
     async addReply() {
-      await commentService.addCommentToComment(this.comment.id, { content: this.replyContent });
+      await usePostStore().addCommentToComment(this.comment.id, { content: this.replyContent });
       this.replyContent = '';
-      await this.$emit('update-comments');
     },
     toggleReplies() {
       this.comment.showReplies = !this.comment.showReplies;
     },
     async toggleLike() {
       if (this.comment.isLiked) {
-        await likeService.unlikeComment(this.comment.id);
+        await usePostStore().unlikeComment(this.comment.id);
         this.comment.isLiked = false;
       } else {
-        await likeService.likeComment(this.comment.id);
+        await usePostStore().likeComment(this.comment.id);
         this.comment.isLiked = true;
       }
-      await this.$emit('update-comments');
     }
   },
   created() {

@@ -29,8 +29,8 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonItem, IonLabel, IonSelect, IonSelectOption } from '@ionic/vue';
-import tagService from '@/services/tag.service';
-import triggerService from '@/services/trigger.service';
+import { useTagStore} from '@/stores/tag';
+import { useTriggerStore } from '@/stores/trigger';
 
 export default defineComponent({
   name: 'PostSettingsModal',
@@ -67,10 +67,10 @@ export default defineComponent({
   },
   methods: {
     async fetchTags() {
-      this.tags = await tagService.fetchAllTags();
+      this.tags = await useTagStore().fetchAllTags();
     },
     async fetchTriggers() {
-      this.triggers = await triggerService.fetchAllTriggers();
+      this.triggers = await useTriggerStore().fetchAllTriggers();
     },
     closeModal() {
       this.$emit('close');

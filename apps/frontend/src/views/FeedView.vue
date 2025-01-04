@@ -5,26 +5,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import PostList from '@/components/Feed/PostList.vue';
-import postService from '@/services/post.service';
+import { usePostStore} from '@/stores/post';
 
 export default defineComponent({
   name: 'FeedView',
   components: {
     PostList
   },
-  data() {
-    return {
-      posts: [],
-    };
+  async created() {
+    await usePostStore().fetchAllPosts();
   },
-  mounted() {
-    this.fetchAllPosts();
+  computed: {
+    posts() {
+      return usePostStore().posts;
+    }
   },
-  methods: {
-    async fetchAllPosts() {
-      const response = await postService.fetchAllPosts();
-      this.posts = response;
-    },
-  }
 });
 </script>
