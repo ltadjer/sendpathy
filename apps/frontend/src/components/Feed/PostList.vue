@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header collapse="fade" class="ion-padding">
+    <ion-header :translucent="true" class="ion-padding">
       <ion-toolbar>
         <ion-buttons slot="start">
           <ion-button size="small" class="ion-no-shadow">
@@ -8,18 +8,18 @@
               <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
             </ion-avatar>
           </ion-button>
-          </ion-buttons>
+        </ion-buttons>
         <ion-title>Feed</ion-title>
         <ion-buttons slot="end">
           <ion-button size="small" class="ion-no-shadow">
-            <img alt="Logo" src="@/assets/logo.png" width="80px" />
+            <img alt="Logo" src="@/assets/logo.png" width="70px" />
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <post-form :post="selectedPost"></post-form>
-      <ion-list class="ion-padding">
+      <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" />
+      <ion-list class="ion-padding" style="background: none;">
         <ion-item class="ion-margin-bottom" lines="none" v-for="post in posts" :key="post.id" @click="editPost(post)">
           <ion-grid>
             <ion-row>
@@ -37,17 +37,17 @@
               </ion-col>
               <ion-col size="auto">
                 <ion-button @click.stop="deletePost(post.id)" class="ion-no-shadow">
-                  <ion-icon :icon="trashOutline"></ion-icon>
+                  <ion-icon size="medium" :icon="trashOutline"></ion-icon>
                 </ion-button>
               </ion-col>
             </ion-row>
             <ion-row>
               <ion-col size="auto">
-                  <ion-icon @click.stop="openCommentModal(post.id)" :icon="chatbubbleOutline"></ion-icon>
+                <ion-icon class="custom-icon" @click.stop="openCommentModal(post.id)" :icon="chatbubbleOutline"></ion-icon>
               </ion-col>
               <ion-col size="auto">
-                  <ion-icon @click.stop="toggleLike(post)" :icon="post.isLiked ? heart : heartOutline"></ion-icon>
-                  <span v-if="post.likes">{{ post.likes.length }}</span>
+                <ion-icon class="custom-icon" @click.stop="toggleLike(post)" :icon="post.isLiked ? heart : heartOutline"></ion-icon>
+                <span v-if="post.likes">{{ post.likes.length }}</span>
               </ion-col>
             </ion-row>
           </ion-grid>
@@ -59,9 +59,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonThumbnail, IonGrid, IonCol, IonRow } from '@ionic/vue';
-import PostForm from '@/components/Feed/PostForm.vue';
+import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
 import { chatbubbleOutline, heart, heartOutline, trashOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
@@ -69,6 +69,7 @@ import { usePostStore } from '@/stores/post';
 export default defineComponent({
   name: 'PostList',
   components: {
+    PostFormModal,
     IonThumbnail,
     IonPage,
     IonHeader,
@@ -84,7 +85,6 @@ export default defineComponent({
     IonGrid,
     IonCol,
     IonRow,
-    PostForm,
     PostCommentModal
   },
   setup() {
@@ -94,6 +94,7 @@ export default defineComponent({
     return {
       selectedPostId: null,
       isCommentModalOpen: false,
+      isPostFormModalOpen: false
     };
   },
   props: {
@@ -111,6 +112,7 @@ export default defineComponent({
   methods: {
     editPost(post) {
       this.selectedPostId = post.id;
+      this.isPostFormModalOpen = true;
     },
     async deletePost(postId) {
       await usePostStore().deletePost(postId);
@@ -131,6 +133,10 @@ export default defineComponent({
         await usePostStore().likePost(post.id);
         post.isLiked = true;
       }
+    },
+    closePostFormModal() {
+      this.isPostFormModalOpen = false;
+      this.selectedPostId = null;
     }
   },
 });

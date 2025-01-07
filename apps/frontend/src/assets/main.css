@@ -1,8 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+
+* {
+    font-family: "Quicksand", sans-serif !important;
+}
+
 body {
     --ion-background-color: #f5f5fa !important;
     --ion-text-color: #333 !important;
 }
 
+.flex-center {
+    display: flex;
+    justify-content: center;
+    height: 95vh;
+    flex-direction: column;
+}
 ion-header {
     box-shadow:none !important;
 }
@@ -11,30 +23,43 @@ ion-card,
 ion-item {
     --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%) !important;
     --background: #f5f5fa !important;
-    box-shadow: var(--neumorphism-box-shadow) !important;
+    box-shadow: var(--neumorphism-out-shadow) !important;
     border-radius: 1rem !important;
+}
+ion-select {
+    box-shadow: var(--neumorphism-out-shadow) !important;
+    border-radius: 1rem !important;
+}
+
+ion-fab-button {
+    --box-shadow: var(--neumorphism-out-shadow) !important;
 }
 
 ion-button {
     --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%) !important;
     --background: #f5f5fa !important;
-    --box-shadow: var(--neumorphism-box-shadow) !important;
+    --box-shadow: var(--neumorphism-out-shadow) !important;
+    --border-radius: 1rem !important;
+    background: transparent;
+    border: none;
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+}
+
+ion-input {
+    box-shadow: var(--neumorphism-in-shadow) !important;
     border-radius: 1rem !important;
 }
 
-ion-button {
-    background: transparent; /* Fond transparent pour laisser apparaître le texte et l'icône */
-    border: none; /* Pas de bordure */
-}
 ion-icon {
     color: #FD7DFB;
 }
 
 .gradient-text {
-    display: inline-block; /* Assure que le texte occupe un bloc en ligne */
     background: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
-    -webkit-background-clip: text; /* Applique le fond comme un clip pour le texte */
-    color: transparent; /* Le texte devient transparent pour ne montrer que le fond dégradé */
+    -webkit-background-clip: text;
+    color: transparent;
+    font-weight: bold;
 }
 
 .ion-no-shadow {
@@ -47,10 +72,12 @@ ion-thumbnail {
 }
 
 ion-tab-bar {
-    box-shadow: var(--neumorphism-box-shadow) !important;
+    box-shadow: var(--neumorphism-out-shadow) !important;
     --border: none;
     border-radius: 1rem !important;
 }
 
-
+.custom-icon {
+    font-size: 1.5rem;
+}
 

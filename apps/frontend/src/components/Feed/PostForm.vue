@@ -15,17 +15,11 @@
         </ion-row>
         <ion-row>
           <ion-col size="10">
-            <ion-button color="primary" @click="openEmojiModal">
-              <ion-icon :icon="happyOutline" class="gradient-icon" color="secondary"></ion-icon>
-            </ion-button>
-            <ion-button @click="openSettingsModal">
-              <ion-icon :icon="optionsOutline" class="gradient-icon"></ion-icon>
-            </ion-button>
+            <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
+            <custom-button :icon="optionsOutline" @click="openSettingsModal"></custom-button>
           </ion-col>
           <ion-col size="2" class="ion-text-right">
-            <ion-button @click="submitPost">
-              <ion-icon :icon="paperPlaneOutline"></ion-icon>
-            </ion-button>
+            <custom-button :icon="paperPlaneOutline" @click="submitPost"></custom-button>
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -37,6 +31,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
 import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow, IonThumbnail } from '@ionic/vue';
+import CustomButton from '@/components/Commun/CustomButton.vue';
 import PostSettingsModal from '@/components/Feed/PostSettingsModal.vue';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
 import { happyOutline, optionsOutline, paperPlaneOutline } from 'ionicons/icons';
@@ -59,7 +54,8 @@ export default defineComponent({
     IonCol,
     IonRow,
     PostSettingsModal,
-    EmotionsModal
+    EmotionsModal,
+    CustomButton
   },
   props: {
     post: Object

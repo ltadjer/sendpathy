@@ -13,9 +13,10 @@
   </template>
   
   <script>
-  import AuthService from '../services/auth.service';
+  import AuthService from '../../services/auth.service.ts';
   
   export default {
+    name: 'RequestResetPasswordView',
     data() {
       return {
         email: '',

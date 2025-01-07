@@ -1,40 +1,55 @@
 <template>
-  <div>
-    <h2>Inscription</h2>
-    <form @submit.prevent="register">
-      <div>
-        <label>Email :</label>
-        <input type="email" v-model="email" required />
-      </div>
-      <div>
-        <label>Pseudo :</label>
-        <input type="text" v-model="username" required />
-      </div>
-      <div>
-        <label>Mot de passe :</label>
-        <input type="password" v-model="password" required />
-      </div>
-      <div>
-        <label>Langue maternelle :</label>
-        <select v-model="nativeLanguage" required>
-          <option v-for="language in languages" :key="language" :value="language">{{ language }}</option>
-        </select>
-      </div>
-      <div>
-        <label>Année de naissance :</label>
-        <select v-model="yearOfBirth" required>
-          <option v-for="year in years" :key="year" :value="year">{{ year }}</option>
-        </select>
-      </div>
-      <button type="submit">S'inscrire</button>
-    </form>
-  </div>
+  <ion-page>
+    <ion-content class="ion-padding">
+      <ion-grid class="flex-center">
+        <ion-row class="">
+          <ion-col class="ion-text-center">
+            <img alt="Logo" src="/img/logo-with-shadow.svg" width="160px"/>
+            <ion-text>
+              <h1 class="gradient-text">Hâte de te connaître ! </h1>
+            </ion-text>
+          <form @submit.prevent="register">
+            <ion-list class="ion-text-start">
+              <ion-input class="ion-margin-bottom ion-padding-horizontal" placeholder="Email" type="email" v-model="email" required></ion-input>
+              <ion-input class="ion-margin-bottom ion-padding-horizontal" placeholder="Pseudo" type="pseudo" v-model="username" required></ion-input>
+              <ion-select class="custom-select ion-margin-bottom" interface="popover" placeholder="Langue maternelle" v-model="nativeLanguage" required>
+              <ion-select-option v-for="language in languages" :key="language" :value="language">{{ language }}</ion-select-option>
+            </ion-select>
+              <ion-select class="custom-select ion-margin-bottom" interface="popover" placeholder="Année de naissance" v-model="yearOfBirth" required>
+                <ion-select-option class="" v-for="year in years" :key="year" :value="year">{{ year }}</ion-select-option>
+              </ion-select>
+              <ion-input class="ion-margin-bottom ion-padding-horizontal" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
+            </ion-list>
+            <custom-button expand="block" color="primary" type="submit" text="S'inscrire"></custom-button>
+      </form>
+            </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-content>
+  </ion-page>
 </template>
 
 <script>
-import AuthService from '../services/auth.service';
+import AuthService from '../../services/auth.service.ts';
+import { defineComponent } from 'vue';
+import { IonContent, IonPage, IonGrid, IonRow, IonCol, IonText, IonInput, IonList, IonSelect, IonSelectOption } from '@ionic/vue';
+import CustomButton from '@/components/Commun/CustomButton.vue'
 
-export default {
+export default defineComponent({
+  name: 'RegisterView',
+  components: {
+    CustomButton,
+    IonContent,
+    IonPage,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonText,
+    IonInput,
+    IonList,
+    IonSelect,
+    IonSelectOption
+  },
   data() {
     return {
       email: '',
@@ -76,5 +91,11 @@ export default {
       }
     }
   }
-};
+});
 </script>
+<style scoped>
+.custom-select::part(placeholder) {
+  padding-left: 1rem; /* Ajustez la valeur selon vos besoins */
+  padding-right: 1rem; /* Ajustez la valeur selon vos besoins */
+}
+</style>
