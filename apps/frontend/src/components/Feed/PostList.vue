@@ -1,26 +1,57 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header collapse="fade" class="ion-padding">
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button size="small" class="ion-no-shadow">
+            <ion-avatar>
+              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+            </ion-avatar>
+          </ion-button>
+          </ion-buttons>
         <ion-title>Feed</ion-title>
+        <ion-buttons slot="end">
+          <ion-button size="small" class="ion-no-shadow">
+            <img alt="Logo" src="@/assets/logo.png" width="80px" />
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <post-form :post="selectedPost" @post-updated="fetchAllPosts"></post-form>
-      <ion-list>
-        <ion-item v-for="post in posts" :key="post.id" @click="editPost(post)">
-          <span>{{ post.emotion }}</span>
-
-          <p>{{ post.content }}</p>
-          <ion-button slot="end" color="danger" @click.stop="deletePost(post.id)">Delete</ion-button>
-          <ion-button slot="end" @click.stop="openCommentModal(post.id)" class="neumorphic-button">
-            <ion-icon :icon="chatbubbleOutline"></ion-icon>
-          </ion-button>
-          <ion-button slot="end" @click.stop="toggleLike(post)">
-            <ion-icon :icon="post.isLiked ? heart : heartOutline"></ion-icon>
-            <span v-if="post.likes">{{ post.likes.length }}</span>
-          </ion-button>
-          <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" @update-comments="fetchComments" :post-id="selectedPostId"></post-comment-modal>
+      <post-form :post="selectedPost"></post-form>
+      <ion-list class="ion-padding">
+        <ion-item class="ion-margin-bottom" lines="none" v-for="post in posts" :key="post.id" @click="editPost(post)">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="2">
+                <ion-thumbnail>
+                  <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+                </ion-thumbnail>
+              </ion-col>
+              <ion-col size="8">
+                <p>
+                  {{ post.user.username }}
+                  <span>{{ post.emotion }}</span>
+                </p>
+                <p>{{ post.content }}</p>
+              </ion-col>
+              <ion-col size="auto">
+                <ion-button @click.stop="deletePost(post.id)" class="ion-no-shadow">
+                  <ion-icon :icon="trashOutline"></ion-icon>
+                </ion-button>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col size="auto">
+                  <ion-icon @click.stop="openCommentModal(post.id)" :icon="chatbubbleOutline"></ion-icon>
+              </ion-col>
+              <ion-col size="auto">
+                  <ion-icon @click.stop="toggleLike(post)" :icon="post.isLiked ? heart : heartOutline"></ion-icon>
+                  <span v-if="post.likes">{{ post.likes.length }}</span>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+          <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId"></post-comment-modal>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -28,17 +59,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon } from '@ionic/vue';
-import postService from '@/services/post.service';
-import likeService from '@/services/like.service';
+import { defineComponent, computed } from 'vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonThumbnail, IonGrid, IonCol, IonRow } from '@ionic/vue';
 import PostForm from '@/components/Feed/PostForm.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
-import { chatbubbleOutline, heart, heartOutline } from 'ionicons/icons';
+import { chatbubbleOutline, heart, heartOutline, trashOutline } from 'ionicons/icons';
+import { usePostStore } from '@/stores/post';
 
 export default defineComponent({
   name: 'PostList',
   components: {
+    IonThumbnail,
     IonPage,
     IonHeader,
     IonToolbar,
@@ -48,62 +79,58 @@ export default defineComponent({
     IonItem,
     IonButton,
     IonIcon,
+    IonAvatar,
+    IonButtons,
+    IonGrid,
+    IonCol,
+    IonRow,
     PostForm,
     PostCommentModal
   },
   setup() {
-    return { chatbubbleOutline, heart, heartOutline };
+    return { chatbubbleOutline, heart, heartOutline, trashOutline };
   },
   data() {
     return {
-      selectedPost: null,
-      isCommentModalOpen: false,
       selectedPostId: null,
-      comments: []
+      isCommentModalOpen: false,
     };
   },
   props: {
     posts: Array,
-    comments: Array
+  },
+  computed: {
+    selectedPost() {
+      const postStore = usePostStore();
+      return postStore.posts.find(post => post.id === this.selectedPostId);
+    },
+    comments() {
+      return this.selectedPost ? this.selectedPost.comments : [];
+    }
   },
   methods: {
     editPost(post) {
-      this.selectedPost = post;
+      this.selectedPostId = post.id;
     },
-    async deleteOnePost(postId) {
-      await postService.deleteOnePost(postId);
+    async deletePost(postId) {
+      await usePostStore().deletePost(postId);
     },
-    async openCommentModal(postId) {
+    openCommentModal(postId) {
       this.selectedPostId = postId;
-      this.selectedPost = this.posts.find(post => post.id === postId);
       this.isCommentModalOpen = true;
-      this.comments = this.selectedPost.comments;
     },
     closeCommentModal() {
       this.isCommentModalOpen = false;
       this.selectedPostId = null;
-      this.comments = [];
-    },
-    async fetchComments() {
-      const updatedPost = await postService.fetchOnePostById(this.selectedPostId);
-      this.comments = updatedPost.comments;
-    },
-    async fetchPost(postId) {
-      const updatedPost = await postService.fetchOnePostById(postId);
-      const index = this.posts.findIndex(post => post.id === postId);
-      if (index !== -1) {
-        this.posts[index] = updatedPost;
-      }
     },
     async toggleLike(post) {
       if (post.isLiked) {
-        await likeService.unlikePost(post.id);
+        await usePostStore().unlikePost(post.id);
         post.isLiked = false;
       } else {
-        await likeService.likePost(post.id);
+        await usePostStore().likePost(post.id);
         post.isLiked = true;
       }
-      await this.fetchPost(post.id);
     }
   },
 });

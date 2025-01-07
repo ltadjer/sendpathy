@@ -1,37 +1,50 @@
 <template>
-  <ion-card class="neumorphic-card">
-    <ion-card-header>
-      <ion-card-title>{{ post ? 'Edit Post' : 'New Post' }}</ion-card-title>
-    </ion-card-header>
+  <ion-card class="ion-no-padding">
     <ion-card-content>
-      <ion-item class="neumorphic-item">
-        <ion-label position="floating">Content</ion-label>
-        <ion-textarea v-model="content" placeholder="What's on your mind?"></ion-textarea>
+      <ion-item class="ion-no-shadow" lines="none">
+        <ion-thumbnail slot="start">
+          <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+        </ion-thumbnail>
+        <ion-textarea v-model="content" placeholder="Qu'est-ce qui te tracasse ?"></ion-textarea>
       </ion-item>
-        <ion-button color="primary" @click="openEmojiModal" class="neumorphic-button">
-          <ion-icon :icon="happyOutline"></ion-icon>
-        </ion-button>
-      <ion-button @click="openSettingsModal" class="neumorphic-button">
-        <ion-icon :icon="settingsOutline"></ion-icon>
-      </ion-button>
-      <ion-button expand="full" @click="submitPost" class="neumorphic-button">{{ post ? 'Update' : 'Post' }}</ion-button>
+      <ion-grid>
+        <ion-row class="ion-justify-content-center">
+          <ion-col size="auto">
+            <img alt="img" src="/img/fond-sendpathy.svg" class="image" />
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="10">
+            <ion-button color="primary" @click="openEmojiModal">
+              <ion-icon :icon="happyOutline" class="gradient-icon" color="secondary"></ion-icon>
+            </ion-button>
+            <ion-button @click="openSettingsModal">
+              <ion-icon :icon="optionsOutline" class="gradient-icon"></ion-icon>
+            </ion-button>
+          </ion-col>
+          <ion-col size="2" class="ion-text-right">
+            <ion-button @click="submitPost">
+              <ion-icon :icon="paperPlaneOutline"></ion-icon>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-card-content>
   </ion-card>
   <post-settings-modal v-if="isSettingsModalOpen" @close="closeSettingsModal" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers" :selectedTags="selectedTags" :selectedTriggers="selectedTriggers"></post-settings-modal>
   <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></emotions-modal>
 </template>
-
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow } from '@ionic/vue';
-import postService from '@/services/post.service';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow, IonThumbnail } from '@ionic/vue';
 import PostSettingsModal from '@/components/Feed/PostSettingsModal.vue';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
-import { happyOutline, settingsOutline } from 'ionicons/icons';
-
+import { happyOutline, optionsOutline, paperPlaneOutline } from 'ionicons/icons';
+import { usePostStore } from '@/stores/post';
 export default defineComponent({
   name: 'PostForm',
   components: {
+    IonThumbnail,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -52,7 +65,7 @@ export default defineComponent({
     post: Object
   },
   setup() {
-    return { happyOutline, settingsOutline };
+    return { happyOutline, optionsOutline, paperPlaneOutline };
   },
   emits: ['post-updated'],
   data() {
@@ -92,16 +105,16 @@ export default defineComponent({
 
       let postId;
       if (this.post && this.post.id) {
-        await postService.updateOnePost(this.post.id, formData);
+        await usePostStore().updatePost(this.post.id, formData);
         postId = this.post.id;
       } else {
-        const response = await postService.createOnePost(formData);
+        const response = await usePostStore().addPost(formData);
         postId = response.id;
       }
 
       await Promise.all([
-        ...this.selectedTags.map(tagId => postService.addTagToPost(postId, tagId)),
-        ...this.selectedTriggers.map(triggerId => postService.addTriggerToPost(postId, triggerId))
+        ...this.selectedTags.map(tagId => usePostStore().addTagToPost(postId, tagId)),
+        ...this.selectedTriggers.map(triggerId => usePostStore().addTriggerToPost(postId, triggerId))
       ]);
 
       this.resetForm();
@@ -138,28 +151,5 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.neumorphic-card {
-  border-radius: 18px;
-  background: #F5F5FA;
-  box-shadow:
-    -5px -5px 10px rgba(255, 255, 255, 0.9), /* Light shadow */
-    10px 10px 20px rgba(214, 200, 223, 0.7); /* Dark shadow */
-}
 
-.neumorphic-item {
-  border-radius: 10px;
-  background: #F5F5FA;
-  box-shadow:
-    -5px -5px 10px rgba(255, 255, 255, 0.9), /* Light shadow */
-    10px 10px 20px rgba(214, 200, 223, 0.7); /* Dark shadow */  margin-bottom: 20px;
-}
-
-.neumorphic-button {
-  border-radius: 10px;
-  background: #F5F5FA;
-  box-shadow:
-    -5px -5px 10px rgba(255, 255, 255, 0.9), /* Light shadow */
-    10px 10px 20px rgba(214, 200, 223, 0.7); /* Dark shadow */
-  margin: 10px 0;
-}
 </style>

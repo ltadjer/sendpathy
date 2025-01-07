@@ -15,7 +15,6 @@
           :key="comment.id"
           :comment="comment"
           :post-id="postId"
-          @update-comments="fetchComments"
         ></comment-item>
       </ion-list>
       <ion-item>
@@ -29,8 +28,9 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput } from '@ionic/vue';
-import commentService from '@/services/comment.service';
 import CommentItem from './CommentItem.vue';
+import { useCommentStore } from '@/stores/comment'
+import { usePostStore } from '@/stores/post'
 
 export default defineComponent({
   name: 'PostCommentModal',
@@ -62,13 +62,9 @@ export default defineComponent({
       this.$emit('close');
     },
     async addComment() {
-      await commentService.addCommentToPost(this.postId, { content: this.newComment });
+      await usePostStore().addCommentToPost(this.postId, { content: this.newComment });
       this.newComment = '';
-      await this.fetchComments();
     },
-    async fetchComments() {
-      await this.$emit('update-comments');
-    }
   }
 });
 </script>

@@ -29,7 +29,7 @@
 import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton } from '@ionic/vue';
 import LifeMomentForm from '@/components/LifeMoment/LifeMomentForm.vue';
-import { useLifeMomentStore } from '@/stores/lifeMoment';
+import { useLifeMomentStore } from '@/stores/life-moment';
 
 export default defineComponent({
   name: 'LifeMomentList',
