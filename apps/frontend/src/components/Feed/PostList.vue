@@ -12,7 +12,7 @@
         <ion-title>Feed</ion-title>
         <ion-buttons slot="end">
           <ion-button size="small" class="ion-no-shadow">
-            <img alt="Logo" src="@/assets/logo.png" width="70px" />
+            <img alt="Logo" src="@/assets/logo.png" width="60px" />
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
@@ -22,7 +22,7 @@
       <ion-list class="ion-padding" style="background: none;">
         <ion-item class="ion-margin-bottom" lines="none" v-for="post in posts" :key="post.id" @click="editPost(post)">
           <ion-grid>
-            <ion-row>
+            <ion-row style="gap:1rem">
               <ion-col size="2">
                 <ion-thumbnail>
                   <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
@@ -51,13 +51,12 @@
               </ion-col>
             </ion-row>
           </ion-grid>
-          <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId"></post-comment-modal>
         </ion-item>
+        <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId"></post-comment-modal>
       </ion-list>
     </ion-content>
   </ion-page>
 </template>
-
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonThumbnail, IonGrid, IonCol, IonRow } from '@ionic/vue';
@@ -141,3 +140,12 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+ion-header {
+  padding: 0.5rem !important;
+}
+ion-avatar {
+  width: 50px;
+  height: 50px;
+}
+</style>

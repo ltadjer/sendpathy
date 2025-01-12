@@ -1,70 +1,188 @@
 <template>
-  <ion-modal :is-open="true" @didDismiss="closeModal">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Comments</ion-title>
-        <ion-buttons slot="end">
-          <ion-button @click="closeModal">Close</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+  <ion-modal
+    :is-open="true"
+    @didDismiss="closeModal"
+    :initial-breakpoint="1"
+    :breakpoints="[0,1]"
+    handle-behavior="cycle"
+    class="custom-modal"
+  >
     <ion-content>
-      <ion-list>
-        <comment-item
-          v-for="comment in comments"
-          :key="comment.id"
-          :comment="comment"
-          :post-id="postId"
-        ></comment-item>
-      </ion-list>
-      <ion-item>
-        <ion-input v-model="newComment" placeholder="Add a comment..."></ion-input>
-        <ion-button @click="addComment">Add</ion-button>
-      </ion-item>
+      <ion-grid v-if="comments && comments.length > 0">
+        <ion-row v-for="comment in comments" :key="comment.id">
+          <comment-item
+            :key="comment.id"
+            :comment="comment"
+            :post-id="postId"
+            @reply="setReplyTarget"
+          ></comment-item>
+        </ion-row>
+      </ion-grid>
+      <ion-grid v-else>
+        <ion-row>
+          <ion-col class="ion-text-center">
+            <ion-text>
+              <p>Aucun commentaire pour le moment</p>
+            </ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-content>
+
+    <!-- Add a comment or reply -->
+    <ion-footer class="add-comment-fixed">
+      <ion-grid>
+        <!-- Input pour commenter ou répondre -->
+        <ion-row class="add-comment">
+          <ion-col size="10">
+            <ion-item lines="none" class="ion-no-shadow">
+              <ion-avatar slot="start">
+                <img src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+              </ion-avatar>
+              <ion-input
+                type="text"
+                v-model="newComment"
+                :placeholder="replyTarget ? `Répondre à @${replyTarget.user.username}` : 'Ajouter un commentaire...'"
+              ></ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="2" class="ion-text-end">
+            <custom-button @click="submitCommentOrReply" :icon="paperPlaneOutline"></custom-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-footer>
   </ion-modal>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, IonList, IonItem, IonInput } from '@ionic/vue';
+import {
+  IonModal,
+  IonContent,
+  IonInput,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonFooter,
+  IonText,
+  IonItem,
+  IonAvatar,
+  IonLabel,
+  IonButton,
+  IonIcon,
+} from '@ionic/vue';
+
 import CommentItem from './CommentItem.vue';
-import { useCommentStore } from '@/stores/comment'
-import { usePostStore } from '@/stores/post'
+import { usePostStore } from '@/stores/post';
+import CustomButton from '@/components/Commun/CustomButton.vue';
+import { paperPlaneOutline, closeOutline } from 'ionicons/icons';
 
 export default defineComponent({
   name: 'PostCommentModal',
   components: {
-    IonModal,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
-    IonContent,
-    IonList,
+    IonAvatar,
     IonItem,
+    IonLabel,
+    IonButton,
+    CustomButton,
+    IonModal,
+    IonContent,
     IonInput,
-    CommentItem
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonFooter,
+    IonText,
+    IonIcon,
+    CommentItem,
   },
   props: {
-    comments: Array,
-    postId: String
+    comments: {
+      type: Array,
+      required: true,
+    },
+    postId: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
-      newComment: ''
+      newComment: '',
+      replyTarget: null, // Gère la cible de la réponse
+      defaultAvatar: 'https://ionicframework.com/docs/img/demos/thumbnail.svg',
+      isSubmitting: false, // Ajout d'un flag
     };
   },
-  emits: ['close', 'update-comments'],
+  setup() {
+    return { paperPlaneOutline, closeOutline };
+  },
+  emits: ['close'],
   methods: {
     closeModal() {
       this.$emit('close');
     },
-    async addComment() {
-      await usePostStore().addCommentToPost(this.postId, { content: this.newComment });
-      this.newComment = '';
+    setReplyTarget(comment) {
+      this.replyTarget = comment;
     },
-  }
+    clearReplyTarget() {
+      this.replyTarget = null;
+    },
+    async submitCommentOrReply() {
+      if (this.isSubmitting || this.newComment.trim() === '') return;
+
+      this.isSubmitting = true;
+      try {
+        if (this.replyTarget) {
+          await usePostStore().addCommentToComment(this.replyTarget.id, {
+            content: this.newComment,
+          });
+        } else {
+          await usePostStore().addCommentToPost(this.postId, {
+            content: this.newComment,
+          });
+        }
+        this.newComment = '';
+        this.replyTarget = null;
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+  },
 });
 </script>
+
+<style scoped>
+ion-grid {
+  margin-top: 1rem !important;
+}
+.custom-modal {
+  --height: 75%;
+}
+
+ion-input {
+  margin:  0 !important;
+}
+
+ion-item {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
+  --background: none !important;
+}
+
+ion-footer ion-grid {
+  margin: 0 !important;
+}
+
+.add-comment {
+  align-items: center;
+  justify-content: center;
+}
+
+.add-comment-fixed {
+  box-shadow: var(--neumorphism-out-shadow);
+  padding: 10px;
+}
+
+</style>

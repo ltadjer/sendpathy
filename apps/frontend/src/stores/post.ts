@@ -84,7 +84,9 @@ export const usePostStore = defineStore('post', {
     },
     async addCommentToPost(postId: string, formData: any) {
       try {
+        console.log('formData:', formData);
         const response = await commentService.addCommentToPost(postId, formData);
+        console.log(response.data);
         this.posts = this.posts.map(post => {
           if (post.id === postId) {
             post.comments.push(response.data);

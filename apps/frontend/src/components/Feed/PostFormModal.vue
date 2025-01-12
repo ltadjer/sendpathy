@@ -2,7 +2,7 @@
   <ion-modal :is-open="true" @didDismiss="closeModal">
     <ion-header>
       <ion-toolbar>
-        <ion-title>{{ post ? 'Modifier le post' : 'Ajouter un post' }}</ion-title>
+        <ion-title class="gradient-text">{{ post ? 'Modifier le post' : 'Ajouter un post' }}</ion-title>
         <ion-buttons slot="end">
           <custom-button @click="closeModal" :icon="closeOutline"></custom-button>
         </ion-buttons>

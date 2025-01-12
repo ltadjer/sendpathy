@@ -4,16 +4,14 @@
       <ion-grid class="flex-center">
         <ion-row class="">
           <ion-col class="ion-text-center">
-            <img alt="Logo" src="/img/logo-with-shadow.svg" width="160px"/>
-            <ion-text class="gradient-text">
+            <img alt="Logo" src="/img/logo-with-shadow.svg" width="140px"/>
+            <ion-text class="gradient-text ion-input-spacing">
               <h1>Content de te revoir !</h1>
             </ion-text>
-            <form @submit.prevent="login">
+            <form @submit.prevent="login" class="ion-text-start form-container">
               <div v-if="message" class="alert alert-success">{{ message }}</div>
-              <ion-list class="ion-text-start">
-                <ion-input class="ion-margin-bottom ion-padding-horizontal full-width" placeholder="Email" type="email" v-model="email" required></ion-input>
-                <ion-input class="ion-margin-bottom ion-padding-horizontal full-width" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
-              </ion-list>
+                <ion-input class="ion-input-spacing" placeholder="Email" type="email" v-model="email" required></ion-input>
+                <ion-input class="ion-input-spacing" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
               <custom-button expand="block" color="primary" type="submit" text="Se connecter"></custom-button>
             </form>
           </ion-col>

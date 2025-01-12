@@ -2,27 +2,25 @@
   <ion-page>
     <ion-content class="ion-padding">
       <ion-grid class="flex-center">
-        <ion-row class="">
+        <ion-row>
           <ion-col class="ion-text-center">
-            <img alt="Logo" src="/img/logo-with-shadow.svg" width="160px"/>
+            <img alt="Logo" src="/img/logo-with-shadow.svg" width="120px"/>
             <ion-text>
-              <h1 class="gradient-text">Hâte de te connaître ! </h1>
+              <h1 class="gradient-text ion-input-spacing">Hâte de te connaître ! </h1>
             </ion-text>
-          <form @submit.prevent="register">
-            <ion-list class="ion-text-start">
-              <ion-input class="ion-margin-bottom ion-padding-horizontal" placeholder="Email" type="email" v-model="email" required></ion-input>
-              <ion-input class="ion-margin-bottom ion-padding-horizontal" placeholder="Pseudo" type="pseudo" v-model="username" required></ion-input>
-              <ion-select class="custom-select ion-margin-bottom" interface="popover" placeholder="Langue maternelle" v-model="nativeLanguage" required>
-              <ion-select-option v-for="language in languages" :key="language" :value="language">{{ language }}</ion-select-option>
-            </ion-select>
-              <ion-select class="custom-select ion-margin-bottom" interface="popover" placeholder="Année de naissance" v-model="yearOfBirth" required>
-                <ion-select-option class="" v-for="year in years" :key="year" :value="year">{{ year }}</ion-select-option>
+            <form @submit.prevent="register" class="ion-text-left form-container">
+              <ion-input class="ion-input-spacing" placeholder="Email" type="email" v-model="email" required></ion-input>
+              <ion-input class="ion-input-spacing" placeholder="Pseudo" type="pseudo" v-model="username" required></ion-input>
+              <ion-select class="ion-input-spacing ion-input-spacing" interface="popover" placeholder="Langue maternelle" v-model="nativeLanguage" required>
+                <ion-select-option v-for="language in languages" :key="language" :value="language">{{ language }}</ion-select-option>
               </ion-select>
-              <ion-input class="ion-margin-bottom ion-padding-horizontal" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
-            </ion-list>
-            <custom-button expand="block" color="primary" type="submit" text="S'inscrire"></custom-button>
-      </form>
-            </ion-col>
+              <ion-select class="ion-input-spacing ion-input-spacing" interface="popover" placeholder="Année de naissance" v-model="yearOfBirth" required>
+                <ion-select-option v-for="year in years" :key="year" :value="year">{{ year }}</ion-select-option>
+              </ion-select>
+              <ion-input class="ion-input-spacing" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
+              <custom-button expand="block" color="primary" type="submit" text="S'inscrire"></custom-button>
+            </form>
+          </ion-col>
         </ion-row>
       </ion-grid>
     </ion-content>
@@ -93,9 +91,3 @@ export default defineComponent({
   }
 });
 </script>
-<style scoped>
-.custom-select::part(placeholder) {
-  padding-left: 1rem; /* Ajustez la valeur selon vos besoins */
-  padding-right: 1rem; /* Ajustez la valeur selon vos besoins */
-}
-</style>

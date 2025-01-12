@@ -29,10 +29,84 @@ ion-item {
 ion-select {
     box-shadow: var(--neumorphism-out-shadow) !important;
     border-radius: 1rem !important;
+    padding-left: 1rem;
 }
 
-ion-fab-button {
+ion-select::part(icon) {
+    font-size: 20px !important;
+    color: #9747ff !important;
+    margin-left: auto !important;
+}
+
+ion-fab-button, ion-popover {
     --box-shadow: var(--neumorphism-out-shadow) !important;
+}
+
+ion-popover ion-item {
+    border-radius:  0 !important;
+    --background-activated: none;
+    --background-focused: none;
+    --background-hover: none;
+}
+
+ion-radio-group ion-item {
+    box-shadow: none !important;
+    --background: #f5f5fa !important;
+    --color: #333 !important;
+    margin: 0.6rem 0;
+    transition: 0.3s ease;
+}
+
+ion-radio-group ion-item::part(native) {
+    padding: 0 !important;
+}
+
+ion-radio-group ion-item {
+    --inner-padding-start: 0 !important;
+    --inner-padding-end: 0 !important;
+}
+
+ion-radio-group ion-radio {
+    padding: 0 1rem;
+}
+ion-radio-group ion-radio:hover,
+ion-radio-group ion-radio[aria-checked="true"],
+ion-radio-group ion-radio:focus-within {
+    box-shadow: var(--neumorphism-in-shadow) !important;
+    color: var(--ion-color-secondary) !important;
+    font-weight: bold;
+}
+
+ion-popover {
+    --offset-y: 26px;
+    /*--width: 450px;*/
+}
+
+ion-select-popover {
+    border-radius: 1rem !important;
+}
+
+ion-popover ion-list {
+    box-shadow:  none !important;
+    padding: 0 !important;
+}
+
+ion-checkbox::part(container) {
+    --border-radius: 50%;
+    box-shadow: var(--neumorphism-out-shadow);
+    height: 1.2rem;
+    width: 1.2rem;
+}
+
+ion-checkbox {
+    --checkbox-background-checked: var(--ion-color-secondary);
+    --checkbox-color-checked: var(--ion-color-primary);
+}
+
+ion-checkbox::part(mark) {
+    stroke-width: 3px;
+    stroke: var(--ion-color-primary);
+    padding: 1rem !important;
 }
 
 ion-button {
@@ -49,6 +123,9 @@ ion-button {
 ion-input {
     box-shadow: var(--neumorphism-in-shadow) !important;
     border-radius: 1rem !important;
+    margin-bottom: 1rem;
+    --padding-start: 1rem !important;
+    --padding-end: 1rem !important;
 }
 
 ion-icon {
@@ -80,4 +157,37 @@ ion-tab-bar {
 .custom-icon {
     font-size: 1.5rem;
 }
+
+ion-modal::part(handle) {
+    background: var(--ion-color-primary);
+    box-shadow: var(--neumorphism-out-shadow);
+    margin-top: 1rem!important;
+    height: 0.6rem;
+    width: 6rem;
+    border-radius: 1rem;
+}
+
+ion-modal {
+    --border-radius: 1rem 1rem 0 0 !important;
+}
+
+ion-modal ion-grid {
+    margin-top: 3rem !important;
+}
+
+.form-container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .form-container {
+        width: 60%;
+    }
+}
+
+.ion-input-spacing {
+    margin-bottom: 1.6rem;
+}
+
 

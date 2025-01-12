@@ -21,7 +21,7 @@ export default defineComponent({
       default: ''
     },
     icon: {
-      type: Object,
+      type: [String, Object],
       default: null
     },
     buttonClass: {

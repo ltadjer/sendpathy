@@ -14,19 +14,26 @@
           </ion-col>
         </ion-row>
         <ion-row>
-          <ion-col size="10">
+          <ion-col size="8">
             <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
             <custom-button :icon="optionsOutline" @click="openSettingsModal"></custom-button>
           </ion-col>
-          <ion-col size="2" class="ion-text-right">
-            <custom-button :icon="paperPlaneOutline" @click="submitPost"></custom-button>
+          <ion-col size="4" class="ion-text-right">
+            <custom-button text="Publier" @click="submitPost"></custom-button>
           </ion-col>
         </ion-row>
       </ion-grid>
     </ion-card-content>
   </ion-card>
-  <post-settings-modal v-if="isSettingsModalOpen" @close="closeSettingsModal" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers" :selectedTags="selectedTags" :selectedTriggers="selectedTriggers"></post-settings-modal>
-  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></emotions-modal>
+  <post-settings-modal
+    :isOpen="isSettingsModalOpen"
+    @update:isOpen="isSettingsModalOpen = $event"
+    @update:selectedTags="updateSelectedTags"
+    @update:selectedTriggers="updateSelectedTriggers"
+    :selectedTags="selectedTags"
+    :selectedTriggers="selectedTriggers"
+  ></post-settings-modal>
+  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion" :selected-emoji="emotion" ></emotions-modal>
 </template>
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
@@ -85,6 +92,7 @@ export default defineComponent({
           this.emotion = newPost.emotion;
           this.selectedTags = newPost.tags || [];
           this.selectedTriggers = newPost.triggers || [];
+          console.log('newPost:', newPost);
         } else {
           this.resetForm();
         }
