@@ -16,8 +16,11 @@ export class UserService {
    * @returns L'utilisateur correspondant à l'ID.
    */
   async findOne(id: string) {
+    if (!id) {
+      throw new Error('User ID is required');
+    }
     return this.prisma.user.findUnique({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -27,8 +30,8 @@ export class UserService {
    * @returns L'utilisateur correspondant à l'email.
    */
   async findOneByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email }
+    return await this.prisma.user.findUnique({
+      where: { email },
     });
   }
 
@@ -162,6 +165,9 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async updateRefreshToken(userId: string, refreshToken: string) {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
     return await this.prisma.user.update({
       where: { id: userId },
       data: { refreshToken },

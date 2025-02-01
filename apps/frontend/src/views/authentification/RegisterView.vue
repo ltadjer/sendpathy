@@ -4,20 +4,74 @@
       <ion-grid class="flex-center">
         <ion-row>
           <ion-col class="ion-text-center">
-            <img alt="Logo" src="/img/logo-with-shadow.svg" width="120px"/>
+            <img alt="Logo" src="/img/logo-with-shadow.svg" width="120px" />
             <ion-text>
-              <h1 class="gradient-text ion-input-spacing">Hâte de te connaître ! </h1>
+              <h1 class="gradient-text ion-input-spacing">Hâte de te connaître !</h1>
             </ion-text>
             <form @submit.prevent="register" class="ion-text-left form-container">
-              <ion-input class="ion-input-spacing" placeholder="Email" type="email" v-model="email" required></ion-input>
-              <ion-input class="ion-input-spacing" placeholder="Pseudo" type="pseudo" v-model="username" required></ion-input>
-              <ion-select class="ion-input-spacing ion-input-spacing" interface="popover" placeholder="Langue maternelle" v-model="nativeLanguage" required>
-                <ion-select-option v-for="language in languages" :key="language" :value="language">{{ language }}</ion-select-option>
+
+              <!-- Bouton pour générer des avatars -->
+              <ion-button expand="block" color="primary" @click="generateAvatars">Générer un avatar</ion-button>
+
+              <!-- Affichage des avatars générés -->
+              <div class="avatar-selection">
+                <ion-row>
+                  <ion-col v-for="(avatar, index) in avatars" :key="index" size="4">
+                    <img
+                      :src="avatar"
+                      alt="Avatar proposé"
+                      class="avatar-option"
+                      @click="selectAvatar(avatar)"
+                      :class="{ selected: avatar === selectedAvatar }"
+                    />
+                  </ion-col>
+                </ion-row>
+              </div>
+
+              <!-- Champs du formulaire -->
+              <ion-input
+                class="ion-input-spacing"
+                placeholder="Email"
+                type="email"
+                v-model="email"
+                required
+              ></ion-input>
+              <ion-input
+                class="ion-input-spacing"
+                placeholder="Pseudo"
+                type="text"
+                v-model="username"
+                required
+              ></ion-input>
+              <ion-select
+                class="ion-input-spacing"
+                interface="popover"
+                placeholder="Langue maternelle"
+                v-model="nativeLanguage"
+                required
+              >
+                <ion-select-option v-for="language in languages" :key="language" :value="language">
+                  {{ language }}
+                </ion-select-option>
               </ion-select>
-              <ion-select class="ion-input-spacing ion-input-spacing" interface="popover" placeholder="Année de naissance" v-model="yearOfBirth" required>
-                <ion-select-option v-for="year in years" :key="year" :value="year">{{ year }}</ion-select-option>
+              <ion-select
+                class="ion-input-spacing"
+                interface="popover"
+                placeholder="Année de naissance"
+                v-model="yearOfBirth"
+                required
+              >
+                <ion-select-option v-for="year in years" :key="year" :value="year">
+                  {{ year }}
+                </ion-select-option>
               </ion-select>
-              <ion-input class="ion-input-spacing" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
+              <ion-input
+                class="ion-input-spacing"
+                placeholder="Mot de passe"
+                type="password"
+                v-model="password"
+                required
+              ></ion-input>
               <custom-button expand="block" color="primary" type="submit" text="S'inscrire"></custom-button>
             </form>
           </ion-col>
@@ -30,8 +84,20 @@
 <script>
 import AuthService from '../../services/auth.service.ts';
 import { defineComponent } from 'vue';
-import { IonContent, IonPage, IonGrid, IonRow, IonCol, IonText, IonInput, IonList, IonSelect, IonSelectOption } from '@ionic/vue';
-import CustomButton from '@/components/Commun/CustomButton.vue'
+import {
+  IonContent,
+  IonPage,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonText,
+  IonInput,
+  IonList,
+  IonSelect,
+  IonSelectOption,
+  IonButton,
+} from '@ionic/vue';
+import CustomButton from '@/components/Commun/CustomButton.vue';
 
 export default defineComponent({
   name: 'RegisterView',
@@ -46,7 +112,8 @@ export default defineComponent({
     IonInput,
     IonList,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonButton,
   },
   data() {
     return {
@@ -55,8 +122,21 @@ export default defineComponent({
       password: '',
       nativeLanguage: '',
       yearOfBirth: null,
+      selectedAvatar: '', // Avatar sélectionné
+      avatars: [], // Liste des avatars générés
       years: [],
-      languages: ['Anglais', 'Français', 'Espagnol', 'Allemand', 'Chinois', 'Japonais', 'Coréen', 'Russe', 'Portugais', 'Italien']
+      languages: [
+        'Anglais',
+        'Français',
+        'Espagnol',
+        'Allemand',
+        'Chinois',
+        'Japonais',
+        'Coréen',
+        'Russe',
+        'Portugais',
+        'Italien',
+      ],
     };
   },
   created() {
@@ -67,6 +147,19 @@ export default defineComponent({
     }
   },
   methods: {
+    // Générer plusieurs avatars
+    generateAvatars() {
+      const newAvatars = [];
+      for (let i = 0; i < 5; i++) {
+        const seed = `${this.username}-${Math.random().toString(36).substr(2, 9)}`;
+        newAvatars.push(`https://api.dicebear.com/6.x/adventurer/svg?seed=${seed}`);
+      }
+      this.avatars = newAvatars;
+    },
+    // Sélectionner un avatar
+    selectAvatar(avatar) {
+      this.selectedAvatar = avatar;
+    },
     async register() {
       try {
         const age = new Date().getFullYear() - this.yearOfBirth;
@@ -80,14 +173,40 @@ export default defineComponent({
           username: this.username,
           password: this.password,
           nativeLanguage: this.nativeLanguage,
-          age: age
+          age: age,
+          avatar: this.selectedAvatar, // Utilisation de l'avatar sélectionné
         };
+
         const response = await AuthService.register(user);
         console.log('Inscription réussie :', response);
       } catch (error) {
-        console.error('Échec de l\'inscription :', error);
+        console.error("Échec de l'inscription :", error);
       }
-    }
-  }
+    },
+  },
 });
 </script>
+
+<style scoped>
+.avatar-selection {
+  margin-bottom: 1rem;
+}
+
+.avatar-option {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid #9747ff;
+  background-color: #f5f5fa;
+  margin: 0.5rem;
+}
+
+.avatar-option.selected {
+  border-color: #fd7dfb; /* Indiquer l'avatar sélectionné */
+}
+
+.avatar-option:hover {
+  opacity: 0.8;
+}
+</style>

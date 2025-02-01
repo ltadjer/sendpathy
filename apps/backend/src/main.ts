@@ -4,14 +4,17 @@ import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
   app.use('/uploads', express.static('uploads'));
   // Enable CORS
   app.enableCors({
-    origin: '*',
+    origin: ['https://sendpathy.aaa', 'https://api.sendpathy.aaa'], // Allow requests from your frontend domain
     methods: ['GET,HEAD,PUT,PATCH,POST,DELETE'],
+    credentials: true,
   });
 
   // Add prefix /api

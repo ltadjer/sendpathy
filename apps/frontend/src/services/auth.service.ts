@@ -8,7 +8,7 @@ export default  {
    */
   async register(user: any) {
     try {
-      const response = await api.post('/auth/register', user)
+      const response = await api.post('/auth/register/user', user)
       return response.data
     } catch (error) {
       throw error
@@ -19,12 +19,52 @@ export default  {
    * @param user - Les informations de l'utilisateur pour la connexion.
    * @returns les nouvelles données de l'utilisateur comme réponse API, y compris les tokens
    */
-  async login(user: any) {
+  async login(user) {
     try {
-      const response = await api.post('/auth/login', user)
+      const response = await api.post('/auth/login', user);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Déconnecte un utilisateur.
+   */
+  async logout() {
+    try {
+      await api.post('/auth/logout')
+    } catch (error) {
+      throw error
+    }
+
+  },
+
+  /**
+   * Vérifie si un utilisateur est connecté.
+   * @returns les nouvelles données de l'utilisateur comme réponse API
+   */
+
+  async checkAuth() {
+    try {
+      const response = await api.get('/auth/me'); // Une route pour retourner les infos utilisateur
       return response.data
     } catch (error) {
       throw error
+    }
+  },
+
+  /**
+   * Rafraîchit le token d'accès.
+   * @returns les nouvelles données de l'utilisateur comme réponse API
+   */
+
+  async refreshToken() {
+    try {
+      const response = await api.post('/auth/refresh-token');
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   },
   /**

@@ -1,8 +1,9 @@
 <template>
   <ion-page>
+    eeeee
     <ion-content class="ion-padding">
       <ion-grid class="flex-center">
-        <ion-row class="">
+        <ion-row>
           <ion-col class="ion-text-center">
             <img alt="Logo" src="/img/logo-with-shadow.svg" width="140px"/>
             <ion-text class="gradient-text ion-input-spacing">
@@ -10,8 +11,8 @@
             </ion-text>
             <form @submit.prevent="login" class="ion-text-start form-container">
               <div v-if="message" class="alert alert-success">{{ message }}</div>
-                <ion-input class="ion-input-spacing" placeholder="Email" type="email" v-model="email" required></ion-input>
-                <ion-input class="ion-input-spacing" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
+              <ion-input class="ion-input-spacing" placeholder="Email" type="email" v-model="email" required></ion-input>
+              <ion-input class="ion-input-spacing" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
               <custom-button expand="block" color="primary" type="submit" text="Se connecter"></custom-button>
             </form>
           </ion-col>
@@ -31,7 +32,7 @@
 
 <script>
 import { useAccountStore } from '@/stores/account.ts';
-import { IonPage, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonThumbnail, IonGrid, IonRow, IonCol, IonText } from '@ionic/vue';
+import { IonPage, IonContent, IonGrid, IonRow, IonCol, IonText, IonInput } from '@ionic/vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 import { defineComponent } from 'vue';
 
@@ -47,19 +48,15 @@ export default defineComponent({
   components: {
     IonPage,
     IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonButton,
-    IonThumbnail,
     IonGrid,
     IonRow,
     IonCol,
     IonText,
+    IonInput,
     CustomButton
   },
   created() {
+    console.log('LoginView created');
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('message')) {
       this.message = urlParams.get('message') === 'email_confirmed' ? 'Votre compte a bien été confirmé.' : '';

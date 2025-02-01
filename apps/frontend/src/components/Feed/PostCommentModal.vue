@@ -35,16 +35,23 @@
         <!-- Input pour commenter ou répondre -->
         <ion-row class="add-comment">
           <ion-col size="10">
-            <ion-item lines="none" class="ion-no-shadow">
-              <ion-avatar slot="start">
-                <img src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-              </ion-avatar>
-              <ion-input
-                type="text"
-                v-model="newComment"
-                :placeholder="replyTarget ? `Répondre à @${replyTarget.user.username}` : 'Ajouter un commentaire...'"
-              ></ion-input>
-            </ion-item>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <ion-avatar>
+                    <img :src="currentUser.avatar" :alt="currentUser.username">
+                  </ion-avatar>
+                </ion-col>
+                <ion-col>
+                  <ion-input
+                    type="text"
+                    v-model="newComment"
+                    :placeholder="replyTarget ? `Répondre à @${replyTarget.user.username}` : 'Ajouter un commentaire...'"
+                  ></ion-input>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
           </ion-col>
           <ion-col size="2" class="ion-text-end">
             <custom-button @click="submitCommentOrReply" :icon="paperPlaneOutline"></custom-button>
@@ -104,6 +111,10 @@ export default defineComponent({
     },
     postId: {
       type: String,
+      required: true,
+    },
+    currentUser: {
+      type: Object,
       required: true,
     },
   },
@@ -183,6 +194,19 @@ ion-footer ion-grid {
 .add-comment-fixed {
   box-shadow: var(--neumorphism-out-shadow);
   padding: 10px;
+}
+
+div {
+  box-shadow: var(--neumorphism-out-shadow);
+  border-radius: 50%;
+  padding: 0.3rem;
+  margin-right: 0.5rem;
+}
+
+ion-avatar {
+  box-shadow: var(--neumorphism-in-shadow);
+  width: 51px;
+  height: 51px;
 }
 
 </style>

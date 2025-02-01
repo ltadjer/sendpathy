@@ -11,6 +11,7 @@ import MainHeader from '@/components/Commun/MainHeader.vue';
 import ReservationListView from '@/views/reservation/ReservationListView.vue';
 import NewReservationView from '@/views/reservation/NewReservationView.vue';
 import ReservationSummaryView from '@/views/reservation/ReservationSummaryView.vue';
+import { useAccountStore } from '@/stores/account';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,8 +34,8 @@ const routes: Array<RouteRecordRaw> = [
     ],
     meta: { requiresAuth: true }
   },
-  { path: '/connexion', component: LoginView },
-  { path: '/inscription', component: RegisterView },
+  { path: '/connexion', component: LoginView, meta: { requiresGuest: true } },
+  { path: '/inscription', component: RegisterView, meta: { requiresGuest: true } },
 ];
 
 const router = createRouter({
@@ -42,13 +43,26 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('refresh_token');
+router.beforeEach(async (to, from, next) => {
+  const accountStore = useAccountStore();
+  try {
+    await accountStore.checkAuth();
+  } catch (error) {
+    console.error('Failed to check authentication:', error);
+  }
 
-  if (to.matched.some(record => record.meta.requiresAuth) && !isAuthenticated) {
-    next('/connexion');
-  } else if (to.path === '/connexion' && isAuthenticated) {
-    next('/feed');
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!accountStore.isAuthenticated) {
+      next('/connexion');
+    } else {
+      next();
+    }
+  } else if (to.matched.some(record => record.meta.requiresGuest)) {
+    if (accountStore.isAuthenticated) {
+      next('/');
+    } else {
+      next();
+    }
   } else {
     next();
   }

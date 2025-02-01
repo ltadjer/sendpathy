@@ -5,7 +5,8 @@
         <ion-buttons slot="start">
           <ion-button size="small" class="ion-no-shadow">
             <ion-avatar>
-              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+              <!-- Affichage de l'avatar de l'utilisateur -->
+              <img alt="User Avatar" :src="currentUser?.avatar" />
             </ion-avatar>
           </ion-button>
         </ion-buttons>
@@ -17,15 +18,23 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
+
     <ion-content>
       <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" />
       <ion-list class="ion-padding" style="background: none;">
-        <ion-item class="ion-margin-bottom" lines="none" v-for="post in posts" :key="post.id" @click="editPost(post)">
+        <ion-item
+          class="ion-margin-bottom"
+          lines="none"
+          v-for="post in posts"
+          :key="post.id"
+          @click="editPost(post)"
+        >
           <ion-grid>
-            <ion-row style="gap:1rem">
+            <ion-row style="gap: 1rem">
               <ion-col size="2">
                 <ion-thumbnail>
-                  <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+                  <!-- Affichage de l'avatar spécifique à chaque utilisateur -->
+                  <img :src="post.user.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg'" alt="User Avatar" />
                 </ion-thumbnail>
               </ion-col>
               <ion-col size="8">
@@ -52,11 +61,12 @@
             </ion-row>
           </ion-grid>
         </ion-item>
-        <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId"></post-comment-modal>
+        <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId" :current-user="currentUser"></post-comment-modal>
       </ion-list>
     </ion-content>
   </ion-page>
 </template>
+
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonThumbnail, IonGrid, IonCol, IonRow } from '@ionic/vue';
@@ -64,6 +74,8 @@ import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
 import { chatbubbleOutline, heart, heartOutline, trashOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
+import { useUserStore } from '@/stores/user';
+import { useAccountStore } from '@/stores/account'
 
 export default defineComponent({
   name: 'PostList',
@@ -98,6 +110,7 @@ export default defineComponent({
   },
   props: {
     posts: Array,
+    currentUserAvatar: String, // Prop pour l'avatar de l'utilisateur connecté
   },
   computed: {
     selectedPost() {
@@ -106,6 +119,11 @@ export default defineComponent({
     },
     comments() {
       return this.selectedPost ? this.selectedPost.comments : [];
+    },
+    currentUser() {
+      const accountStore = useAccountStore();
+      return accountStore.user;
+
     }
   },
   methods: {
@@ -140,6 +158,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <style scoped>
 ion-header {
   padding: 0.5rem !important;
