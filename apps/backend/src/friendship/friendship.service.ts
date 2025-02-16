@@ -8,7 +8,6 @@ export class FriendshipService {
     constructor(private prisma: PrismaService) {}
 
     async create(createFriendshipDto: CreateFriendshipDto) {
-        console.log(createFriendshipDto);
 
         // Check if the friendship already exists
         const existingFriendship = await this.prisma.friendship.findFirst({

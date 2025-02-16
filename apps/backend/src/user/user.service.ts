@@ -72,7 +72,6 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async update(id: string, updateUserDto: UpdateUserDto) {
-    console.log('updateUserDto', updateUserDto);
     return this.prisma.user.update({
       where: { id },
       data: updateUserDto,
@@ -180,15 +179,12 @@ export class UserService {
    * @returns L'utilisateur correspondant au refresh token.
    */
   async findByRefreshToken(refreshToken: string) {
-    console.log('refreshToken', refreshToken);
     return await this.prisma.user.findFirst({ where: { refreshToken } });
   }
 
   async updateAccessCode(userId: string, accessCode: string) {
-    console.log('accessCode', accessCode);
     const salt = await bcrypt.genSalt();
     const hashedAccessCode = await bcrypt.hash(accessCode, salt);
-    console.log('hashedAccessCode', hashedAccessCode);
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: { accessCode: hashedAccessCode },
@@ -197,14 +193,18 @@ export class UserService {
   }
 
   async validateAccessCode(userId: string, accessCode: string): Promise<boolean> {
+    console.log('ccessCode', accessCode);
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { accessCode: true },
     });
-    if (!user || !user.accessCode) {
+
+    console.log('user -validate', user);
+
+    if (!user || !(await bcrypt.compare(accessCode, user.accessCode))) {
       return false;
     }
-    return bcrypt.compare(accessCode, user.accessCode);
+    return true;
   }
 
   async findAllTherapists() {

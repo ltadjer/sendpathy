@@ -50,7 +50,7 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
     const payload = { email: user.email, id: user.id };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '3600s' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     await this.userService.updateRefreshToken(user.id, refreshToken);
     return {
@@ -60,6 +60,7 @@ export class AuthService {
       accessCode: user.accessCode,
       avatar: user.avatar,
       username: user.username,
+      id: user.id,
     };
   }
 

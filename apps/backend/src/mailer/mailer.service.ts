@@ -21,7 +21,6 @@ export class MailerService {
 
     try {
       const response = await this.brevoClient.sendTransacEmail(sendSmtpEmail);
-      console.log('Email sent successfully:', response);
       return true;
     } catch (error) {
       console.error('Erreur lors de l\'envoi de l\'email de confirmation:', error);

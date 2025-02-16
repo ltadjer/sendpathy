@@ -2,10 +2,20 @@
   <ion-modal
     :is-open="isOpen"
     @did-dismiss="closeModal"
-    :initial-breakpoint="0.75"
-    :breakpoints="[0, 0.5, 0.75]"
+    :initial-breakpoint="isMobile ? 0.75 : undefined"
+    :breakpoints="isMobile ?[0, 0.5, 0.75] : undefined"
     handle-behavior="cycle"
   >
+    <ion-header v-if="isDesktop">
+      <ion-toolbar>
+        <ion-title class="ion-text-center gradient-text">Choisir une émotion</ion-title>
+        <ion-buttons slot="end">
+          <ion-button @click="closeModal">
+            <ion-icon :icon="closeOutline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
     <ion-content>
       <ion-grid class="emoji-picker">
         <ion-row>
@@ -38,8 +48,10 @@ import {
   IonRow,
   IonCol,
   IonItem,
-  IonLabel
+  IonLabel,
+  IonIcon,
 } from '@ionic/vue';
+import { closeOutline } from 'ionicons/icons';
 
 export default {
   name: 'EmotionsModal',
@@ -55,7 +67,8 @@ export default {
     IonRow,
     IonCol,
     IonItem,
-    IonLabel
+    IonLabel,
+    IonIcon,
   },
   props: {
     isOpen: {
@@ -65,6 +78,17 @@ export default {
     selectedEmoji: {
       type: String,
       default: ''
+    }
+  },
+  setup() {
+    return { closeOutline };
+  },
+  computed: {
+    isDesktop() {
+      return window.innerWidth >= 768;
+    },
+    isMobile() {
+      return window.innerWidth < 768;
     }
   },
   data() {
@@ -92,10 +116,6 @@ export default {
 </script>
 
 <style scoped>
-.emoji-picker {
-
-}
-
 ion-item.emoji-item {
   box-shadow: none !important;
   text-align: center;

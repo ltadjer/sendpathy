@@ -9,6 +9,10 @@ body {
     --ion-text-color: #333 !important;
 }
 
+.full-width {
+    width: 100%;
+}
+
 .flex-center {
     display: flex;
     justify-content: center;
@@ -17,6 +21,10 @@ body {
 }
 ion-header {
     box-shadow:none !important;
+}
+
+.no-background {
+    --background: none !important;
 }
 
 ion-card,
@@ -164,16 +172,23 @@ ion-modal::part(handle) {
     margin-top: 1rem!important;
     height: 0.6rem;
     width: 6rem;
-    border-radius: 1rem;
+    /*border-radius: 1rem;*/
 }
 
-ion-modal {
-    --border-radius: 1rem 1rem 0 0 !important;
+@media (min-width: 768px) {
+    ion-modal {
+        --border-radius: 1rem !important;
+    }
 }
 
 ion-modal ion-grid {
     margin-top: 3rem !important;
 }
+
+@media (min-width: 768px) {
+    ion-modal ion-grid {
+        margin-top: 1rem !important;
+    }}
 
 .form-container {
     width: 90%;
@@ -182,7 +197,7 @@ ion-modal ion-grid {
 
 @media (min-width: 768px) {
     .form-container {
-        width: 60%;
+        width: 380px;
     }
 }
 
@@ -190,4 +205,27 @@ ion-modal ion-grid {
     margin-bottom: 1.6rem;
 }
 
+.avatar-container {
+    box-shadow: var(--neumorphism-out-shadow);
+    border-radius: 50%;
+    padding: 0.3rem;
+    margin-right: 0.5rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+}
 
+
+.avatar-container ion-avatar {
+    box-shadow: var(--neumorphism-in-shadow);
+    width: 48px;
+    height: 48px;
+}
+
+.header-page ion-toolbar {
+    box-shadow: var(--neumorphism-out-shadow);
+    border-radius: 1rem;
+}
+
+.header-page ion-toolbar .avatar-container {
+    margin: 0.8rem;
+}

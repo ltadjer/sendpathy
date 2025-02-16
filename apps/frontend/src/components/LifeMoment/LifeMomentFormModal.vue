@@ -8,7 +8,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <post-form :post="post" @post-updated="closeModal" :current-user="currentUser" />
+      <life-moment-form :lifeMoment="lifeMoment"/>
     </ion-content>
   </ion-modal>
 </template>
@@ -17,20 +17,16 @@
 import { defineComponent } from 'vue';
 import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent } from '@ionic/vue';
 import { closeOutline } from 'ionicons/icons';
-import PostForm from '@/components/Feed/PostForm.vue';
+import LifeMomentForm from '@/components/LifeMoment/LifeMomentForm.vue';
 import CustomButton from '@/components/Commun/CustomButton.vue'
 
 export default defineComponent({
-  name: 'PostFormModal',
-  components: { CustomButton, IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, PostForm },
+  name: 'LifeMomentFormModal',
+  components: { CustomButton, IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonContent, LifeMomentForm },
   props: {
-    post: {
+    lifeMoment: {
       type: Object,
     },
-    currentUser: {
-      type: Object,
-      required: true
-    }
   },
   setup() {
     return { closeOutline };

@@ -45,24 +45,20 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const accountStore = useAccountStore();
-  try {
-    await accountStore.checkAuth();
-  } catch (error) {
-    console.error('Failed to check authentication:', error);
-  }
 
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (!accountStore.isAuthenticated) {
-      next('/connexion');
-    } else {
-      next();
+    try {
+      await accountStore.checkAuth();
+    } catch (error) {
+      console.error('Failed to check authentication:', error);
     }
-  } else if (to.matched.some(record => record.meta.requiresGuest)) {
-    if (accountStore.isAuthenticated) {
-      next('/');
-    } else {
-      next();
-    }
+
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
+
+  if (requiresAuth && !accountStore.isAuthenticated) {
+    next('/connexion');
+  } else if (requiresGuest && accountStore.isAuthenticated) {
+    next('/');
   } else {
     next();
   }

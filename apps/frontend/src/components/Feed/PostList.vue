@@ -1,26 +1,25 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true" class="ion-padding">
+    <ion-header :translucent="true" class="ion-padding header-page">
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button size="small" class="ion-no-shadow">
-            <ion-avatar>
-              <!-- Affichage de l'avatar de l'utilisateur -->
+        <ion-item lines="none" class="ion-no-shadow ion-align-items-center">
+          <div class="avatar-container">
+            <ion-avatar slot="start">
               <img alt="User Avatar" :src="currentUser?.avatar" />
             </ion-avatar>
-          </ion-button>
-        </ion-buttons>
-        <ion-title>Feed</ion-title>
+          </div>
+          <ion-title>Feed</ion-title>
+        </ion-item>
         <ion-buttons slot="end">
           <ion-button size="small" class="ion-no-shadow">
-            <img alt="Logo" src="@/assets/logo.png" width="60px" />
+            <img alt="Logo" src="@/assets/logo.png" width="50px" />
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
     <ion-content>
-      <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" />
+      <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" :current-user="currentUser" />
       <ion-list class="ion-padding" style="background: none;">
         <ion-item
           class="ion-margin-bottom"
@@ -30,24 +29,46 @@
           @click="editPost(post)"
         >
           <ion-grid>
-            <ion-row style="gap: 1rem">
-              <ion-col size="2">
-                <ion-thumbnail>
-                  <!-- Affichage de l'avatar spécifique à chaque utilisateur -->
-                  <img :src="post.user.avatar || 'https://ionicframework.com/docs/img/demos/avatar.svg'" alt="User Avatar" />
-                </ion-thumbnail>
+            <ion-row>
+              <ion-col size="10">
+                <ion-item lines="none" class="ion-no-shadow ion-align-items-start">
+                  <div class="avatar-container">
+                    <ion-avatar slot="start">
+                      <img alt="User Avatar" :src="post.user.avatar" class="avatar-option" />
+                    </ion-avatar>
+                  </div>
+                  <div>
+                    <ion-text>
+                      {{ post.user.username }}
+                      <span>{{ post.emotion }}</span>
+                    </ion-text>
+                    <p>
+                      <ion-textarea
+                        class="ion-margin-top"
+                        :auto-grow="true"
+                        :value="post.content"
+                      >
+                      </ion-textarea>
+                    </p>
+                  </div>
+                </ion-item>
               </ion-col>
-              <ion-col size="8">
-                <p>
-                  {{ post.user.username }}
-                  <span>{{ post.emotion }}</span>
-                </p>
-                <p>{{ post.content }}</p>
-              </ion-col>
-              <ion-col size="auto">
-                <ion-button @click.stop="deletePost(post.id)" class="ion-no-shadow">
-                  <ion-icon size="medium" :icon="trashOutline"></ion-icon>
-                </ion-button>
+              <ion-col size="2" class="ion-text-end">
+                <ion-icon class="custom-icon"
+                          :id="'popover-button-' + post.id"
+                          @click.stop :icon="ellipsisVerticalOutline"></ion-icon>
+
+                <ion-popover
+                  :trigger="'popover-button-' + post.id"
+                  :dismiss-on-select="true"
+                  side="top"
+                  alignment="end"
+                >
+                  <ion-list>
+                    <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click="deletePost(post.id)">Supprimer</ion-item>
+                    <ion-item lines="none" :button="true" :detail="false" @click="reportPost(post.id)">Signaler</ion-item>
+                  </ion-list>
+                </ion-popover>
               </ion-col>
             </ion-row>
             <ion-row>
@@ -57,6 +78,9 @@
               <ion-col size="auto">
                 <ion-icon class="custom-icon" @click.stop="toggleLike(post)" :icon="post.isLiked ? heart : heartOutline"></ion-icon>
                 <span v-if="post.likes">{{ post.likes.length }}</span>
+              </ion-col>
+              <ion-col class="ion-text-end">
+                <ion-text>{{ timeSince(post.createdAt) }}</ion-text>
               </ion-col>
             </ion-row>
           </ion-grid>
@@ -69,19 +93,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonThumbnail, IonGrid, IonCol, IonRow } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonGrid, IonCol, IonRow, IonText, IonTextarea, IonPopover } from '@ionic/vue';
 import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
-import { chatbubbleOutline, heart, heartOutline, trashOutline } from 'ionicons/icons';
+import { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
-import { useUserStore } from '@/stores/user';
-import { useAccountStore } from '@/stores/account'
 
 export default defineComponent({
   name: 'PostList',
   components: {
     PostFormModal,
-    IonThumbnail,
     IonPage,
     IonHeader,
     IonToolbar,
@@ -96,10 +117,13 @@ export default defineComponent({
     IonGrid,
     IonCol,
     IonRow,
+    IonText,
+    IonTextarea,
+    IonPopover,
     PostCommentModal
   },
   setup() {
-    return { chatbubbleOutline, heart, heartOutline, trashOutline };
+    return { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline };
   },
   data() {
     return {
@@ -109,8 +133,14 @@ export default defineComponent({
     };
   },
   props: {
-    posts: Array,
-    currentUserAvatar: String, // Prop pour l'avatar de l'utilisateur connecté
+    posts: {
+      type: Array,
+      required: true
+    },
+    currentUser: {
+      type: Object,
+      required: true
+    }
   },
   computed: {
     selectedPost() {
@@ -118,21 +148,37 @@ export default defineComponent({
       return postStore.posts.find(post => post.id === this.selectedPostId);
     },
     comments() {
-      return this.selectedPost ? this.selectedPost.comments : [];
-    },
-    currentUser() {
-      const accountStore = useAccountStore();
-      return accountStore.user;
-
+      return this.selectedPost ? this.selectedPost.comments.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
     }
   },
   methods: {
+    timeSince(date) {
+      const now = new Date();
+      const createdAt = new Date(date);
+      const diffInSeconds = Math.floor((now - createdAt) / 1000);
+
+      const minutes = Math.floor(diffInSeconds / 60);
+      const hours = Math.floor(diffInSeconds / 3600);
+      const days = Math.floor(diffInSeconds / 86400);
+
+      if (days > 0) {
+        return ` ${days} j`;
+      } else if (hours > 0) {
+        return `${hours} h`;
+      } else {
+        return `${minutes} min`;
+      }
+    },
     editPost(post) {
       this.selectedPostId = post.id;
       this.isPostFormModalOpen = true;
     },
     async deletePost(postId) {
       await usePostStore().deletePost(postId);
+    },
+    async reportPost(postId) {
+      // Add your report post logic here
+      console.log(`Reported post with id: ${postId}`);
     },
     openCommentModal(postId) {
       this.selectedPostId = postId;
@@ -160,11 +206,25 @@ export default defineComponent({
 </script>
 
 <style scoped>
-ion-header {
-  padding: 0.5rem !important;
+ion-grid {
+  padding: 1rem;
 }
-ion-avatar {
-  width: 50px;
-  height: 50px;
+
+ion-item:not(ion-popover ion-item) {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
 }
+
+
+ion-popover ion-list {
+  padding: 4px !important;
+  box-shadow: var(--neumorphism-out-shadow) !important;
+}
+
+ion-popover ion-item:hover {
+  --box-shadow: var(--neumorphism-in-shadow) !important;
+  color: var(--ion-color-secondary) !important;
+  font-weight: bold;
+}
+
 </style>

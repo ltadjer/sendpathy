@@ -1,11 +1,12 @@
 <template>
-  <post-list :posts="posts" />
+  <post-list :posts="posts" :current-user="currentUser"/>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import PostList from '@/components/Feed/PostList.vue';
 import { usePostStore} from '@/stores/post';
+import { useAccountStore } from '@/stores/account';
 
 export default defineComponent({
   name: 'FeedView',
@@ -17,7 +18,10 @@ export default defineComponent({
   },
   computed: {
     posts() {
-      return usePostStore().posts;
+      return usePostStore().posts.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    },
+    currentUser() {
+      return useAccountStore().user;
     }
   },
 });

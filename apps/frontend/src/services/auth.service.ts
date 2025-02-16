@@ -47,8 +47,7 @@ export default  {
 
   async checkAuth() {
     try {
-      const response = await api.get('/auth/me'); // Une route pour retourner les infos utilisateur
-      return response.data
+      return  await api.get('/auth/me'); // Une route pour retourner les infos utilisateur
     } catch (error) {
       throw error
     }
@@ -86,18 +85,18 @@ export default  {
    * @param newPassword - Le nouveau mot de passe.
    * @returns les nouvelles données de l'utilisateur comme réponse API
    */
-  async resetPassword(token: string, newPassword: string) {
+  async resetPassword(newPassword: string) {
     try {
-      const response = await api.post('/auth/reset-password', { token, newPassword })
+      const response = await api.post('/auth/reset-password', newPassword)
       return response.data
     } catch (error) {
       throw error
     }
   },
 
-  async updateAccessCode(token: string, accessCode: string) {
+  async updateAccessCode(accessCode: string) {
     try {
-      const response = await api.patch(`/users/access-code`, { token, accessCode });
+      const response = await api.patch(`/users/access-code`, { accessCode: accessCode });
       console.log('updateAccessCode', response);
       return response.data;
     } catch (error) {
@@ -105,9 +104,9 @@ export default  {
     }
   },
 
-  async validateAccessCode(token: string, accessCode: string) {
+  async validateAccessCode(accessCode: string) {
     try {
-      const response = await api.post(`/users/validate-access-code`, { token, accessCode });
+      const response = await api.post(`/users/validate-access-code`, { accessCode: accessCode });
       console.log('validateAccessCode', response);
       return response.data;
     } catch (error) {
@@ -115,9 +114,9 @@ export default  {
     }
   },
 
-  async setAccessCode(token: string, accessCode: string) {
+  async setAccessCode(accessCode: string) {
     try {
-      const response = await api.post(`/users/access-code`, { token, accessCode });
+      const response = await api.post(`/users/access-code`, { accessCode: accessCode });
       console.log('setAccessCode', response);
       return response.data;
     } catch (error) {

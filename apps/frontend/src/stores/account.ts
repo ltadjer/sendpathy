@@ -1,11 +1,9 @@
 import { defineStore } from 'pinia';
 import AuthService from '@/services/auth.service';
-import api from '@/services/api.service';
 import WebSocketService from '@/services/websocket.service';
 
 export const useAccountStore = defineStore('account', {
   state: () => ({
-    email: null,
     user: null,
     isAuthenticated: false,
   }),
@@ -14,8 +12,7 @@ export const useAccountStore = defineStore('account', {
       try {
         const response = await AuthService.login(user);
         this.isAuthenticated = true;
-        this.email = response.email;
-        this.user = response;
+        this.user = response.data;
         console.log('Login successful:', response);
       } catch (error) {
         console.error('Login failed:', error);
@@ -24,8 +21,7 @@ export const useAccountStore = defineStore('account', {
     async checkAuth() {
       try {
         const response = await AuthService.checkAuth();
-        this.user = response;
-        this.email = response.email;
+        this.user = response.data;
         this.isAuthenticated = true;
         console.log('User data:', response);
       } catch (error) {
@@ -36,7 +32,6 @@ export const useAccountStore = defineStore('account', {
     async logout() {
       await AuthService.logout();
       this.isAuthenticated = false;
-      this.email = null;
       this.user = null;
       WebSocketService.disconnect(); // Disconnect WebSocket on logout
     },
@@ -49,6 +44,28 @@ export const useAccountStore = defineStore('account', {
         console.error('Failed to refresh token:', error);
         await this.logout();
       }
-    }
+    },
+
+    async validateAccessCode(code: string) {
+      try {
+        console.log('Validating access code:', code);
+        const response = await AuthService.validateAccessCode(code);
+        this.user.accessCode = response;
+        return response;
+      } catch (error) {
+        console.error('Failed to validate access code:', error);
+      }
+    },
+
+    async setAccessCode(code: string) {
+      try {
+        const response = await AuthService.setAccessCode(code);
+        this.user.accessCode = response;
+        console.log('Access code set:', response);
+        return response;
+      } catch (error) {
+        console.error('Failed to set access code:', error);
+      }
+    },
   },
 });

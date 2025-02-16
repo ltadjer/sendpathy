@@ -2,13 +2,16 @@
   <ion-grid>
     <ion-row>
       <ion-col class="comment-container">
-        <ion-thumbnail class="user-avatar">
-          <img alt="User avatar" :src="comment.user.avatar || defaultAvatar" />
-        </ion-thumbnail>
-        <div class="comment-content">
-          <div class="comment-header">
-            <span class="username">{{ comment.user.username }}</span>
-            <span>
+        <ion-item lines="none" class="full-width ion-align-items-start">
+          <div class="avatar-container">
+            <ion-avatar>
+              <img alt="User Avatar" :src="comment.user.avatar" />
+            </ion-avatar>
+          </div>
+          <div class="comment-content">
+            <div class="comment-header">
+              <span class="username">{{ comment.user.username }}</span>
+              <span>
               <ion-icon
                 class="icon-size"
                 @click="toggleLike(comment)"
@@ -16,26 +19,28 @@
               ></ion-icon>
               <span v-if="comment.likes" class="likes-count">{{ comment.likes.length }}</span>
             </span>
+            </div>
+            <p class="comment-text">{{ comment.content }}</p>
+            <div class="comment-actions">
+              <ion-text v-if="comment.replies && comment.replies.length > 0" @click="toggleReplies(comment)">
+                {{ comment.showReplies ? 'Masquer les réponses' : 'Afficher les réponses' }}
+              </ion-text>
+              <ion-text @click="$emit('reply', comment)" class="reply-text">Répondre</ion-text>
+              <ion-text v-if="comment.user.id === currentUser.id" @click="deleteComment(comment)" class="delete-text">Supprimer</ion-text>
+            </div>
+            <!-- Replies section -->
+            <div v-if="comment.showReplies && comment.replies && comment.replies.length > 0" class="replies">
+              <comment-item
+                v-for="reply in comment.replies"
+                :key="reply.id"
+                :comment="reply"
+                :post-id="postId"
+                :current-user="currentUser"
+                @reply="$emit('reply', reply)"
+              ></comment-item>
+            </div>
           </div>
-          <p class="comment-text">{{ comment.content }}</p>
-          <div class="comment-actions">
-            <ion-text v-if="comment.replies && comment.replies.length > 0" @click="toggleReplies(comment)">
-              {{ comment.showReplies ? 'Masquer les réponses' : 'Afficher les réponses' }}
-            </ion-text>
-            <ion-text @click="$emit('reply', comment)" class="reply-text">Répondre</ion-text>
-            <ion-text @click="deleteComment(comment)" class="delete-text">Supprimer</ion-text>
-          </div>
-          <!-- Replies section -->
-          <div v-if="comment.showReplies && comment.replies && comment.replies.length > 0" class="replies">
-            <comment-item
-              v-for="reply in comment.replies"
-              :key="reply.id"
-              :comment="reply"
-              :post-id="postId"
-              @reply="$emit('reply', reply)"
-            ></comment-item>
-          </div>
-        </div>
+        </ion-item>
       </ion-col>
     </ion-row>
   </ion-grid>
@@ -50,6 +55,8 @@ import {
   IonThumbnail,
   IonText,
   IonIcon,
+  IonAvatar,
+  IonItem,
 } from '@ionic/vue';
 import { heart, heartOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
@@ -57,12 +64,14 @@ import { usePostStore } from '@/stores/post';
 export default defineComponent({
   name: 'CommentItem',
   components: {
+    IonAvatar,
     IonGrid,
     IonRow,
     IonCol,
     IonThumbnail,
     IonText,
     IonIcon,
+    IonItem,
   },
   props: {
     comment: {
@@ -71,6 +80,10 @@ export default defineComponent({
     },
     postId: {
       type: String,
+      required: true,
+    },
+    currentUser: {
+      type: Object,
       required: true,
     },
   },
@@ -110,15 +123,9 @@ export default defineComponent({
   align-items: flex-start;
 }
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
 .comment-content {
   flex: 1;
+  padding: 12px;
 }
 
 .comment-header {
@@ -127,6 +134,12 @@ export default defineComponent({
   justify-content: space-between;
 }
 
+ion-item::part(native) {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+  --inner-padding-end: none !important;
+  --inner-padding-start: none !important;
+}
 .username {
   font-weight: bold;
   margin-right: 10px;
@@ -143,13 +156,6 @@ export default defineComponent({
   color: gray;
 }
 
-.replies {
-}
-
-.delete-text {
-  color: red;
-}
-
 .icon-size {
   font-size: 20px;
   cursor: pointer;
@@ -157,4 +163,13 @@ export default defineComponent({
 ion-grid {
   margin-top: 1rem !important;
 }
+
+.avatar-container {
+  margin: 0.5rem !important;
+}
+ion-avatar {
+  width: 40px;
+  height: 40px;
+}
+
 </style>

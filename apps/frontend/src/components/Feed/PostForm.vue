@@ -1,18 +1,20 @@
 <template>
   <ion-card class="ion-no-padding">
     <ion-card-content>
-      <ion-item class="ion-no-shadow" lines="none">
-        <ion-thumbnail slot="start">
-          <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-        </ion-thumbnail>
-        <ion-textarea v-model="content" placeholder="Qu'est-ce qui te tracasse ?"></ion-textarea>
+      <ion-item class="ion-no-shadow ion-align-items-start" lines="none">
+        <div class="avatar-container">
+          <ion-avatar slot="start">
+            <img alt="User Avatar" :src="currentUser?.avatar" class="avatar-option" />
+          </ion-avatar>
+        </div>
+        <ion-textarea
+          v-model="content"
+          placeholder="Qu'est-ce qui te tracasse ?"
+          class="custom-textarea"
+          rows="5"
+        ></ion-textarea>
       </ion-item>
       <ion-grid>
-        <ion-row class="ion-justify-content-center">
-          <ion-col size="auto">
-            <img alt="img" src="/img/fond-sendpathy.svg" class="image" />
-          </ion-col>
-        </ion-row>
         <ion-row>
           <ion-col size="8">
             <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
@@ -25,6 +27,7 @@
       </ion-grid>
     </ion-card-content>
   </ion-card>
+
   <post-settings-modal
     :isOpen="isSettingsModalOpen"
     @update:isOpen="isSettingsModalOpen = $event"
@@ -33,20 +36,28 @@
     :selectedTags="selectedTags"
     :selectedTriggers="selectedTriggers"
   ></post-settings-modal>
-  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion" :selected-emoji="emotion" ></emotions-modal>
+
+  <emotions-modal
+    :isOpen="isEmojiModalOpen"
+    @update:isOpen="isEmojiModalOpen = $event"
+    @emoji-selected="updateEmotion"
+    :selected-emoji="emotion"
+  ></emotions-modal>
 </template>
+
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow, IonThumbnail } from '@ionic/vue';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow, IonAvatar } from '@ionic/vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 import PostSettingsModal from '@/components/Feed/PostSettingsModal.vue';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
 import { happyOutline, optionsOutline, paperPlaneOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
+
 export default defineComponent({
   name: 'PostForm',
   components: {
-    IonThumbnail,
+    IonAvatar,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -65,10 +76,20 @@ export default defineComponent({
     CustomButton
   },
   props: {
-    post: Object
+    post: {
+      type: Object,
+      required: true
+    },
+    currentUser: {
+      type: Object,
+      required: true
+    }
   },
   setup() {
     return { happyOutline, optionsOutline, paperPlaneOutline };
+  },
+  mounted() {
+    console.log('currentUser:', this.currentUser);
   },
   emits: ['post-updated'],
   data() {
@@ -154,6 +175,22 @@ export default defineComponent({
   },
 });
 </script>
-<style scoped>
 
+<style scoped>
+ion-item {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
+}
+
+.custom-textarea {
+  background-image: url('/img/fond-sendpathy.svg');
+  background-size: cover;
+  background-position: center;
+  height: 300px;
+  resize: none;
+}
+
+.custom-textarea textarea {
+  padding: 1rem;
+}
 </style>

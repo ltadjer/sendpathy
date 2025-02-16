@@ -51,7 +51,6 @@ export class MessageGateway {
   async handleMessage(@ConnectedSocket() client: CustomSocket, @MessageBody() payload: CreateMessageDto): Promise<void> {
     try {
       const user = client.user;
-      console.log('user', user);
 
       if (!user) {
         throw new UnauthorizedException('User not found');

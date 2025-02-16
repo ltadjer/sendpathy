@@ -15,17 +15,15 @@
 
               <!-- Affichage des avatars générés -->
               <div class="avatar-selection">
-                <ion-row>
-                  <ion-col v-for="(avatar, index) in avatars" :key="index" size="4">
-                    <img
-                      :src="avatar"
-                      alt="Avatar proposé"
-                      class="avatar-option"
-                      @click="selectAvatar(avatar)"
-                      :class="{ selected: avatar === selectedAvatar }"
-                    />
-                  </ion-col>
-                </ion-row>
+                <div v-for="(avatar, index) in avatars" :key="index" class="avatar-container">
+                  <img
+                    :src="avatar"
+                    alt="Avatar proposé"
+                    class="avatar-option"
+                    @click="selectAvatar(avatar)"
+                    :class="{ selected: avatar === selectedAvatar }"
+                  />
+                </div>
               </div>
 
               <!-- Champs du formulaire -->
@@ -67,11 +65,12 @@
               </ion-select>
               <ion-input
                 class="ion-input-spacing"
-                placeholder="Mot de passe"
-                type="password"
-                v-model="password"
-                required
-              ></ion-input>
+                           placeholder="Mot de passe"
+                           type="password"
+                           v-model="password"
+                           required>
+                <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+              </ion-input>
               <custom-button expand="block" color="primary" type="submit" text="S'inscrire"></custom-button>
             </form>
           </ion-col>
@@ -96,6 +95,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonButton,
+  IonInputPasswordToggle,
 } from '@ionic/vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 
@@ -114,6 +114,7 @@ export default defineComponent({
     IonSelect,
     IonSelectOption,
     IonButton,
+    IonInputPasswordToggle,
   },
   data() {
     return {
@@ -150,9 +151,11 @@ export default defineComponent({
     // Générer plusieurs avatars
     generateAvatars() {
       const newAvatars = [];
-      for (let i = 0; i < 5; i++) {
+      const backgroundColors = ['b6e3f4', 'c0aede', 'd1d4f9', 'ffd5dc', 'ffdfbf'];
+      for (let i = 0; i < 6; i++) {
         const seed = `${this.username}-${Math.random().toString(36).substr(2, 9)}`;
-        newAvatars.push(`https://api.dicebear.com/6.x/adventurer/svg?seed=${seed}`);
+        const backgroundColor = backgroundColors[i % backgroundColors.length];
+        newAvatars.push(`https://api.dicebear.com/9.x/adventurer/svg?seed=${seed}&backgroundColor=${backgroundColor}`);
       }
       this.avatars = newAvatars;
     },
@@ -190,20 +193,21 @@ export default defineComponent({
 <style scoped>
 .avatar-selection {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .avatar-option {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
   cursor: pointer;
-  border: 3px solid #9747ff;
-  background-color: #f5f5fa;
-  margin: 0.5rem;
+  box-shadow: var(--neumorphism-in-shadow) !important;
 }
 
 .avatar-option.selected {
-  border-color: #fd7dfb; /* Indiquer l'avatar sélectionné */
+  box-shadow: var(--neumorphism-in-shadow) !important;
 }
 
 .avatar-option:hover {

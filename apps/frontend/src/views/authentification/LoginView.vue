@@ -1,6 +1,5 @@
 <template>
   <ion-page>
-    eeeee
     <ion-content class="ion-padding">
       <ion-grid class="flex-center">
         <ion-row>
@@ -12,7 +11,14 @@
             <form @submit.prevent="login" class="ion-text-start form-container">
               <div v-if="message" class="alert alert-success">{{ message }}</div>
               <ion-input class="ion-input-spacing" placeholder="Email" type="email" v-model="email" required></ion-input>
-              <ion-input class="ion-input-spacing" placeholder="Mot de passe" type="password" v-model="password" required></ion-input>
+              <ion-input
+                class="ion-input-spacing"
+                placeholder="Mot de passe"
+                type="password"
+                v-model="password"
+                required>
+                <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+              </ion-input>
               <custom-button expand="block" color="primary" type="submit" text="Se connecter"></custom-button>
             </form>
           </ion-col>
@@ -32,7 +38,7 @@
 
 <script>
 import { useAccountStore } from '@/stores/account.ts';
-import { IonPage, IonContent, IonGrid, IonRow, IonCol, IonText, IonInput } from '@ionic/vue';
+import { IonPage, IonContent, IonGrid, IonRow, IonCol, IonText, IonInput, IonInputPasswordToggle } from '@ionic/vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 import { defineComponent } from 'vue';
 
@@ -53,7 +59,8 @@ export default defineComponent({
     IonCol,
     IonText,
     IonInput,
-    CustomButton
+    CustomButton,
+    IonInputPasswordToggle
   },
   created() {
     console.log('LoginView created');
@@ -84,9 +91,3 @@ export default defineComponent({
   }
 });
 </script>
-
-<style scoped>
-.full-width {
-  width: 100%;
-}
-</style>

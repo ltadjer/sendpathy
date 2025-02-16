@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from './decorators/user.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -82,15 +83,12 @@ export class UserController {
     description: 'The access code has been successfully set.',
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async setAccessCode(@Body('token') token: string, @Body('accessCode') accessCode: string) {
-    console.log('token', token);
-    console.log('accessCode', accessCode);
-    const user = await this.userService.findByRefreshToken(token);
+  async setAccessCode(@User() user: any, @Body('accessCode') accessCode: string) {
+    const existingUser = await this.userService.findOneByEmail(user.email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    console.log('user', user);
-    return await this.userService.updateAccessCode(user.id, accessCode);
+    return await this.userService.updateAccessCode(existingUser.id, accessCode);
 
   }
 
@@ -102,13 +100,14 @@ export class UserController {
     description: 'The access code is valid.',
   })
   @ApiResponse({ status: 404, description: 'User not found or invalid access code.' })
-  async validateAccessCode(@Body('token') token: string, @Body('accessCode') accessCode: string) {
-    console.log('token', token);
-    const user = await this.userService.findByRefreshToken(token);
+  async validateAccessCode(@User() user: any, @Body('accessCode') accessCode: string) {
+    const existingUser = await this.userService.findOneByEmail(user.email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return await this.userService.validateAccessCode(user.id, accessCode);
+    const result = await this.userService.validateAccessCode(existingUser.id, accessCode)
+    console.log(result)
+    return result
   }
 
   @UseGuards(JwtAuthGuard)

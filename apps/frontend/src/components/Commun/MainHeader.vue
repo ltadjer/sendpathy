@@ -1,6 +1,6 @@
 <template>
   <ion-fab horizontal="center" vertical="bottom">
-    <ion-fab-button @click="openPostFormModal">
+    <ion-fab-button @click="openFormModal">
       <ion-icon :icon="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
@@ -22,19 +22,25 @@
       <ion-tab-button tab="settings" href="/parametres">
         <ion-icon :icon="settingsOutline" />
       </ion-tab-button>
+      <ion-tab-button @click="logout">
+        <ion-icon :icon="logOutOutline" />
+      </ion-tab-button>
     </ion-tab-bar>
-    <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" />
+    <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :current-user="currentUser"/>
+    <life-moment-form-modal v-if="isLifeMomentModalOpen" @close="closeLifeMomentModal"/>
   </ion-tabs>
 </template>
 
 <script lang="ts">
 import { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton } from '@ionic/vue';
-import { settingsOutline, homeOutline, chatbubblesOutline, journalOutline, todayOutline, add } from 'ionicons/icons';
+import { settingsOutline, homeOutline, chatbubblesOutline, journalOutline, todayOutline, add, logOutOutline} from 'ionicons/icons';
 import PostFormModal from '@/components/Feed/PostFormModal.vue';
+import LifeMomentFormModal from '@/components/LifeMoment/LifeMomentFormModal.vue';
+import { useAccountStore } from '@/stores/account';
 
 export default {
   name: 'MainHeader',
-  components: { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, PostFormModal },
+  components: { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, PostFormModal, LifeMomentFormModal },
   data() {
     return {
       homeOutline,
@@ -43,15 +49,34 @@ export default {
       settingsOutline,
       todayOutline,
       add,
-      isPostFormModalOpen: false
+      logOutOutline,
+      isPostFormModalOpen: false,
+      isLifeMomentModalOpen: false
     };
   },
+  computed: {
+    currentUser() {
+      return useAccountStore().user;
+    }
+  },
   methods: {
-    openPostFormModal() {
-      this.isPostFormModalOpen = true;
+    openFormModal() {
+      if (this.$route.path === '/journal') {
+        this.isLifeMomentModalOpen = true;
+      } else {
+        this.isPostFormModalOpen = true;
+      }
     },
     closePostFormModal() {
       this.isPostFormModalOpen = false;
+    },
+    closeLifeMomentModal() {
+      this.isLifeMomentModalOpen = false;
+    },
+    async logout() {
+      const accountStore = useAccountStore();
+      await accountStore.logout();
+      this.$router.push('/connexion');
     }
   }
 };

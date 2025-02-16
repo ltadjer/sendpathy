@@ -28,7 +28,6 @@ export class MessageService {
 
     async create(createMessageDto: CreateMessageDto, senderId: string) {
         // Check if a conversation exists between the users
-        console.log('senderId', senderId);
         const conversation = await this.prisma.conversation.findFirst({
             where: {
                 AND: [

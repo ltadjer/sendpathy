@@ -26,10 +26,10 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
   async login(@Body() req: LoginDto, @Res() res: Response) {
     const user = await this.authService.login(req.email, req.password);
-    res.cookie('access_token', user.access_token, { httpOnly: true, secure: true, maxAge: 15 * 60 * 1000 });
+    res.cookie('access_token', user.access_token, { httpOnly: true, secure: true});
     res.cookie('refresh_token', user.refresh_token, { httpOnly: true, secure: true});
     // ne pas envoyer les tokens, mais le reste des données de l'utilisateur
-    return res.send({ email: user.email, avatar: user.avatar, username: user.username,});
+    return res.send({ email: user.email, avatar: user.avatar, username: user.username, id: user.id, accessCode: user.accessCode });
   }
   /**
    * Registers a new user.
@@ -62,13 +62,13 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'User profile retrieved successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async getProfile(@User() user: any) {
-    console.log('user', user);
     const updatedUser = await this.userService.findOneByEmail(user.email);
-    console.log('updatedUser', updatedUser);
     return {
       email: updatedUser.email,
       username: updatedUser.username,
       avatar: updatedUser.avatar,
+      id: updatedUser.id,
+      accessCode: updatedUser.accessCode,
     };
   }
 
@@ -99,7 +99,6 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Failed to confirm email.' })
   async confirmEmail(@Query('token') token: string, @Res() res: Response) {
     try {
-      console.log('token', token);
       await this.authService.confirmEmail(token);
       return res.redirect('https://sendpathy.aaa/connexion?message=email_confirmed');
     } catch (error) {

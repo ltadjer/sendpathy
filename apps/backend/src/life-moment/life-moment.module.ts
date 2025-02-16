@@ -12,16 +12,6 @@ import { JwtModule } from '@nestjs/jwt';
   imports: [
     PrismaModule,
     ContentModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '3600s' },
-    }),
   ],
 })
-export class LifeMomentModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(CodeAuthMiddleware)
-      .forRoutes({ path: 'life-moments', method: RequestMethod.ALL });
-  }
-}
+export class LifeMomentModule {}

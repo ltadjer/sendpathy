@@ -1,26 +1,22 @@
 <template>
-  <ion-card class="neumorphic-card">
-    <ion-card-header>
-      <ion-card-title>{{ lifeMoment ? 'Edit LifeMoment' : 'New LifeMoment' }}</ion-card-title>
-    </ion-card-header>
+  <ion-card>
     <ion-card-content>
-      <ion-item class="neumorphic-item">
-        <ion-label position="static">Content</ion-label>
-        <ion-textarea v-model="content" placeholder="What's on your mind?"></ion-textarea>
+      <ion-item class="ion-no-shadow" lines="none">
+        <ion-textarea v-model="content" placeholder="Comment te sens-tu aujourd'hui?" class="custom-textarea" rows="5"></ion-textarea>
       </ion-item>
-      <ion-item class="neumorphic-item">
-        <ion-label position="static">Image/Video</ion-label>
-        <input type="file" @change="onFileChange" accept="image/*,video/*" />
-      </ion-item>
-      <ion-item class="neumorphic-item">
-        <ion-label position="floating">Audio</ion-label>
-        <ion-button @click="startRecording" :disabled="isRecording">Start Recording</ion-button>
-        <ion-button @click="stopRecording" :disabled="!isRecording">Stop Recording</ion-button>
-      </ion-item>
-      <ion-button color="primary" @click="openEmojiModal" class="neumorphic-button">
-        <ion-icon :icon="happyOutline"></ion-icon>
-      </ion-button>
-      <ion-button expand="full" @click="submitLifeMoment" class="neumorphic-button">{{ lifeMoment ? 'Update' : 'LifeMoment' }}</ion-button>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="8">
+            <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
+            <custom-button :icon="imageOutline" @click="triggerFileInput"></custom-button>
+            <input type="file" ref="fileInput" @change="onFileChange" accept="image/*,video/*" style="display: none;" />
+            <custom-button :icon="isRecording ? stopOutline : micOutline" @click="toggleRecording"></custom-button>
+          </ion-col>
+          <ion-col size="4" class="ion-text-end">
+            <custom-button text="Partager" @click="submitLifeMoment"></custom-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-card-content>
   </ion-card>
   <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></emotions-modal>
@@ -28,24 +24,24 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { IonIcon, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonButton } from '@ionic/vue';
-import { useLifeMomentStore } from '@/stores/life-moment';
+import { IonCard, IonCardContent, IonItem, IonTextarea, IonGrid, IonRow, IonCol } from '@ionic/vue';
+import { happyOutline, imageOutline, micOutline, stopOutline } from 'ionicons/icons';
+import CustomButton from '@/components/Commun/CustomButton.vue';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
-import { happyOutline } from 'ionicons/icons';
+import { useLifeMomentStore } from '@/stores/life-moment';
 
 export default defineComponent({
   name: 'LifeMomentForm',
   components: {
-    IonIcon,
+    IonCol,
+    CustomButton,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
     IonCardContent,
     IonItem,
-    IonLabel,
     IonTextarea,
-    IonButton,
-    EmotionsModal
+    EmotionsModal,
+    IonGrid,
+    IonRow
   },
   props: {
     lifeMoment: Object
@@ -63,47 +59,11 @@ export default defineComponent({
     };
   },
   setup() {
-    return { happyOutline };
-  },
-  watch: {
-    lifeMoment: {
-      immediate: true,
-      handler(newLifeMoment) {
-        if (newLifeMoment) {
-          this.content = newLifeMoment.content;
-          this.emotion = newLifeMoment.emotion;
-          this.contents = newLifeMoment.contents;
-        } else {
-          this.resetForm();
-        }
-      }
-    }
+    return { happyOutline, imageOutline, micOutline, stopOutline };
   },
   methods: {
-    async submitLifeMoment() {
-      let base64Content = null;
-      if (this.file) {
-        base64Content = await this.getFileBase64(this.file);
-      }
-      const formData = {
-        content: this.content,
-        emotion: this.emotion ? this.emotion : '',
-        contents: [
-          {
-            base64Content: base64Content,
-            type: this.file ? this.file.type : null,
-            content: this.content ? this.content : null,
-            originalName: this.file ? this.file.name : null,
-            size: this.file ? this.file.size : null,
-            order: 1
-          }
-        ]
-      };
-      if (this.lifeMoment && this.lifeMoment.id) {
-        await useLifeMomentStore().updateLifeMoment(this.lifeMoment.id, formData);
-      } else {
-        await useLifeMomentStore().addLifeMoment(formData);
-      }
+    triggerFileInput() {
+      this.$refs.fileInput.click();
     },
     onFileChange(event) {
       const file = event.target.files[0];
@@ -140,6 +100,13 @@ export default defineComponent({
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
+    },
+    toggleRecording() {
+      if (this.isRecording) {
+        this.stopRecording();
+      } else {
+        this.startRecording();
+      }
     },
     startRecording() {
       navigator.mediaDevices.getUserMedia({ audio: true })
@@ -182,3 +149,19 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+ion-item {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
+}
+
+.custom-textarea {
+  background-image: url('/img/fond-sendpathy.svg');
+  background-size: cover;
+  background-position: center;
+  height: 300px;
+  resize: none;
+  padding: 1rem;
+}
+
+</style>

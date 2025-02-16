@@ -1,13 +1,13 @@
 <template>
   <access-code-modal
     :is-open="isAccessCodeModalOpen"
-    :token="getAccessToken"
+    :token="accessToken"
     :has-access-code="hasAccessCode"
     @update:isOpen="(value) => isAccessCodeModalOpen = value"
     @access-code-set="fetchLifeMoments"
     @access-code-validated="fetchLifeMoments">
   </access-code-modal>
-  <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" />
+  <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" :current-user="currentUser" />
 </template>
 
 <script lang="ts">
@@ -15,6 +15,7 @@ import { defineComponent } from 'vue';
 import LifeMomentList from '@/components/LifeMoment/LifeMomentList.vue';
 import AccessCodeModal from '@/components/LifeMoment/AccessCodeModal.vue';
 import { useLifeMomentStore } from '@/stores/life-moment';
+import { useAccountStore } from '@/stores/account';
 
 export default defineComponent({
   name: 'LifeMomentView',
@@ -28,19 +29,20 @@ export default defineComponent({
       hasAccessCode: false,
     };
   },
-  async created() {
-    await useLifeMomentStore.fetchLifeMoments();
-  },
   computed: {
-    getAccessToken() {
-      return localStorage.getItem('refresh_token');
+    accessToken() {
+      return useAccountStore().user?.refreshToken;
     },
     lifeMoments() {
       return useLifeMomentStore().lifeMoments;
+    },
+    currentUser() {
+      return useAccountStore().user;
     }
   },
   methods: {
     async fetchLifeMoments() {
+      console.log('Fetching life moments', this.accessToken);
       await useLifeMomentStore().fetchLifeMoments();
     },
     async checkAccessCode() {
@@ -48,9 +50,9 @@ export default defineComponent({
         console.log('Access code modal is already open');
         return;
       }
-      const accessCode = localStorage.getItem('access_code');
+      const accessCode = useAccountStore().user?.accessCode;
       console.log('access_code', accessCode);
-      if (!accessCode || accessCode === 'null') {
+      if (!accessCode) {
         console.log('No access code');
         this.isAccessCodeModalOpen = true;
         this.hasAccessCode = false;
@@ -58,11 +60,12 @@ export default defineComponent({
         console.log('Access code found');
         this.isAccessCodeModalOpen = true;
         this.hasAccessCode = true;
+        await this.fetchLifeMoments();
       }
     }
   },
   async mounted() {
-      await this.checkAccessCode();
-    }
+    await this.checkAccessCode();
+  }
 });
 </script>
