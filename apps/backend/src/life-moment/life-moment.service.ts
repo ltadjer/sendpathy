@@ -83,7 +83,11 @@ export class LifeMomentService {
 
     if (contents && contents.length > 0) {
       for (const content of contents) {
-        await this.contentService.update(content.id, content);
+        if (content.id) {
+          await this.contentService.update(content.id, content);
+        } else {
+          await this.contentService.create(content, lifeMoment.id);
+        }
       }
     }
 

@@ -32,12 +32,15 @@ export class LifeMomentController {
   @ApiResponse({ status: 200, description: 'The life moment has been successfully updated.' })
   @ApiResponse({ status: 404, description: 'Life moment not found.' })
   async update(@Param('id') id: string, @Body() updateLifeMomentDto: any, @User() user: any) {
+    console.log('user', user);
     if (updateLifeMomentDto.contents && updateLifeMomentDto.contents.length > 0) {
       updateLifeMomentDto.contents = updateLifeMomentDto.contents.map(content => {
-        if (content.content) {
+        // faire ça seulement si le content est nouveau (pas de id)
+        if (!content.id && content.content) {
+          console.log('content', content);
           return {
             ...content,
-            fileUrl: `data:${content.type};base64,${content.content}`,
+            fileUrl: `data:${content.type};base64,${content.base64Content}`,
           };
         }
         return content;

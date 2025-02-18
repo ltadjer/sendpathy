@@ -1,26 +1,42 @@
 <template>
   <ion-card>
     <ion-card-content>
-      <ion-item class="ion-no-shadow" lines="none">
-        <ion-textarea v-model="content" placeholder="Comment te sens-tu aujourd'hui?" class="custom-textarea" rows="5"></ion-textarea>
-      </ion-item>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="8">
-            <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
-            <custom-button :icon="imageOutline" @click="triggerFileInput"></custom-button>
-            <input type="file" ref="fileInput" @change="onFileChange" accept="image/*,video/*" style="display: none;" />
-            <custom-button :icon="isRecording ? stopOutline : micOutline" @click="toggleRecording"></custom-button>
-          </ion-col>
-          <ion-col size="4" class="ion-text-end">
-            <custom-button text="Partager" @click="submitLifeMoment"></custom-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+      <form @submit.prevent="submitLifeMoment">
+        <div v-if="contents.length">
+          <div v-for="(content, index) in contents" :key="index">
+            <div v-if="content.type.startsWith('image/')">
+              <img :src="`https://api.sendpathy.aaa${content.fileUrl}`" alt="Image" />
+            </div>
+            <div v-else-if="content.type.startsWith('video/')">
+              <video :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls></video>
+            </div>
+            <div v-else-if="content.type.startsWith('audio/')">
+              <audio :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls></audio>
+            </div>
+          </div>
+        </div>
+        <ion-item class="ion-no-shadow" lines="none">
+          <ion-textarea v-model="content" placeholder="Comment te sens-tu aujourd'hui?" class="custom-textarea" rows="5"></ion-textarea>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="8">
+              <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
+              <custom-button :icon="imageOutline" @click="triggerFileInput"></custom-button>
+              <input type="file" ref="fileInput" @change="onFileChange" accept="image/*,video/*" style="display: none;" />
+              <custom-button :icon="isRecording ? stopOutline : micOutline" @click="toggleRecording"></custom-button>
+            </ion-col>
+            <ion-col size="4" class="ion-text-end">
+              <custom-button text="Partager" type="submit"></custom-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </form>
     </ion-card-content>
   </ion-card>
-  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></emotions-modal>
+  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion" :selected-emoji="emotion"></emotions-modal>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
@@ -49,6 +65,7 @@ export default defineComponent({
   data() {
     return {
       content: '',
+      emotion: '',
       file: null,
       base64Image: '',
       isRecording: false,
@@ -57,6 +74,21 @@ export default defineComponent({
       isEmojiModalOpen: false,
       contents: [],
     };
+  },
+  watch: {
+    lifeMoment: {
+      immediate: true,
+      handler(newVal) {
+        if(newVal) {
+          this.content = newVal.content;
+          this.emotion = newVal.emotion;
+          this.contents = newVal.contents || [];
+          console.log('this.contents:', this.contents);
+        } else {
+          this.resetForm();
+        }
+      },
+    },
   },
   setup() {
     return { happyOutline, imageOutline, micOutline, stopOutline };
@@ -136,6 +168,39 @@ export default defineComponent({
     openEmojiModal() {
       this.isEmojiModalOpen = true;
     },
+    async submitLifeMoment() {
+      let base64Content = null;
+      if (this.file) {
+        base64Content = await this.getFileBase64(this.file);
+      }
+
+      const newContent = {
+        base64Content: base64Content,
+        type: this.file ? this.file.type : null,
+        content: '', // TODO: remove it from the bdd
+        originalName: this.file ? this.file.name : null,
+        size: this.file ? this.file.size : null,
+        order: this.contents.length + 1
+      };
+
+      const formData = {
+        content: this.content,
+        emotion: this.emotion ? this.emotion : '',
+        contents: this.contents ? this.contents : [],
+      };
+      if(base64Content) {
+        formData.contents = [...this.contents, newContent];
+      }
+
+      if (this.lifeMoment && this.lifeMoment.id) {
+        await useLifeMomentStore().updateOneLifeMoment(this.lifeMoment.id, formData);
+      } else {
+        await useLifeMomentStore().createOneLifeMoment(formData);
+      }
+
+      this.resetForm();
+      this.$emit('close');
+    },
     resetForm() {
       this.content = '';
       this.file = null;
@@ -163,5 +228,4 @@ ion-item {
   resize: none;
   padding: 1rem;
 }
-
 </style>

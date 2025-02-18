@@ -14,7 +14,7 @@ export const useLifeMomentStore = defineStore('lifeMoment', {
         console.error('Failed to fetch life moments:', error);
       }
     },
-    async addLifeMoment(lifeMoment: any) {
+    async createOneLifeMoment(lifeMoment: any) {
       try {
         // créer un life moment
         const newLifeMoment = await lifeMomentService.createOneLifeMoment(lifeMoment);
@@ -24,7 +24,7 @@ export const useLifeMomentStore = defineStore('lifeMoment', {
         console.error('Failed to add life moment:', error);
       }
     },
-    async updateLifeMoment(id: string, lifeMoment: any) {
+    async updateOneLifeMoment(id: string, lifeMoment: any) {
       const updatedLifeMoment = await lifeMomentService.updateOneLifeMoment(id, lifeMoment);
       // mettre à jour la liste des life moments du store
       const index = this.lifeMoments.findIndex((l) => l.id === id);
