@@ -33,7 +33,7 @@
                         <ion-text class="ion-margin-top">{{ lifeMoment.content }}</ion-text>
                     </ion-col>
                   </ion-row>
-                  <ion-row class="media-grid" :class="`media-count-${lifeMoment.contents.length}`">
+                  <ion-row v-if="lifeMoment.contents && lifeMoment.contents.length > 0" class="media-grid" :class="`media-count-${lifeMoment.contents.length}`">
                     <template v-for="(content, index) in lifeMoment.contents" :key="content.id">
                       <ion-col v-if="index < 4" class="media-item">
                         <img v-if="content.type.startsWith('image/')" :src="`https://api.sendpathy.aaa${content.fileUrl}`" class="media-content" />
@@ -41,7 +41,9 @@
                       </ion-col>
                     </template>
                     <ion-col v-if="lifeMoment.contents.length > 4" class="overlay-more">
-                      +{{ lifeMoment.contents.length - 4 }}
+                      <span class="gradient-text">
+                        +{{ lifeMoment.contents.length - 4 }}
+                      </span>
                     </ion-col>
                   </ion-row>
                   <ion-row class="separator ion-margin-top"></ion-row>
@@ -67,7 +69,6 @@
     </ion-content>
   </ion-page>
 </template>
-
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonButtons, IonAvatar, IonGrid, IonRow, IonCol, IonIcon, IonPopover, IonText } from '@ionic/vue';
@@ -121,6 +122,7 @@ export default defineComponent({
     },
     async deleteLifeMoment(lifeMomentId) {
       await useLifeMomentStore().deleteLifeMoment(lifeMomentId);
+      // fermer le ion-popover
     },
     closeLifeMomentFormModal() {
       this.isLifeMomentFormModalOpen = false;
@@ -133,10 +135,6 @@ export default defineComponent({
   setup() {
     return { ellipsisHorizontalOutline };
   },
-  mounted() {
-    console.log('LifeMomentList mounted');
-    console.log('LifeMoments', this.lifeMoments);
-  },
 });
 </script>
 <style scoped>
@@ -148,17 +146,20 @@ export default defineComponent({
 .media-count-1 {
   grid-template-columns: 1fr;
 }
-.media-count-2 {
-  grid-template-columns: 1fr 1fr;
+
+.media-count-2, .media-count-3, .media-count-4, .media-count-5,
+.media-count-6, .media-count-7, .media-count-8, .media-count-9, .media-count-10 {
+  grid-template-columns: repeat(2, 1fr);
 }
+
 .media-count-3 {
-  grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
 }
+
 .media-count-4, .media-count-5 {
-  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
 }
+
 .media-item {
   position: relative;
 }
@@ -166,16 +167,23 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 1rem;
+  box-shadow: var(--neumorphism-out-shadow);
+  padding: 6px;
+}
+
+.media-content img {
+  border-radius: 1rem;
 }
 .overlay-more {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
+  background: var(--ion-color-primary);
+  box-shadow: var(--neumorphism-out-shadow);
   font-size: 1.5rem;
   border-radius: 8px;
+  grid-column: 1 / -1;
 }
 
 .separator {

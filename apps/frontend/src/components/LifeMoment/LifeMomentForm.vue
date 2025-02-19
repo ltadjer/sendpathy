@@ -2,16 +2,21 @@
   <ion-card>
     <ion-card-content>
       <form @submit.prevent="submitLifeMoment">
-        <div v-if="contents.length">
-          <div v-for="(content, index) in contents" :key="index">
+        <div v-if="contents.length" :class="`media-grid media-count-${contents.length}`">
+          <div v-for="(content, index) in contents" :key="index" class="media-item">
             <div v-if="content.type.startsWith('image/')">
-              <img :src="`https://api.sendpathy.aaa${content.fileUrl}`" alt="Image" />
+              <img :src="getImageUrl(content)" alt="Image" class="media-content" />
+              <ion-buttons class="delete-icon">
+                <custom-button @button-click="deleteOneContent(content, index)" :icon="closeOutline"></custom-button>
+              </ion-buttons>
             </div>
             <div v-else-if="content.type.startsWith('video/')">
-              <video :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls></video>
+              <video :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls class="media-content"></video>
+              <ion-icon name="close-circle" class="delete-icon" @click="deleteOneContent(index)"></ion-icon>
             </div>
             <div v-else-if="content.type.startsWith('audio/')">
-              <audio :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls></audio>
+              <audio :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls class="media-content"></audio>
+              <ion-icon name="close-circle" class="delete-icon" @click="deleteOneContent(index)"></ion-icon>
             </div>
           </div>
         </div>
@@ -37,11 +42,10 @@
   <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion" :selected-emoji="emotion"></emotions-modal>
 </template>
 
-
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { IonCard, IonCardContent, IonItem, IonTextarea, IonGrid, IonRow, IonCol } from '@ionic/vue';
-import { happyOutline, imageOutline, micOutline, stopOutline } from 'ionicons/icons';
+import { IonCard, IonCardContent, IonItem, IonTextarea, IonGrid, IonRow, IonCol, IonIcon } from '@ionic/vue';
+import { happyOutline, imageOutline, micOutline, stopOutline, closeOutline } from 'ionicons/icons';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
 import { useLifeMomentStore } from '@/stores/life-moment';
@@ -57,7 +61,8 @@ export default defineComponent({
     IonTextarea,
     EmotionsModal,
     IonGrid,
-    IonRow
+    IonRow,
+    IonIcon
   },
   props: {
     lifeMoment: Object
@@ -73,6 +78,7 @@ export default defineComponent({
       mediaRecorder: null,
       isEmojiModalOpen: false,
       contents: [],
+      isFileInputTriggered: false,
     };
   },
   watch: {
@@ -83,7 +89,6 @@ export default defineComponent({
           this.content = newVal.content;
           this.emotion = newVal.emotion;
           this.contents = newVal.contents || [];
-          console.log('this.contents:', this.contents);
         } else {
           this.resetForm();
         }
@@ -91,18 +96,31 @@ export default defineComponent({
     },
   },
   setup() {
-    return { happyOutline, imageOutline, micOutline, stopOutline };
+    return { happyOutline, imageOutline, micOutline, stopOutline, closeOutline };
   },
+  emits: ['close', 'button-click'],
   methods: {
     triggerFileInput() {
-      this.$refs.fileInput.click();
+      if (!this.isFileInputTriggered && this.$refs.fileInput) {
+        this.isFileInputTriggered = true;
+        this.$refs.fileInput.click();
+      }
     },
     onFileChange(event) {
+      this.isFileInputTriggered = false;
       const file = event.target.files[0];
       if (this.validateFile(file)) {
         this.file = file;
         this.getFileBase64(this.file).then(base64 => {
           this.base64Image = base64;
+          this.contents.push({
+            type: file.type,
+            content: '',
+            base64Content: base64,
+            originalName: file.name,
+            size: file.size,
+            order: this.contents.length + 1
+          });
         });
       }
     },
@@ -133,6 +151,12 @@ export default defineComponent({
         reader.readAsDataURL(file);
       });
     },
+    getImageUrl(content) {
+      if (content.fileUrl && content.fileUrl.startsWith('/uploads')) {
+        return `https://api.sendpathy.aaa${content.fileUrl}`;
+      }
+      return `data:${content.type};base64,${content.base64Content}`;
+    },
     toggleRecording() {
       if (this.isRecording) {
         this.stopRecording();
@@ -162,35 +186,26 @@ export default defineComponent({
       this.isRecording = false;
     },
     updateEmotion(emoji) {
-      console.log('emoji:', emoji);
       this.emotion = emoji;
     },
     openEmojiModal() {
       this.isEmojiModalOpen = true;
     },
-    async submitLifeMoment() {
-      let base64Content = null;
-      if (this.file) {
-        base64Content = await this.getFileBase64(this.file);
+    async deleteOneContent(content, index) {
+      if (content.id) {
+        await useLifeMomentStore().deleteOneContent(content.id);
+        const updatedLifeMoment = await useLifeMomentStore().fetchOneLifeMomentById(this.lifeMoment.id);
+        this.contents = updatedLifeMoment.contents;
+      } else {
+        this.contents.splice(index, 1);
       }
-
-      const newContent = {
-        base64Content: base64Content,
-        type: this.file ? this.file.type : null,
-        content: '', // TODO: remove it from the bdd
-        originalName: this.file ? this.file.name : null,
-        size: this.file ? this.file.size : null,
-        order: this.contents.length + 1
-      };
-
+    },
+    async submitLifeMoment() {
       const formData = {
         content: this.content,
         emotion: this.emotion ? this.emotion : '',
         contents: this.contents ? this.contents : [],
       };
-      if(base64Content) {
-        formData.contents = [...this.contents, newContent];
-      }
 
       if (this.lifeMoment && this.lifeMoment.id) {
         await useLifeMomentStore().updateOneLifeMoment(this.lifeMoment.id, formData);
@@ -214,6 +229,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <style scoped>
 ion-item {
   --padding-start: 0px;
@@ -227,5 +243,49 @@ ion-item {
   height: 300px;
   resize: none;
   padding: 1rem;
+}
+
+.media-grid {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+.media-count-1 {
+  grid-template-columns: 1fr;
+}
+
+.media-count-2, .media-count-3, .media-count-4, .media-count-5,
+.media-count-6, .media-count-7, .media-count-8, .media-count-9, .media-count-10 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.media-count-3 {
+  grid-template-rows: auto auto;
+}
+
+.media-count-4, .media-count-5 {
+  grid-template-rows: 1fr 1fr;
+}
+
+.media-item {
+  position: relative;
+}
+.media-content {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1rem;
+  box-shadow: var(--neumorphism-out-shadow);
+  padding: 6px;
+}
+
+.media-content img {
+  border-radius: 1rem;
+}
+
+.delete-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
 }
 </style>

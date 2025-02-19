@@ -91,7 +91,7 @@ export class LifeMomentService {
       }
     }
 
-    return lifeMoment;
+    return await this.findOne(lifeMoment.id, userId);
   }
 
   async delete(id: string, userId: string) {

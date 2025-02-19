@@ -1,7 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&family=Quicksand:wght@300..700&display=swap');
 * {
-    font-family: "Quicksand", sans-serif !important;
+    font-family: "Inclusive Sans", serif;
 }
 
 body {

@@ -8,7 +8,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <life-moment-form :lifeMoment="lifeMoment"/>
+      <life-moment-form :lifeMoment="lifeMoment" @close="closeModal()"/>
     </ion-content>
   </ion-modal>
 </template>

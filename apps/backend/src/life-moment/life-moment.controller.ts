@@ -36,8 +36,7 @@ export class LifeMomentController {
     if (updateLifeMomentDto.contents && updateLifeMomentDto.contents.length > 0) {
       updateLifeMomentDto.contents = updateLifeMomentDto.contents.map(content => {
         // faire ça seulement si le content est nouveau (pas de id)
-        if (!content.id && content.content) {
-          console.log('content', content);
+        if (!content.id && content.base64Content) {
           return {
             ...content,
             fileUrl: `data:${content.type};base64,${content.base64Content}`,
@@ -61,7 +60,7 @@ export class LifeMomentController {
     createLifeMomentDto.contents = createLifeMomentDto.contents.map(content => {
       return {
         ...content,
-        fileUrl: `data:${content.type};base64,${content.content}`,
+        fileUrl: content.base64Content,
       };
     });
 

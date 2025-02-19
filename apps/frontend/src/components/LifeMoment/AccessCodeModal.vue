@@ -64,7 +64,6 @@ export default {
     async handleAccessCode() {
       try {
         if (this.hasAccessCode) {
-          console.log('Validating access code');
           const isValid = await useAccountStore().validateAccessCode(this.accessCode);
           if (isValid) {
             this.$emit('access-code-validated');
@@ -83,7 +82,6 @@ export default {
     },
     closeModal() {
       this.$emit('update:isOpen', false);
-      console.log('Closing modal', this.isOpen);
     }
   }
 };

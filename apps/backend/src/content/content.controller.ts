@@ -47,6 +47,6 @@ export class ContentController {
   @ApiResponse({ status: 200, description: 'The content has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Content not found.' })
   async delete(@Param('id') id: string) {
-    return this.contentService.delete(id);
+    return await this.contentService.delete(id);
   }
 }

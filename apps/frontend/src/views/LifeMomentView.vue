@@ -30,11 +30,8 @@ export default defineComponent({
     };
   },
   computed: {
-    accessToken() {
-      return useAccountStore().user?.refreshToken;
-    },
     lifeMoments() {
-      return useLifeMomentStore().lifeMoments;
+      return useLifeMomentStore().lifeMoments.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     },
     currentUser() {
       return useAccountStore().user;
@@ -42,7 +39,6 @@ export default defineComponent({
   },
   methods: {
     async fetchLifeMoments() {
-      console.log('Fetching life moments', this.accessToken);
       await useLifeMomentStore().fetchLifeMoments();
     },
     async checkAccessCode() {

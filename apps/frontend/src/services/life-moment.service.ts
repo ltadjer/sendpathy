@@ -55,6 +55,15 @@ export default {
 
   async getEmojis() {
     return Object.values(Emojis);
-  }
+  },
 
+  async deleteOneContent(contentId) {
+    try {
+      const response = await api.delete(`/contents/content/${contentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error while deleting content', error);
+      throw error;
+    }
+  }
 }

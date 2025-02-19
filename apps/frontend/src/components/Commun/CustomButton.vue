@@ -1,5 +1,5 @@
 <template>
-  <ion-button :class="buttonClass" @click="handleClick">
+  <ion-button :class="buttonClass" @click.stop="handleClick">
     <span v-if="text" class="gradient-text">{{ text }}</span>
     <ion-icon v-if="icon" :icon="icon"></ion-icon>
   </ion-button>
@@ -31,7 +31,8 @@ export default defineComponent({
   },
   methods: {
     handleClick(event: Event) {
-      this.$emit('click', event);
+      event.stopPropagation();
+      this.$emit('button-click', event);
     }
   }
 });

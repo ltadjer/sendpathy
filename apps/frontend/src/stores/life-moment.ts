@@ -14,6 +14,17 @@ export const useLifeMomentStore = defineStore('lifeMoment', {
         console.error('Failed to fetch life moments:', error);
       }
     },
+    async fetchOneLifeMomentById(id: string) {
+      try {
+        const updatedLifeMoment = await lifeMomentService.fetchOneLifeMomentById(id);
+        // mettre à jour la liste des life moments du store
+        const index = this.lifeMoments.findIndex((l) => l.id === id);
+        this.lifeMoments[index] = updatedLifeMoment;
+        return updatedLifeMoment;
+      } catch (error) {
+        console.error('Failed to fetch life moment:', error);
+      }
+    },
     async createOneLifeMoment(lifeMoment: any) {
       try {
         // créer un life moment
@@ -35,5 +46,10 @@ export const useLifeMomentStore = defineStore('lifeMoment', {
       // mettre à jour la liste des life moments du store
       this.lifeMoments = this.lifeMoments.filter((l) => l.id !== id);
     },
+
+    async deleteOneContent(contentId: string) {
+      console.log('contentId', contentId);
+      await lifeMomentService.deleteOneContent(contentId);
+    }
   },
 });
