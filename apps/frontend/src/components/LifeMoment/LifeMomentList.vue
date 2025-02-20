@@ -1,5 +1,4 @@
 <template>
-  <ion-page>
     <ion-header>
       <ion-header :translucent="true" class="ion-padding header-page">
         <ion-toolbar>
@@ -55,7 +54,7 @@
                       <ion-icon class="custom-icon" :id="'popover-button-' + lifeMoment.id" @click.stop :icon="ellipsisHorizontalOutline"></ion-icon>
                       <ion-popover :trigger="'popover-button-' + lifeMoment.id" :dismiss-on-select="true" side="top" alignment="end">
                         <ion-list>
-                          <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" @click.stop="deleteLifeMoment(lifeMoment.id)">Supprimer</ion-item>
+                          <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" @click.stop="deleteOneLifeMoment(lifeMoment.id)">Supprimer</ion-item>
                         </ion-list>
                       </ion-popover>
                     </ion-col>
@@ -67,21 +66,20 @@
         </ion-item>
       </ion-list>
     </ion-content>
-  </ion-page>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonButtons, IonAvatar, IonGrid, IonRow, IonCol, IonIcon, IonPopover, IonText } from '@ionic/vue';
+import {IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonButtons, IonAvatar, IonGrid, IonRow, IonCol, IonIcon, IonPopover, IonText } from '@ionic/vue';
 import { useLifeMomentStore } from '@/stores/life-moment';
 import LifeMomentFormModal from '@/components/LifeMoment/LifeMomentFormModal.vue';
 import { ellipsisHorizontalOutline } from 'ionicons/icons';
+import { formatDate } from '@/utils/date';
 
 export default defineComponent({
   name: 'LifeMomentList',
   components: {
     IonButtons,
     IonAvatar,
-    IonPage,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -116,21 +114,18 @@ export default defineComponent({
     },
   },
   methods: {
+    formatDate,
     editLifeMoment(lifeMoment) {
       this.selectedLifeMoment = lifeMoment;
       this.isLifeMomentFormModalOpen = true;
     },
-    async deleteLifeMoment(lifeMomentId) {
-      await useLifeMomentStore().deleteLifeMoment(lifeMomentId);
-      // fermer le ion-popover
+    async deleteOneLifeMoment(lifeMomentId) {
+      await useLifeMomentStore().deleteOneLifeMoment(lifeMomentId);
     },
     closeLifeMomentFormModal() {
       this.isLifeMomentFormModalOpen = false;
     },
-    formatDate(dateString) {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString('fr-FR', options);
-    }
+
   },
   setup() {
     return { ellipsisHorizontalOutline };
@@ -174,6 +169,7 @@ export default defineComponent({
 
 .media-content img {
   border-radius: 1rem;
+  box-shadow: var(--neumorphism-out-shadow);
 }
 .overlay-more {
   display: flex;

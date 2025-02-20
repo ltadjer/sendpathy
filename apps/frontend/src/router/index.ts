@@ -3,12 +3,12 @@ import RegisterView from '../views/authentification/RegisterView.vue';
 import LoginView from '../views/authentification/LoginView.vue';
 import RequestPasswordResetView from '../views/authentification/RequestResetPasswordView.vue';
 import ResetPasswordView from '../views/authentification/ResetPasswordView.vue';
-import MessageView from "@/views/MessageView.vue";
-import ConversationView from "@/views/ConversationView.vue";
+import MessageView from '@/views/MessageView.vue';
+import ConversationView from '@/views/ConversationView.vue';
 import FeedView from '@/views/FeedView.vue';
-import LifeMomentView from "@/views/LifeMomentView.vue";
+import LifeMomentView from '@/views/LifeMomentView.vue';
 import MainHeader from '@/components/Commun/MainHeader.vue';
-import ReservationListView from '@/views/reservation/ReservationListView.vue';
+import ReservationView from '@/views/reservation/ReservationView.vue';
 import NewReservationView from '@/views/reservation/NewReservationView.vue';
 import ReservationSummaryView from '@/views/reservation/ReservationSummaryView.vue';
 import { useAccountStore } from '@/stores/account';
@@ -28,8 +28,8 @@ const routes: Array<RouteRecordRaw> = [
       { path: '/conversations/:id', component: MessageView },
       { path: '/feed', component: FeedView },
       { path: '/journal', component: LifeMomentView },
-      { path: '/reservations', component: ReservationListView },
-      { path: '/new-reservation', component: NewReservationView },
+      { path: '/reservations', component: ReservationView },
+      { path: '/nouvelle-reservation', component: NewReservationView },
       { path: '/reservations/summary', component: ReservationSummaryView },
     ],
     meta: { requiresAuth: true }
@@ -46,11 +46,11 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const accountStore = useAccountStore();
 
-    try {
-      await accountStore.checkAuth();
-    } catch (error) {
-      console.error('Failed to check authentication:', error);
-    }
+  try {
+    await accountStore.checkAuth();
+  } catch (error) {
+    console.error('Failed to check authentication:', error);
+  }
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const requiresGuest = to.matched.some(record => record.meta.requiresGuest);

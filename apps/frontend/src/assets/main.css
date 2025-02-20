@@ -151,6 +151,24 @@ ion-icon {
     box-shadow: none !important;
 }
 
+.ion-shadow-out {
+    --box-shadow: var(--neumorphism-out-shadow) !important;
+    box-shadow: var(--neumorphism-out-shadow) !important;
+}
+
+.ion-shadow-in {
+    --box-shadow: var(--neumorphism-in-shadow) !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+ion-chip {
+    box-shadow: var(--neumorphism-out-shadow);
+}
+ion-list {
+    --background: none !important;
+    background-color: transparent !important;
+    background: none !important;
+}
 ion-thumbnail {
     --border-radius: 50%;
 }

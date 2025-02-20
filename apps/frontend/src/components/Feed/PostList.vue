@@ -1,5 +1,4 @@
 <template>
-  <ion-page>
     <ion-header :translucent="true" class="ion-padding header-page">
       <ion-toolbar>
         <ion-item lines="none" class="ion-no-shadow ion-align-items-center">
@@ -20,17 +19,24 @@
 
     <ion-content>
       <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" :current-user="currentUser" />
-      <ion-list class="ion-padding" style="background: none;">
+      <ion-list class="ion-padding">
+        <filter-button class="ion-margin-bottom ion-text-end" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers"></filter-button>
+
         <ion-item
           class="ion-margin-bottom"
           lines="none"
-          v-for="post in posts"
+          v-for="post in filteredPosts"
           :key="post.id"
           @click="editPost(post)"
         >
           <ion-grid>
             <ion-row>
               <ion-col size="10">
+                <ion-list v-if="post.tags && post.tags.length > 0 || post.triggers && post.triggers.length > 0" class="ion-padding-bottom">
+                  <ion-chip v-for="element in [...post.tags, ...post.triggers]" :key="element.id" class="ion-margin-top">
+                    <span class="gradient-text">{{ element.name }}</span>
+                  </ion-chip>
+                </ion-list>
                 <ion-item lines="none" class="ion-no-shadow ion-align-items-start">
                   <div class="avatar-container">
                     <ion-avatar slot="start">
@@ -65,7 +71,7 @@
                   alignment="end"
                 >
                   <ion-list>
-                    <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click="deletePost(post.id)">Supprimer</ion-item>
+                    <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click="deleteOnePost(post.id)">Supprimer</ion-item>
                     <ion-item lines="none" :button="true" :detail="false" @click="reportPost(post.id)">Signaler</ion-item>
                   </ion-list>
                 </ion-popover>
@@ -88,22 +94,22 @@
         <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId" :current-user="currentUser"></post-comment-modal>
       </ion-list>
     </ion-content>
-  </ion-page>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonGrid, IonCol, IonRow, IonText, IonTextarea, IonPopover } from '@ionic/vue';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonGrid, IonCol, IonRow, IonText, IonTextarea, IonPopover, IonChip, IonLabel } from '@ionic/vue';
 import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
 import { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
+import FilterButton from '@/components/Feed/FilterButton.vue';
 
 export default defineComponent({
   name: 'PostList',
   components: {
     PostFormModal,
-    IonPage,
+    FilterButton,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -120,6 +126,8 @@ export default defineComponent({
     IonText,
     IonTextarea,
     IonPopover,
+    IonChip,
+    IonLabel,
     PostCommentModal
   },
   setup() {
@@ -129,7 +137,9 @@ export default defineComponent({
     return {
       selectedPostId: null,
       isCommentModalOpen: false,
-      isPostFormModalOpen: false
+      isPostFormModalOpen: false,
+      selectedTags: [],
+      selectedTriggers: []
     };
   },
   props: {
@@ -149,6 +159,13 @@ export default defineComponent({
     },
     comments() {
       return this.selectedPost ? this.selectedPost.comments.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
+    },
+    filteredPosts() {
+      return this.posts.filter(post => {
+        const hasSelectedTags = this.selectedTags.length === 0 || post.tags.some(tag => this.selectedTags.includes(tag.id));
+        const hasSelectedTriggers = this.selectedTriggers.length === 0 || post.triggers.some(trigger => this.selectedTriggers.includes(trigger.id));
+        return hasSelectedTags && hasSelectedTriggers;
+      });
     }
   },
   methods: {
@@ -173,8 +190,8 @@ export default defineComponent({
       this.selectedPostId = post.id;
       this.isPostFormModalOpen = true;
     },
-    async deletePost(postId) {
-      await usePostStore().deletePost(postId);
+    async deleteOnePost(postId) {
+      await usePostStore().deleteOnePost(postId);
     },
     async reportPost(postId) {
       // Add your report post logic here
@@ -200,6 +217,12 @@ export default defineComponent({
     closePostFormModal() {
       this.isPostFormModalOpen = false;
       this.selectedPostId = null;
+    },
+    updateSelectedTags(tags) {
+      this.selectedTags = tags;
+    },
+    updateSelectedTriggers(triggers) {
+      this.selectedTriggers = triggers;
     }
   },
 });
@@ -215,7 +238,6 @@ ion-item:not(ion-popover ion-item) {
   --inner-padding-end: 0px;
 }
 
-
 ion-popover ion-list {
   padding: 4px !important;
   box-shadow: var(--neumorphism-out-shadow) !important;
@@ -226,5 +248,4 @@ ion-popover ion-item:hover {
   color: var(--ion-color-secondary) !important;
   font-weight: bold;
 }
-
 </style>

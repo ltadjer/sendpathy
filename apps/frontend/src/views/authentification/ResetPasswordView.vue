@@ -1,21 +1,35 @@
 <template>
-    <div>
-      <h2>Reset Password</h2>
-      <form @submit.prevent="resetPassword">
-        <div>
-          <label>New Password:</label>
-          <input type="password" v-model="newPassword" required />
-        </div>
-        <button type="submit">Reset Password</button>
-      </form>
-      <div v-if="message" class="alert alert-success">{{ message }}</div>
-    </div>
+  <ion-page>
+    <ion-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-text>
+              <h2>Reset Password</h2>
+            </ion-text>
+            <form @submit.prevent="resetPassword">
+              <ion-list>
+                <ion-item>
+                  <ion-label position="floating">New Password</ion-label>
+                  <ion-input type="password" v-model="newPassword" required></ion-input>
+                </ion-item>
+              </ion-list>
+              <ion-button type="submit" expand="block">Reset Password</ion-button>
+            </form>
+            <ion-text v-if="message" class="alert alert-success">{{ message }}</ion-text>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-content>
+  </ion-page>
   </template>
   
-  <script>
+  <script lang="ts">
+  import { defineComponent } from 'vue';
   import AuthService from '../../services/auth.service.ts';
+  import { IonPage, IonContent, IonGrid, IonRow, IonCol, IonText, IonList, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
   
-  export default {
+  export default defineComponent( {
     name: 'ResetPasswordView',
     data() {
       return {
@@ -23,6 +37,19 @@
         message: '',
         token: ''
       };
+    },
+    components: {
+      IonPage,
+      IonContent,
+      IonGrid,
+      IonRow,
+      IonCol,
+      IonText,
+      IonList,
+      IonItem,
+      IonLabel,
+      IonInput,
+      IonButton
     },
     created() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -40,5 +67,5 @@
         }
       }
     }
-  };
+  });
   </script>

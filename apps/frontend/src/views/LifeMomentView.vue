@@ -1,13 +1,14 @@
 <template>
-  <access-code-modal
-    :is-open="isAccessCodeModalOpen"
-    :token="accessToken"
-    :has-access-code="hasAccessCode"
-    @update:isOpen="(value) => isAccessCodeModalOpen = value"
-    @access-code-set="fetchLifeMoments"
-    @access-code-validated="fetchLifeMoments">
-  </access-code-modal>
-  <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" :current-user="currentUser" />
+  <ion-page>
+    <access-code-modal
+      :is-open="isAccessCodeModalOpen"
+      :has-access-code="hasAccessCode"
+      @update:isOpen="(value) => isAccessCodeModalOpen = value"
+      @access-code-set="fetchLifeMoments"
+      @access-code-validated="fetchLifeMoments">
+    </access-code-modal>
+    <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" :current-user="currentUser" />
+  </ion-page>
 </template>
 
 <script lang="ts">
@@ -16,12 +17,14 @@ import LifeMomentList from '@/components/LifeMoment/LifeMomentList.vue';
 import AccessCodeModal from '@/components/LifeMoment/AccessCodeModal.vue';
 import { useLifeMomentStore } from '@/stores/life-moment';
 import { useAccountStore } from '@/stores/account';
+import { IonPage } from '@ionic/vue';
 
 export default defineComponent({
   name: 'LifeMomentView',
   components: {
     AccessCodeModal,
-    LifeMomentList
+    LifeMomentList,
+    IonPage
   },
   data() {
     return {

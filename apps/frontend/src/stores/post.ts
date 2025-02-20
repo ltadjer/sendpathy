@@ -32,7 +32,7 @@ export const usePostStore = defineStore('post', {
         console.error('Failed to update post:', error);
       }
     },
-    async deletePost(id: string) {
+    async deleteOnePost(id: string) {
       try {
         await PostService.deleteOnePost(id);
         this.posts = this.posts.filter((l) => l.id !== id);

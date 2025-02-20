@@ -46,10 +46,6 @@ export default {
       type: Boolean,
       required: true
     },
-    token: {
-      type: String,
-      required: true
-    },
     hasAccessCode: {
       type: Boolean,
       required: true

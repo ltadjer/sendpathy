@@ -1,5 +1,4 @@
 <template>
-  <ion-page>
     <ion-header>
       <ion-toolbar>
         <ion-title>Conversations</ion-title>
@@ -12,13 +11,12 @@
         </ion-item>
       </ion-list>
     </ion-content>
-  </ion-page>
 </template>
 
 <script lang="ts">
 
 import { defineComponent } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem } from '@ionic/vue';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem } from '@ionic/vue';
 
 import conversationService from '@/services/conversation.service';
 
@@ -30,7 +28,6 @@ export default defineComponent({
     };
   },
   components: {
-    IonPage,
     IonHeader,
     IonToolbar,
     IonTitle,

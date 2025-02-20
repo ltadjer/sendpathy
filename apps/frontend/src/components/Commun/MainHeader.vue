@@ -1,4 +1,5 @@
 <template>
+  <ion-page>
   <ion-fab horizontal="center" vertical="bottom">
     <ion-fab-button @click="openFormModal">
       <ion-icon :icon="add"></ion-icon>
@@ -29,6 +30,7 @@
     <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :current-user="currentUser"/>
     <life-moment-form-modal v-if="isLifeMomentModalOpen" @close="closeLifeMomentModal"/>
   </ion-tabs>
+  </ion-page>
 </template>
 
 <script lang="ts">
@@ -37,8 +39,9 @@ import { settingsOutline, homeOutline, chatbubblesOutline, journalOutline, today
 import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import LifeMomentFormModal from '@/components/LifeMoment/LifeMomentFormModal.vue';
 import { useAccountStore } from '@/stores/account';
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'MainHeader',
   components: { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, PostFormModal, LifeMomentFormModal },
   data() {
@@ -79,7 +82,7 @@ export default {
       this.$router.push('/connexion');
     }
   }
-};
+});
 </script>
 <style scoped>
 ion-fab {

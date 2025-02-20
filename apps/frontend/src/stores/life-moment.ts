@@ -41,7 +41,7 @@ export const useLifeMomentStore = defineStore('lifeMoment', {
       const index = this.lifeMoments.findIndex((l) => l.id === id);
       this.lifeMoments[index] = updatedLifeMoment;
     },
-    async deleteLifeMoment(id: string) {
+    async deleteOneLifeMoment(id: string) {
       await lifeMomentService.deleteOneLifeMoment(id);
       // mettre à jour la liste des life moments du store
       this.lifeMoments = this.lifeMoments.filter((l) => l.id !== id);
