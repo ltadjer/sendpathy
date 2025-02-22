@@ -1,10 +1,10 @@
-import { Post, Comment, Like, trigger, tag, User } from '@prisma/client';
+import { Post, Comment, Like, Trigger, Tag, User } from '@prisma/client';
 
 export interface ExtendedPost extends Post {
     comments: (Comment & { user: User })[];
     likes: Like[];
-    triggers: trigger[];
-    tags: tag[];
+    triggers: Trigger[];
+    tags: Tag[];
     user: User;
     isLiked?: boolean;
 }

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import PostService from '@/services/post.service';
 import commentService from '@/services/comment.service'
 import likeService from '@/services/like.service'
+import { useToastStore } from './toast';
 
 export const usePostStore = defineStore('post', {
   state: () => ({
@@ -15,20 +16,36 @@ export const usePostStore = defineStore('post', {
         console.error('Failed to fetch posts:', error);
       }
     },
-    async addPost(post: any) {
+    async createOnePost(post: any) {
+      const toastStore = useToastStore();
       try {
-        const newPost = await PostService.createOnePost(post);
-        this.posts.push(newPost);
+        const response = await PostService.createOnePost(post);
+        console.log(response);
+        if(response && response.status === 201) {
+          this.posts.push(response.data);
+          toastStore.showToast('Post créé avec succès', 'primary');
+          return response.data;
+        } else {
+          toastStore.showToast('Échec de la création du post', 'danger');
+        }
       } catch (error) {
+        toastStore.showToast('Une error est survenue, veuillez réessayer', 'danger');
         console.error('Failed to add post:', error);
       }
     },
-    async updatePost(id: string, post: any) {
+    async updateOnePost(id: string, post: any) {
+      const toastStore = useToastStore();
       try {
-        const updatedPost = await PostService.updateOnePost(id, post);
-        const index = this.posts.findIndex((l) => l.id === id);
-        this.posts[index] = updatedPost;
+        const response = await PostService.updateOnePost(id, post);
+        if(response && response.status === 200) {
+          const index = this.posts.findIndex((l) => l.id === id);
+          this.posts[index] = response.data;
+          toastStore.showToast('Post mis à jour avec succès', 'primary');
+        } else {
+          toastStore.showToast('Échec de la mise à jour du post', 'danger');
+        }
       } catch (error) {
+        toastStore.showToast('Une error est survenue, veuillez réessayer', 'danger');
         console.error('Failed to update post:', error);
       }
     },

@@ -30,8 +30,7 @@ export default {
    */
 
   async createOnePost(postData) {
-    const response = await api.post('/posts', postData);
-    return response.data;
+    return await api.post('/posts', postData);
   },
 
   /**
@@ -41,8 +40,7 @@ export default {
    * @param {object} postData The new data for the post.
    */
   async updateOnePost(postId, postData) {
-    const response = await api.patch(`/posts/${postId}`, postData);
-    return response.data;
+    return await api.patch(`/posts/${postId}`, postData);
   },
 
   /**

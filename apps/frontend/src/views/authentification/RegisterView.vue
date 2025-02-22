@@ -1,5 +1,12 @@
 <template>
   <ion-page>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button :defaultHref="true" :icon="arrowBackOutline" @click="navigateToLogin" />
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
     <ion-content class="ion-padding">
       <ion-grid class="flex-center">
         <ion-row>
@@ -15,13 +22,13 @@
 
               <!-- Affichage des avatars générés -->
               <div class="avatar-selection">
-                <div v-for="(avatar, index) in avatars" :key="index" class="avatar-container">
+                <div v-for="(avatar, index) in avatars" :key="index" class="avatar-container"
+                     :class="{ 'selected': avatar === selectedAvatar }"
+                     @click="selectAvatar(avatar)">
                   <img
                     :src="avatar"
                     alt="Avatar proposé"
                     class="avatar-option"
-                    @click="selectAvatar(avatar)"
-                    :class="{ selected: avatar === selectedAvatar }"
                   />
                 </div>
               </div>
@@ -65,10 +72,10 @@
               </ion-select>
               <ion-input
                 class="ion-input-spacing"
-                           placeholder="Mot de passe"
-                           type="password"
-                           v-model="password"
-                           required>
+                placeholder="Mot de passe"
+                type="password"
+                v-model="password"
+                required>
                 <ion-input-password-toggle slot="end"></ion-input-password-toggle>
               </ion-input>
               <custom-button expand="block" color="primary" type="submit" text="S'inscrire"></custom-button>
@@ -76,12 +83,11 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+      <ToastMessage/>
     </ion-content>
   </ion-page>
 </template>
-
 <script>
-import AuthService from '../../services/auth.service.ts';
 import { defineComponent } from 'vue';
 import {
   IonContent,
@@ -96,12 +102,19 @@ import {
   IonSelectOption,
   IonButton,
   IonInputPasswordToggle,
+  IonHeader,
+  IonToolbar,
+IonBackButton,
+  IonButtons
 } from '@ionic/vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
+import ToastMessage from '@/components/Commun/ToastMessage.vue'
+import { useAccountStore } from '@/stores/account'
 
 export default defineComponent({
   name: 'RegisterView',
   components: {
+    ToastMessage,
     CustomButton,
     IonContent,
     IonPage,
@@ -115,6 +128,10 @@ export default defineComponent({
     IonSelectOption,
     IonButton,
     IonInputPasswordToggle,
+    IonHeader,
+    IonToolbar,
+    IonBackButton,
+    IonButtons
   },
   data() {
     return {
@@ -162,6 +179,7 @@ export default defineComponent({
     // Sélectionner un avatar
     selectAvatar(avatar) {
       this.selectedAvatar = avatar;
+      console.log('Avatar sélectionné :', this.selectedAvatar );
     },
     async register() {
       try {
@@ -180,12 +198,15 @@ export default defineComponent({
           avatar: this.selectedAvatar, // Utilisation de l'avatar sélectionné
         };
 
-        const response = await AuthService.register(user);
+        const response = await useAccountStore().register(user);
         console.log('Inscription réussie :', response);
       } catch (error) {
         console.error("Échec de l'inscription :", error);
       }
     },
+    navigateToLogin() {
+      this.$router.push('/connexion');
+    }
   },
 });
 </script>
@@ -193,24 +214,23 @@ export default defineComponent({
 <style scoped>
 .avatar-selection {
   margin-bottom: 1rem;
+  margin-top: 1rem;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
 }
 
+.avatar-container:hover,
+.avatar-container.selected {
+  box-shadow: var(--neumorphism-in-shadow) !important;
+}
 .avatar-option {
   width: 70px;
   height: 70px;
   border-radius: 50%;
   cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
   box-shadow: var(--neumorphism-in-shadow) !important;
 }
 
-.avatar-option.selected {
-  box-shadow: var(--neumorphism-in-shadow) !important;
-}
-
-.avatar-option:hover {
-  opacity: 0.8;
-}
 </style>

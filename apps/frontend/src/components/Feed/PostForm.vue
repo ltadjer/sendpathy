@@ -1,30 +1,32 @@
 <template>
   <ion-card class="ion-no-padding">
     <ion-card-content>
-      <ion-item class="ion-no-shadow ion-align-items-start" lines="none">
-        <div class="avatar-container">
-          <ion-avatar slot="start">
-            <img alt="User Avatar" :src="currentUser?.avatar" class="avatar-option" />
-          </ion-avatar>
-        </div>
-        <ion-textarea
-          v-model="content"
-          placeholder="Qu'est-ce qui te tracasse ?"
-          class="custom-textarea"
-          rows="5"
-        ></ion-textarea>
-      </ion-item>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="8">
-            <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
-            <custom-button :icon="optionsOutline" @click="openSettingsModal"></custom-button>
-          </ion-col>
-          <ion-col size="4" class="ion-text-right">
-            <custom-button text="Publier" @click="submitPost"></custom-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+      <form @submit.prevent="submitPost">
+        <ion-item class="ion-no-shadow ion-align-items-start" lines="none">
+          <div class="avatar-container">
+            <ion-avatar slot="start">
+              <img alt="User Avatar" :src="currentUser?.avatar" class="avatar-option" />
+            </ion-avatar>
+          </div>
+          <ion-textarea
+            v-model="content"
+            placeholder="Qu'est-ce qui te tracasse ?"
+            class="custom-textarea"
+            rows="5"
+          ></ion-textarea>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="8">
+              <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
+              <custom-button :icon="optionsOutline" @click="openSettingsModal"></custom-button>
+            </ion-col>
+            <ion-col size="4" class="ion-text-right">
+              <custom-button text="Publier" type="submit"></custom-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </form>
     </ion-card-content>
   </ion-card>
 
@@ -91,7 +93,7 @@ export default defineComponent({
   mounted() {
     console.log('currentUser:', this.currentUser);
   },
-  emits: ['post-updated'],
+  emits: ['post-updated', 'close'],
   data() {
     return {
       content: '',
@@ -130,11 +132,11 @@ export default defineComponent({
 
       let postId;
       if (this.post && this.post.id) {
-        await usePostStore().updatePost(this.post.id, formData);
+        await usePostStore().updateOnePost(this.post.id, formData);
         postId = this.post.id;
       } else {
-        const response = await usePostStore().addPost(formData);
-        postId = response.id;
+        const newPost = await usePostStore().createOnePost(formData);
+        postId = newPost.id;
       }
 
       await Promise.all([
@@ -143,7 +145,7 @@ export default defineComponent({
       ]);
 
       this.resetForm();
-      this.$emit('post-updated');
+      this.$emit('close');
     },
     resetForm() {
       this.content = '';

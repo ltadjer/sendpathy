@@ -22,8 +22,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     component: MainHeader,
     children: [
-      { path: '/request-password-reset', component: RequestPasswordResetView },
-      { path: '/reset-password', component: ResetPasswordView },
       { path: '/conversations', component: ConversationView },
       { path: '/conversations/:id', component: MessageView },
       { path: '/feed', component: FeedView },
@@ -36,6 +34,8 @@ const routes: Array<RouteRecordRaw> = [
   },
   { path: '/connexion', component: LoginView, meta: { requiresGuest: true } },
   { path: '/inscription', component: RegisterView, meta: { requiresGuest: true } },
+  { path: '/request-password-reset', component: RequestPasswordResetView, meta: { requiresGuest: true } },
+  { path: '/reset-password', component: ResetPasswordView, meta: { requiresGuest: true } },
 ];
 
 const router = createRouter({

@@ -114,6 +114,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Password reset email sent.' })
   @ApiResponse({ status: 400, description: 'Failed to send password reset email.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   @ApiBody({ schema: { type: 'object', properties: { email: { type: 'string', description: 'Email of the user' } } } })
   async requestPasswordReset(@Body('email') email: string) {
     return await this.authService.requestPasswordReset(email);

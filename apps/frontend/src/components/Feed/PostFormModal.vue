@@ -8,7 +8,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <post-form :post="post" @post-updated="closeModal" :current-user="currentUser" />
+      <post-form :post="post" @post-updated="closeModal" :current-user="currentUser" @close="closeModal()"/>
     </ion-content>
   </ion-modal>
 </template>

@@ -58,25 +58,25 @@ CREATE TABLE "Post" (
 );
 
 -- CreateTable
-CREATE TABLE "tag" (
+CREATE TABLE "Tag" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
 
-    CONSTRAINT "tag_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "trigger" (
+CREATE TABLE "Trigger" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMP(3),
 
-    CONSTRAINT "trigger_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Trigger_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -182,8 +182,6 @@ CREATE TABLE "Content" (
 -- CreateTable
 CREATE TABLE "Reservation" (
     "id" TEXT NOT NULL,
-    "uuid" TEXT NOT NULL,
-    "date" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
     "slotId" TEXT,
     "videoCallLink" TEXT,
@@ -236,18 +234,6 @@ CREATE TABLE "Notification" (
 );
 
 -- CreateTable
-CREATE TABLE "_UserTags" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
-);
-
--- CreateTable
-CREATE TABLE "_UserTriggers" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
-);
-
--- CreateTable
 CREATE TABLE "_PostTags" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
@@ -255,6 +241,18 @@ CREATE TABLE "_PostTags" (
 
 -- CreateTable
 CREATE TABLE "_PostTriggers" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_UserTags" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_UserTriggers" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
@@ -278,18 +276,6 @@ CREATE UNIQUE INDEX "Content_fileUrl_key" ON "Content"("fileUrl");
 CREATE UNIQUE INDEX "Reservation_slotId_key" ON "Reservation"("slotId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_UserTags_AB_unique" ON "_UserTags"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_UserTags_B_index" ON "_UserTags"("B");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_UserTriggers_AB_unique" ON "_UserTriggers"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_UserTriggers_B_index" ON "_UserTriggers"("B");
-
--- CreateIndex
 CREATE UNIQUE INDEX "_PostTags_AB_unique" ON "_PostTags"("A", "B");
 
 -- CreateIndex
@@ -300,6 +286,18 @@ CREATE UNIQUE INDEX "_PostTriggers_AB_unique" ON "_PostTriggers"("A", "B");
 
 -- CreateIndex
 CREATE INDEX "_PostTriggers_B_index" ON "_PostTriggers"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_UserTags_AB_unique" ON "_UserTags"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_UserTags_B_index" ON "_UserTags"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_UserTriggers_AB_unique" ON "_UserTriggers"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_UserTriggers_B_index" ON "_UserTriggers"("B");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_ConversationUsers_AB_unique" ON "_ConversationUsers"("A", "B");
@@ -365,28 +363,28 @@ ALTER TABLE "Report" ADD CONSTRAINT "Report_reporterId_fkey" FOREIGN KEY ("repor
 ALTER TABLE "Notification" ADD CONSTRAINT "Notification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_UserTags" ADD CONSTRAINT "_UserTags_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UserTags" ADD CONSTRAINT "_UserTags_B_fkey" FOREIGN KEY ("B") REFERENCES "tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UserTriggers" ADD CONSTRAINT "_UserTriggers_A_fkey" FOREIGN KEY ("A") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_UserTriggers" ADD CONSTRAINT "_UserTriggers_B_fkey" FOREIGN KEY ("B") REFERENCES "trigger"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "_PostTags" ADD CONSTRAINT "_PostTags_A_fkey" FOREIGN KEY ("A") REFERENCES "Post"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_PostTags" ADD CONSTRAINT "_PostTags_B_fkey" FOREIGN KEY ("B") REFERENCES "tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_PostTags" ADD CONSTRAINT "_PostTags_B_fkey" FOREIGN KEY ("B") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_PostTriggers" ADD CONSTRAINT "_PostTriggers_A_fkey" FOREIGN KEY ("A") REFERENCES "Post"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_PostTriggers" ADD CONSTRAINT "_PostTriggers_B_fkey" FOREIGN KEY ("B") REFERENCES "trigger"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_PostTriggers" ADD CONSTRAINT "_PostTriggers_B_fkey" FOREIGN KEY ("B") REFERENCES "Trigger"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserTags" ADD CONSTRAINT "_UserTags_A_fkey" FOREIGN KEY ("A") REFERENCES "Tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserTags" ADD CONSTRAINT "_UserTags_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserTriggers" ADD CONSTRAINT "_UserTriggers_A_fkey" FOREIGN KEY ("A") REFERENCES "Trigger"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_UserTriggers" ADD CONSTRAINT "_UserTriggers_B_fkey" FOREIGN KEY ("B") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_ConversationUsers" ADD CONSTRAINT "_ConversationUsers_A_fkey" FOREIGN KEY ("A") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;

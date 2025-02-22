@@ -5,9 +5,6 @@
         <ion-row>
           <ion-col class="ion-text-center">
             <img alt="Logo" src="/img/logo-with-shadow.svg" width="140px"/>
-            <ion-text class="gradient-text ion-input-spacing">
-              <h1>Content de te revoir !</h1>
-            </ion-text>
             <form @submit.prevent="login" class="ion-text-start form-container">
               <div v-if="message" class="alert alert-success">{{ message }}</div>
               <ion-input class="ion-input-spacing" placeholder="Email" type="email" v-model="email" required></ion-input>
@@ -32,6 +29,7 @@
           </ion-col>
         </ion-row>
       </ion-grid>
+      <ToastMessage/>
     </ion-content>
   </ion-page>
 </template>
@@ -41,6 +39,7 @@ import { useAccountStore } from '@/stores/account.ts';
 import { IonPage, IonContent, IonGrid, IonRow, IonCol, IonText, IonInput, IonInputPasswordToggle } from '@ionic/vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 import { defineComponent } from 'vue';
+import ToastMessage from '@/components/Commun/ToastMessage.vue';
 
 export default defineComponent({
   name: 'LoginView',
@@ -52,6 +51,7 @@ export default defineComponent({
     };
   },
   components: {
+    ToastMessage,
     IonPage,
     IonContent,
     IonGrid,

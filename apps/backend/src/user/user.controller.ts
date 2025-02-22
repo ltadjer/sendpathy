@@ -20,59 +20,20 @@ import { User } from './decorators/user.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get a user by ID' })
-  @ApiResponse({ status: 200, description: 'Return the user.' })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
-  }
-
+  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'Return all users.' })
   async findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(':email')
-  async findOneByEmail(@Param('email') email: string) {
-    return this.userService.findOneByEmail(email);
-  }
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({
-    status: 201,
-    description: 'The user has been successfully created.',
-  })
-  @ApiResponse({ status: 400, description: 'Bad request.' })
-  async create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return await this.userService.findAll();
   }
 
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update a user by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'The user has been successfully updated.',
-  })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a user by ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'The user has been successfully deleted.',
-  })
-  @ApiResponse({ status: 404, description: 'User not found.' })
-  async delete(@Param('id') id: string) {
-    return this.userService.delete(id);
+  @Get('therapists')
+  @ApiOperation({ summary: 'Get all therapists' })
+  @ApiResponse({ status: 200, description: 'Return all therapists.' })
+  async findAllTherapists() {
+    return await this.userService.findAllTherapists();
   }
 
   @UseGuards(JwtAuthGuard)
@@ -111,13 +72,55 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/therapists')
-  @ApiOperation({ summary: 'Get all therapists' })
-  @ApiResponse({ status: 200, description: 'Return all therapists.' })
-  async findAllTherapists() {
-    console.log('find all therapists');
-    return await this.userService.findAllTherapists();
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiResponse({ status: 200, description: 'Return the user.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async findOne(@Param('id') id: string) {
+    return this.userService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get(':email')
+  @ApiOperation({ summary: 'Get a user by email' })
+  @ApiResponse({ status: 200, description: 'Return the user.' })
+  async findOneByEmail(@Param('email') email: string) {
+    return this.userService.findOneByEmail(email);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a user by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully updated.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(id, updateUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully deleted.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async delete(@Param('id') id: string) {
+    return this.userService.delete(id);
+  }
 
 }

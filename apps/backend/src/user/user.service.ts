@@ -40,7 +40,25 @@ export class UserService {
    * @returns Une liste de tous les utilisateurs.
    */
   async findAll() {
-    return this.prisma.user.findMany();
+    return await this.prisma.user.findMany();
+  }
+
+  /**
+   * Trouve tous les thérapeutes.
+   * @returns Une liste de tous les thérapeutes.
+   */
+
+  async findAllTherapists() {
+    return await this.prisma.user.findMany({
+      where: { role: 'THERAPIST' },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        biography: true,
+        email: true,
+      },
+    });
   }
 
   /**
@@ -205,21 +223,6 @@ export class UserService {
       return false;
     }
     return true;
-  }
-
-  async findAllTherapists() {
-    console.log('find all therapists', this.prisma.user.findMany({}));
-    return this.prisma.user.findMany({
-      where: { role: 'THERAPIST' },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        biography: true,
-        email: true,
-        slug: true,
-      },
-    });
   }
 
 }

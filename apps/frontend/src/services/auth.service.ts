@@ -7,12 +7,7 @@ export default  {
    * @returns Les données de la réponse de l'API.
    */
   async register(user: any) {
-    try {
-      const response = await api.post('/auth/register/user', user)
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    return await api.post('/auth/register/user', user)
   },
   /**
    * Connecte un utilisateur.
@@ -20,24 +15,14 @@ export default  {
    * @returns les nouvelles données de l'utilisateur comme réponse API, y compris les tokens
    */
   async login(user) {
-    try {
-      const response = await api.post('/auth/login', user);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    return await api.post('/auth/login', user);
   },
 
   /**
    * Déconnecte un utilisateur.
    */
   async logout() {
-    try {
       await api.post('/auth/logout')
-    } catch (error) {
-      throw error
-    }
-
   },
 
   /**
@@ -47,7 +32,7 @@ export default  {
 
   async checkAuth() {
     try {
-      return  await api.get('/auth/me'); // Une route pour retourner les infos utilisateur
+      return await api.get('/auth/me'); // Une route pour retourner les infos utilisateur
     } catch (error) {
       throw error
     }
@@ -72,12 +57,7 @@ export default  {
    * @returns les nouvelles données de l'utilisateur comme réponse API
    */
   async requestPasswordReset(email: string) {
-    try {
-      const response = await api.post('/auth/request-password-reset', { email })
-      return response.data
-    } catch (error) {
-      throw error
-    }
+      return await api.post('/auth/request-password-reset', { email })
   },
   /**
    * Réinitialise le mot de passe d'un utilisateur.
@@ -85,13 +65,12 @@ export default  {
    * @param newPassword - Le nouveau mot de passe.
    * @returns les nouvelles données de l'utilisateur comme réponse API
    */
-  async resetPassword(newPassword: string) {
-    try {
-      const response = await api.post('/auth/reset-password', newPassword)
-      return response.data
-    } catch (error) {
-      throw error
-    }
+  async resetPassword(token: string, newPassword: string) {
+    console.log('resetPassword', token, newPassword);
+      return await api.post('/auth/reset-password', {
+        token: token,
+        newPassword: newPassword
+      })
   },
 
   async updateAccessCode(accessCode: string) {
@@ -131,6 +110,6 @@ export default  {
     const response = await api.get('/users/therapists');
     console.log('fetchAllTherapists', response);
     return response.data;
-  },
+  }
 }
 

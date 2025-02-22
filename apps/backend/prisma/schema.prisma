@@ -44,8 +44,8 @@ model User {
   friendshipsReceived Friendship[]    @relation("friendshipsReceived")
   likes               Like[] // Relation to the likes made by the user
   comments            Comment[] // Relation to the comments made by the user
-  tags                tag[]           @relation("UserTags")
-  triggers            trigger[]       @relation("UserTriggers")
+  tags                Tag[]           @relation("UserTags")
+  triggers            Trigger[]       @relation("UserTriggers")
   reservations        Reservation[] // Relation to the reservations made by the user
   reports             Report[] // Relation to the reports made by the user
   notifications       Notification[] // Relation to the notifications sent to the user
@@ -69,8 +69,8 @@ model Post {
   // Relation to the user who created the post
   user     User?     @relation(fields: [userId], references: [id])
   comments Comment[] // A post contains multiple comments
-  tags     tag[]     @relation("PostTags")
-  triggers trigger[] @relation("PostTriggers")
+  tags     Tag[]     @relation("PostTags")
+  triggers Trigger[] @relation("PostTriggers")
   likes    Like[] // A post can have multiple likes
 
   createdAt DateTime  @default(now())
@@ -78,7 +78,7 @@ model Post {
   deletedAt DateTime?
 }
 
-model tag {
+model Tag {
   id   String @id @default(cuid())
   name String
 
@@ -91,7 +91,7 @@ model tag {
   deletedAt DateTime?
 }
 
-model trigger {
+model Trigger {
   id   String @id @default(cuid())
   name String
 
@@ -241,13 +241,11 @@ model Content {
 }
 
 model Reservation {
-  id            String   @id @default(cuid())
-  uuid          String
-  date          DateTime
+  id            String  @id @default(cuid())
   userId        String
-  slotId        String?  @unique
+  slotId        String? @unique
   videoCallLink String?
-  isCancelled   Boolean  @default(false)
+  isCancelled   Boolean @default(false)
 
   user User           @relation(fields: [userId], references: [id])
   slot AvailableSlot? @relation(fields: [slotId], references: [id])

@@ -15,6 +15,7 @@ export class ReservationService {
       where: { userId: userId },
       include: {
         user: true,
+        slot: true,
       },
     });
   }
@@ -28,6 +29,7 @@ export class ReservationService {
       where: { id: id },
       include: {
         user: true,
+        slot: true,
       },
     });
 
@@ -55,10 +57,12 @@ export class ReservationService {
 
     const reservation = await this.prisma.reservation.create({
       data: {
-        ...createReservationDto,
+        slotId: createReservationDto.slotId,
         userId,
       },
     });
+
+    console.log('reservation', reservation);
 
     await this.availableSlotService.update(createReservationDto.slotId, { isBooked: true });
 

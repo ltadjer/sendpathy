@@ -2,27 +2,35 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Request Password Reset</ion-title>
+        <ion-buttons slot="start">
+          <ion-back-button :defaultHref="true" :icon="arrowBackOutline" @click="navigateToLogin" />
+        </ion-buttons>
+        <ion-title>Réinitialiser du mot de passe</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content>
-      <h2>Request Password Reset</h2>
-      <form @submit.prevent="requestPasswordReset">
-        <ion-item>
-          <ion-label>Email:</ion-label>
-          <ion-input type="email" v-model="email" required></ion-input>
-        </ion-item>
-        <ion-button type="submit">Request Password Reset</ion-button>
-      </form>
-      <ion-alert v-if="message" isOpen="true" message="Password reset email sent. Please check your inbox." />
+    <ion-content class="ion-padding">
+      <ion-grid class="flex-center">
+        <ion-row>
+          <ion-col class="ion-text-center">
+            <img alt="Logo" src="/img/logo-with-shadow.svg" width="140px"/>
+            <form @submit.prevent="requestPasswordReset" class="ion-text-start form-container">
+              <ion-input placeholder="Email" type="email" v-model="email" required></ion-input>
+              <custom-button expand="block" color="primary" type="submit" text="Envoyer"></custom-button>
+            </form>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <Toast-message />
     </ion-content>
   </ion-page>
   </template>
   
   <script>
   import { defineComponent } from 'vue';
-  import AuthService from '../../services/auth.service.ts';
-  import { IonPage, IonContent, IonHeader, IonToolbar, IonTitle, IonItem, IonLabel, IonInput, IonButton, IonAlert } from '@ionic/vue';
+  import { IonPage, IonContent, IonInput, IonButton, IonGrid, IonRow, IonCol, IonText, IonHeader, IonToolbar, IonTitle, IonBackButton, IonButtons  } from '@ionic/vue';
+  import { useAccountStore } from '@/stores/account'
+  import ToastMessage from '@/components/Commun/ToastMessage.vue'
+  import CustomButton from '@/components/Commun/CustomButton.vue'
   
   export default defineComponent( {
     name: 'RequestResetPasswordView',
@@ -33,25 +41,28 @@
       };
     },
     components: {
+      CustomButton,
+      ToastMessage,
       IonPage,
       IonContent,
+      IonInput,
+      IonButton,
+      IonGrid,
+      IonRow,
+      IonCol,
+      IonText,
       IonHeader,
       IonToolbar,
       IonTitle,
-      IonItem,
-      IonLabel,
-      IonInput,
-      IonButton,
-      IonAlert
+      IonBackButton,
+      IonButtons
     },
     methods: {
       async requestPasswordReset() {
-        try {
-          const response = await AuthService.requestPasswordReset(this.email);
-          this.message = 'Password reset email sent. Please check your inbox.';
-        } catch (error) {
-          console.error('Request password reset failed:', error);
-        }
+        await useAccountStore().requestPasswordReset(this.email);
+      },
+      navigateToLogin() {
+        this.$router.push('/connexion');
       }
     }
   });

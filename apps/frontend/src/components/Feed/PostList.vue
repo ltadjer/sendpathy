@@ -16,7 +16,6 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-
     <ion-content>
       <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" :current-user="currentUser" />
       <ion-list class="ion-padding">
@@ -93,6 +92,7 @@
         </ion-item>
         <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId" :current-user="currentUser"></post-comment-modal>
       </ion-list>
+      <ToastMessage />
     </ion-content>
 </template>
 
@@ -104,10 +104,12 @@ import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
 import { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
 import PostFilterButton from '@/components/Feed/PostFilterButton.vue';
+import ToastMessage from '@/components/Commun/ToastMessage.vue'
 
 export default defineComponent({
   name: 'PostList',
   components: {
+    ToastMessage,
     PostFormModal,
     PostFilterButton,
     IonHeader,

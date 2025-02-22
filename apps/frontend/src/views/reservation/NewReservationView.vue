@@ -29,7 +29,7 @@
                 <ion-label>Psychologue</ion-label>
                 <ion-select class="ion-no-shadow" v-model="selectedTherapist" placeholder="Choisir un psychologue">
                   <ion-select-option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id">
-                    {{ therapist.username }}
+                    {{ therapist.firstName }} {{ therapist.lastName }}
                   </ion-select-option>
                 </ion-select>
               </ion-item>
@@ -38,8 +38,8 @@
           <ion-row>
             <ion-col>
               <ion-accordion-group class="ion-shadow-out rounded-accordion">
-                <ion-accordion v-for="(slots, date) in availableSlotsByDate" :key="date">
-                  <ion-item slot="header" class="ion-no-shadow">
+              <ion-accordion class="ion-shadow-out ion-margin-bottom" v-for="(slots, date) in availableSlotsByDate" :key="date">
+                  <ion-item lines="none" slot="header" class="ion-no-shadow">
                     <ion-label>{{ date }}</ion-label>
                   </ion-item>
                   <ion-list slot="content">
@@ -126,12 +126,10 @@ export default {
 };
 </script>
 <style scoped>
-.rounded-accordion {
-  border-radius: 1rem;
-}
 
 ion-accordion, ion-accordion ion-item {
   --background: none;
   background-color: transparent;
+  border-radius: 1rem;
 }
 </style>

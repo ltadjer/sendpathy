@@ -9,7 +9,6 @@ export const useLifeMomentStore = defineStore('lifeMoment', {
     async fetchLifeMoments() {
       try {
         this.lifeMoments = await lifeMomentService.fetchAllLifeMoments();
-        console.log('Life moments:', this.lifeMoments);
       } catch (error) {
         console.error('Failed to fetch life moments:', error);
       }

@@ -1,71 +1,80 @@
 <template>
   <ion-page>
-    <ion-content>
-      <ion-grid>
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button :defaultHref="true" :icon="arrowBackOutline" @click="navigateToLogin" />
+        </ion-buttons>
+        <ion-title>Réinitialiser du mot de passe</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding">
+      <ion-grid class="flex-center">
         <ion-row>
-          <ion-col>
-            <ion-text>
-              <h2>Reset Password</h2>
-            </ion-text>
-            <form @submit.prevent="resetPassword">
-              <ion-list>
-                <ion-item>
-                  <ion-label position="floating">New Password</ion-label>
-                  <ion-input type="password" v-model="newPassword" required></ion-input>
-                </ion-item>
-              </ion-list>
-              <ion-button type="submit" expand="block">Reset Password</ion-button>
+          <ion-col class="ion-text-center">
+            <img alt="Logo" src="/img/logo-with-shadow.svg" width="140px"/>
+            <form @submit.prevent="resetPassword" class="ion-text-start form-container">
+              <ion-input placeholder="Mot de passe" type="password" v-model="newPassword" required></ion-input>
+              <custom-button expand="block" color="primary" type="submit" text="Envoyer"></custom-button>
             </form>
-            <ion-text v-if="message" class="alert alert-success">{{ message }}</ion-text>
           </ion-col>
         </ion-row>
       </ion-grid>
+      <ToastMessage />
     </ion-content>
   </ion-page>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent } from 'vue';
-  import AuthService from '../../services/auth.service.ts';
-  import { IonPage, IonContent, IonGrid, IonRow, IonCol, IonText, IonList, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
-  
-  export default defineComponent( {
-    name: 'ResetPasswordView',
-    data() {
-      return {
-        newPassword: '',
-        message: '',
-        token: ''
-      };
-    },
-    components: {
-      IonPage,
-      IonContent,
-      IonGrid,
-      IonRow,
-      IonCol,
-      IonText,
-      IonList,
-      IonItem,
-      IonLabel,
-      IonInput,
-      IonButton
-    },
-    created() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('token')) {
-        this.token = urlParams.get('token');
-      }
-    },
-    methods: {
-      async resetPassword() {
-        try {
-          const response = await AuthService.resetPassword(this.token, this.newPassword);
-          this.message = 'Password reset successful. You can now log in with your new password.';
-        } catch (error) {
-          console.error('Reset password failed:', error);
-        }
-      }
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { IonPage, IonContent, IonGrid, IonRow, IonCol, IonInput, IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonBackButton, IonButtons } from '@ionic/vue';
+import { arrowBackOutline } from 'ionicons/icons';
+import { useAccountStore } from '@/stores/account';
+import ToastMessage from '@/components/Commun/ToastMessage.vue';
+import CustomButton from '@/components/Commun/CustomButton.vue';
+
+export default defineComponent({
+  name: 'ResetPasswordView',
+  data() {
+    return {
+      newPassword: '',
+      message: '',
+      token: ''
+    };
+  },
+  components: {
+    CustomButton,
+    ToastMessage,
+    IonPage,
+    IonContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonInput,
+    IonButton,
+    IonIcon,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonBackButton,
+    IonButtons
+  },
+  setup() {
+    return { arrowBackOutline };
+  },
+  created() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('token')) {
+      this.token = urlParams.get('token');
     }
-  });
-  </script>
+  },
+  methods: {
+    async resetPassword() {
+      await useAccountStore().resetPassword(this.token, this.newPassword);
+    },
+    navigateToLogin() {
+      this.$router.push('/connexion');
+    }
+  }
+});
+</script>

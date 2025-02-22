@@ -127,6 +127,12 @@ ion-button {
     --padding-bottom: 14px;
 }
 
+ion-back-button {
+    border-radius: 50%;
+    box-shadow: var(--neumorphism-out-shadow);
+    --icon-font-size: 1.2rem;
+    --color: var(--ion-color-secondary);
+}
 ion-input {
     box-shadow: var(--neumorphism-in-shadow) !important;
     border-radius: 1rem !important;

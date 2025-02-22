@@ -1,6 +1,7 @@
 export function formatDate(dateString: string): string {
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(dateString).toLocaleDateString('fr-FR', options);
+  const date = new Date(dateString).toLocaleDateString('fr-FR', options);
+  return date.charAt(0).toUpperCase() + date.slice(1);
 }
 
 export function formatTime(dateString: string): string {

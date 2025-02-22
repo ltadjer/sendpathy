@@ -30,11 +30,9 @@ export class ReservationController {
   @ApiResponse({ status: 201, description: 'The reservation has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async create(@Body() createReservationDto: any, @User() user: any) {
-    try {
+      console.log('createReservationDto', createReservationDto);
+      console.log('user', user);
       return await this.reservationService.create(createReservationDto, user.id);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
   }
 
   @UseGuards(JwtAuthGuard)
