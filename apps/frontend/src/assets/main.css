@@ -146,6 +146,10 @@ ion-icon {
     font-weight: bold;
 }
 
+.selected {
+    --box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
 .ion-no-shadow {
     --box-shadow: none !important;
     box-shadow: none !important;

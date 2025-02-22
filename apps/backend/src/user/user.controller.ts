@@ -111,11 +111,12 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('therapists')
+  @Get('/therapists')
   @ApiOperation({ summary: 'Get all therapists' })
   @ApiResponse({ status: 200, description: 'Return all therapists.' })
   async findAllTherapists() {
-    return this.userService.findAllTherapists();
+    console.log('find all therapists');
+    return await this.userService.findAllTherapists();
   }
 
 

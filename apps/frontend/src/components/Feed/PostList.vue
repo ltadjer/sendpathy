@@ -20,7 +20,7 @@
     <ion-content>
       <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" :current-user="currentUser" />
       <ion-list class="ion-padding">
-        <filter-button class="ion-margin-bottom ion-text-end" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers"></filter-button>
+        <post-filter-button class="ion-margin-bottom ion-text-end" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers"></post-filter-button>
 
         <ion-item
           class="ion-margin-bottom"
@@ -103,13 +103,13 @@ import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
 import { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
-import FilterButton from '@/components/Feed/FilterButton.vue';
+import PostFilterButton from '@/components/Feed/PostFilterButton.vue';
 
 export default defineComponent({
   name: 'PostList',
   components: {
     PostFormModal,
-    FilterButton,
+    PostFilterButton,
     IonHeader,
     IonToolbar,
     IonTitle,

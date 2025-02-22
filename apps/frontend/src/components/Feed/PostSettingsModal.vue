@@ -169,7 +169,4 @@ ion-content {
   --padding-start: 1rem;
   --padding-end: 1rem;
 }
-.selected {
-  --box-shadow: var(--neumorphism-in-shadow) !important;
-}
 </style>

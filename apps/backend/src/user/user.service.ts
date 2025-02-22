@@ -208,6 +208,7 @@ export class UserService {
   }
 
   async findAllTherapists() {
+    console.log('find all therapists', this.prisma.user.findMany({}));
     return this.prisma.user.findMany({
       where: { role: 'THERAPIST' },
       select: {

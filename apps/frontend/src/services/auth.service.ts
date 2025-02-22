@@ -129,6 +129,7 @@ export default  {
    */
   async fetchAllTherapists() {
     const response = await api.get('/users/therapists');
+    console.log('fetchAllTherapists', response);
     return response.data;
   },
 }
