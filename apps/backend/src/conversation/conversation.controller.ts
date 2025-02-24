@@ -21,7 +21,8 @@ export class ConversationController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@User() user: any) {
-        return this.conversationService.findAll(user.id);
+        console.log('this.conversationService.findAll(user.id);', this.conversationService.findAll(user.id))
+        return await this.conversationService.findAll(user.id);
     }
 
 

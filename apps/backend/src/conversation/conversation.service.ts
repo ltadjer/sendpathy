@@ -69,8 +69,13 @@ export class ConversationService {
         return conversations.map(conversation => {
             const receiver = conversation.users.find(user => user.id !== userId);
             return {
-                ...conversation,
-                name: receiver ? receiver.username : 'Unknown',
+                id: conversation.id,
+                conversationType: conversation.conversationType,
+                createdAt: conversation.createdAt,
+                updatedAt: conversation.updatedAt,
+                deletedAt: conversation.deletedAt,
+                user: receiver ? { id: receiver.id, username: receiver.username, avatar: receiver.avatar } : null,
+                lastMessage: conversation.messages[0] || null,
             };
         });
     }

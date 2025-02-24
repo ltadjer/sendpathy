@@ -105,6 +105,7 @@ import { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalO
 import { usePostStore } from '@/stores/post';
 import PostFilterButton from '@/components/Feed/PostFilterButton.vue';
 import ToastMessage from '@/components/Commun/ToastMessage.vue'
+import { timeSince } from '@/utils/date';
 
 export default defineComponent({
   name: 'PostList',
@@ -171,23 +172,7 @@ export default defineComponent({
     }
   },
   methods: {
-    timeSince(date) {
-      const now = new Date();
-      const createdAt = new Date(date);
-      const diffInSeconds = Math.floor((now - createdAt) / 1000);
-
-      const minutes = Math.floor(diffInSeconds / 60);
-      const hours = Math.floor(diffInSeconds / 3600);
-      const days = Math.floor(diffInSeconds / 86400);
-
-      if (days > 0) {
-        return ` ${days} j`;
-      } else if (hours > 0) {
-        return `${hours} h`;
-      } else {
-        return `${minutes} min`;
-      }
-    },
+    timeSince,
     editPost(post) {
       this.selectedPostId = post.id;
       this.isPostFormModalOpen = true;

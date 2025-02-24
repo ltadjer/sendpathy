@@ -100,7 +100,7 @@ export default defineComponent({
   data() {
     return {
       selectedLifeMoment: null,
-      isLifeMomentFormModalOpen: false,
+      isLifeMomentFormModalOpen: false as boolean,
     };
   },
   props: {

@@ -16,6 +16,20 @@ export default defineComponent({
       messageContent: ''
     };
   },
+  props: {
+    conversationId: {
+      type: String,
+      required: true
+    },
+    senderName: {
+      type: String,
+      required: true
+    },
+    receiverId: {
+      type: String,
+      required: true
+    }
+  },
   emits: ['newMessage'],
   methods: {
     /**
@@ -24,9 +38,10 @@ export default defineComponent({
     sendMessage() {
       const message = {
         content: this.messageContent,
-        receiverId: 'cm2dcwo180001kv4ocppo62ws', // Replace with actual receiver ID
-        senderName: "titis",
-        conversationId: "cm2eic9ot0000vl8hvcu2t76a"
+
+        receiverId: this.receiverId,
+        senderName: this.senderName,
+        conversationId: this.conversationId
       };
       WebSocketService.emit('message', message);
       this.messageContent = '';

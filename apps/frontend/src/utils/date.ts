@@ -8,3 +8,21 @@ export function formatTime(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 }
+
+export function timeSince(date: string): string {
+  const now = new Date();
+  const createdAt = new Date(date);
+  const diffInSeconds = Math.floor((now - createdAt) / 1000);
+
+  const minutes = Math.floor(diffInSeconds / 60);
+  const hours = Math.floor(diffInSeconds / 3600);
+  const days = Math.floor(diffInSeconds / 86400);
+
+  if (days > 0) {
+    return ` ${days} j`;
+  } else if (hours > 0) {
+    return `${hours} h`;
+  } else {
+    return `${minutes} min`;
+  }
+}

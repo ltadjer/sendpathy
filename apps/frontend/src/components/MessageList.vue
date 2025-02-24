@@ -1,33 +1,79 @@
 <template>
-  <div>
-    <ul>
-      <li v-for="message in messages" :key="message.id">{{ message.content }}</li>
-    </ul>
-    <MessageForm @newMessage="addMessage" />
-  </div>
+
+  <ion-content>
+    <ion-list class="ion-padding">
+      <ion-item
+        lines="none"
+        v-for="message in messages"
+        :key="message.id"
+        :class="{
+          'message-out': message.senderId === currentUser.id,
+          'message-in': message.senderId !== currentUser.id
+        }"
+        class="ion-margin-bottom"
+      >
+        <ion-avatar slot="start">
+          <img :src="message.senderAvatar || '/default-avatar.png'" alt="User Avatar" />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ message.senderName }}</h2>
+          <p :class="{ 'unread': message.read === false }">{{ message.content }}</p>
+        </ion-label>
+        <ion-note slot="end" class="time">
+          {{ timeSince(message.createdAt) }}
+        </ion-note>
+      </ion-item>
+    </ion-list>
+    <MessageForm @newMessage="addMessage"  :conversation-id="conversationId" :receiver-id="receiverId"  :sender-name="currentUser.username"/>
+  </ion-content>
 </template>
 
 <script lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import conversationService from '@/services/conversation.service';
+import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
+import { IonContent, IonList, IonItem, IonAvatar, IonLabel, IonNote } from '@ionic/vue';
 import WebSocketService from '@/services/websocket.service';
 import MessageForm from '@/components/MessageForm.vue';
+import conversationService from '@/services/conversation.service';
+import { timeSince} from '@/utils/date'
 
-export default {
+export default defineComponent({
   name: 'MessageList',
   components: { MessageForm },
   props: {
+    currentUser: {
+      type: String,
+      required: true
+    },
     conversationId: {
       type: String,
       required: true
     }
+  },
+  components: {
+    MessageForm,
+    IonContent,
+    IonList,
+    IonItem,
+    IonAvatar,
+    IonLabel,
+    IonNote,
+
   },
   data() {
     return {
       messages: [],
     };
   },
+  computed: {
+    receiverId() {
+      if (this.conversation) {
+        return this.conversation.user.id !== this.currentUser.id ? this.conversation.user.id : this.conversation.otherUserId;
+      }
+      return null;
+    }
+  },
   methods: {
+    timeSince,
     /**
      * Fetch messages for the selected conversation.
      */
@@ -72,5 +118,6 @@ export default {
       console.log('WebSocket connected');
     });
   },
-};
+});
 </script>
+
