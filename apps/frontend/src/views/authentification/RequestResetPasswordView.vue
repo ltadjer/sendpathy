@@ -3,7 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button :defaultHref="true" :icon="arrowBackOutline" @click="navigateToLogin" />
+          <ion-back-button :defaultHref="true" :icon="arrowBackOutline"/>
         </ion-buttons>
         <ion-title>Réinitialiser du mot de passe</ion-title>
       </ion-toolbar>
@@ -28,6 +28,7 @@
   <script>
   import { defineComponent } from 'vue';
   import { IonPage, IonContent, IonInput, IonButton, IonGrid, IonRow, IonCol, IonText, IonHeader, IonToolbar, IonTitle, IonBackButton, IonButtons  } from '@ionic/vue';
+  import { arrowBackOutline } from 'ionicons/icons';
   import { useAccountStore } from '@/stores/account'
   import ToastMessage from '@/components/Commun/ToastMessage.vue'
   import CustomButton from '@/components/Commun/CustomButton.vue'
@@ -57,13 +58,13 @@
       IonBackButton,
       IonButtons
     },
+    setup() {
+      return { arrowBackOutline };
+    },
     methods: {
       async requestPasswordReset() {
         await useAccountStore().requestPasswordReset(this.email);
       },
-      navigateToLogin() {
-        this.$router.push('/connexion');
-      }
     }
   });
   </script>

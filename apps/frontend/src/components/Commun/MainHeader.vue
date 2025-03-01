@@ -9,7 +9,7 @@
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom" class="ion-margin">
         <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/feed') }" tab="feed" href="/feed">
-          <ion-icon :icon="homeOutline"></ion-icon>
+            <ion-icon :icon="homeOutline"></ion-icon>
         </ion-tab-button>
         <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/journal') }" tab="libray" href="/journal">
           <ion-icon :icon="journalOutline" />

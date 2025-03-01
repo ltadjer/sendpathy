@@ -16,20 +16,23 @@
           </ion-button>
         </ion-buttons>
       </ion-toolbar>
+      <ion-searchbar class="ion-margin-top ion-no-padding" v-model="searchTerm" placeholder="Rechercher"></ion-searchbar>
     </ion-header>
   </ion-header>
   <ion-content>
     <ion-list class="ion-padding">
       <ion-item
-        v-for="conversation in conversations"
+        v-for="conversation in filteredConversations"
         :key="conversation.id"
         @click="selectConversation(conversation)"
         lines="none"
         class="conversation-item"
       >
-        <ion-avatar slot="start">
-          <img :src="conversation.user?.avatar || '/default-avatar.png'" alt="User Avatar" />
-        </ion-avatar>
+        <div class="avatar-container">
+          <ion-avatar slot="start">
+            <img :src="conversation.user?.avatar || '/default-avatar.png'" alt="User Avatar" />
+          </ion-avatar>
+        </div>
         <ion-label>
           <h2>{{ conversation.user?.username }}</h2>
           <p :class="{ 'last-message': true, 'unread': conversation.lastMessage?.read === false }">
@@ -40,15 +43,14 @@
           {{ timeSince(conversation.lastMessage?.createdAt) }}
         </ion-note>
         <ion-badge v-if="conversation.lastMessage?.read === false" color="secondary" slot="end">1</ion-badge>
-
       </ion-item>
     </ion-list>
   </ion-content>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonAvatar, IonButtons, IonButton, IonLabel, IonNote, IonBadge } from '@ionic/vue';
+import { defineComponent, ref, computed } from 'vue';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonAvatar, IonButtons, IonButton, IonLabel, IonNote, IonBadge, IonSearchbar } from '@ionic/vue';
 import { timeSince } from '@/utils/date';
 
 export default defineComponent({
@@ -65,7 +67,19 @@ export default defineComponent({
   },
   components: {
     IonAvatar, IonButtons, IonButton, IonLabel, IonNote, IonBadge,
-    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem
+    IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonSearchbar
+  },
+  data() {
+    return {
+      searchTerm: '',
+    };
+  },
+  computed: {
+    filteredConversations() {
+      return this.conversations.filter(conversation =>
+        conversation.user?.username.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    },
   },
   methods: {
     selectConversation(conversation) {
@@ -85,4 +99,7 @@ export default defineComponent({
   font-weight: bold;
 }
 
+.avatar-container {
+  margin-bottom: 0;
+}
 </style>

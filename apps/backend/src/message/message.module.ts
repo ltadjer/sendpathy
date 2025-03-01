@@ -4,9 +4,10 @@ import { MessageController } from './message.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { PrismaService } from '../prisma/prisma.service';
 import { MessageGateway } from './message.gateway';
+import { ConversationService } from '../conversation/conversation.service'
 
 @Module({
-  providers: [MessageService, PrismaService, MessageGateway],
+  providers: [MessageService, PrismaService, MessageGateway, ConversationService],
   controllers: [MessageController],
   imports: [PrismaModule],
   exports: [MessageService],

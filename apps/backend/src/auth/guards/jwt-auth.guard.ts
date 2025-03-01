@@ -41,7 +41,7 @@ export class JwtAuthGuard implements CanActivate {
      */
     private validateWsRequest(context: ExecutionContext): boolean {
         const client: CustomSocket = context.switchToWs().getClient();
-        const token = client.handshake.auth.token;
+        const token = client.handshake.auth.token || client.handshake.headers.cookie?.split('; ').find(c => c.startsWith('access_token='))?.split('=')[1];
         if (!token) {
             throw new UnauthorizedException('Token not found');
         }

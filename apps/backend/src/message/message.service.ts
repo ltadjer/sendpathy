@@ -4,7 +4,6 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageGateway } from './message.gateway';
 
-
 @Injectable()
 export class MessageService {
     constructor(private prisma: PrismaService, private messageGateway: MessageGateway) {}
@@ -19,11 +18,23 @@ export class MessageService {
         return this.prisma.message.findMany();
     }
 
-    async findByConversation(conversationId: string) {
-        return this.prisma.message.findMany({
+    async findByConversation(conversationId: string, userId: string) {
+        const messages = await this.prisma.message.findMany({
             where: { conversationId: conversationId },
             orderBy: { createdAt: 'asc' },
+            include: {
+                sender: true,
+                receiver: true,
+                conversation: {
+                    select: { users: true },
+                },
+            },
         });
+
+        return messages.map(message => ({
+            ...message,
+            isSentByCurrentUser: message.senderId === userId,
+        }));
     }
 
     async create(createMessageDto: CreateMessageDto, senderId: string) {

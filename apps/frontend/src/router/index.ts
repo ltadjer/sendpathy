@@ -23,7 +23,6 @@ const routes: Array<RouteRecordRaw> = [
     component: MainHeader,
     children: [
       { path: '/conversations', component: ConversationView },
-      { path: '/conversations/:id', component: MessageView },
       { path: '/feed', component: FeedView },
       { path: '/journal', component: LifeMomentView },
       { path: '/reservations', component: ReservationView },
@@ -32,6 +31,8 @@ const routes: Array<RouteRecordRaw> = [
     ],
     meta: { requiresAuth: true }
   },
+  { path: '/conversations/:id', component: MessageView, meta: { requiresAuth: true }},
+
   { path: '/connexion', component: LoginView, meta: { requiresGuest: true } },
   { path: '/inscription', component: RegisterView, meta: { requiresGuest: true } },
   { path: '/request-password-reset', component: RequestPasswordResetView, meta: { requiresGuest: true } },

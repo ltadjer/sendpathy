@@ -18,8 +18,14 @@ body {
     height: 95vh;
     flex-direction: column;
 }
-ion-header {
+ion-header,
+ion-footer {
     box-shadow:none !important;
+}
+
+ion-searchbar {
+    --border-radius: 1rem !important;
+    --box-shadow: var(--neumorphism-in-shadow) !important;
 }
 
 .no-background {
@@ -127,6 +133,16 @@ ion-button {
     --padding-bottom: 14px;
 }
 
+/* When hovered */
+ion-button:hover,
+ion-button:active,
+ion-fab-button:hover,
+ion-tab-button:hover,
+ion-back-button:hover {
+    --box-shadow: var(--neumorphism-in-shadow) !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
 ion-back-button {
     border-radius: 50%;
     box-shadow: var(--neumorphism-out-shadow);
@@ -191,6 +207,14 @@ ion-tab-bar {
 
 .custom-icon {
     font-size: 1.5rem;
+    border-radius: 50%;
+    padding: 0.6rem;
+    box-shadow: var(--neumorphism-out-shadow);
+}
+
+.custom-icon:hover,
+.custom-icon:active {
+    box-shadow: var(--neumorphism-in-shadow) !important;
 }
 
 ion-modal::part(handle) {
@@ -248,7 +272,8 @@ ion-modal ion-grid {
     height: 48px;
 }
 
-.header-page ion-toolbar {
+.header-page ion-toolbar,
+.footer-page ion-toolbar {
     box-shadow: var(--neumorphism-out-shadow);
     border-radius: 1rem;
 }

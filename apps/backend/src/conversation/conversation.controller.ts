@@ -25,13 +25,12 @@ export class ConversationController {
         return await this.conversationService.findAll(user.id);
     }
 
-
     @UseGuards(JwtAuthGuard)
     @Get(':id/messages')
     @ApiResponse({ status: 200, description: 'Return messages for the conversation.' })
     @ApiResponse({ status: 404, description: 'Conversation not found.' })
-    async findMessagesByConversation(@Param('id') id: string) {
-        return this.messageService.findByConversation(id);
+    async findMessagesByConversation(@Param('id') id: string, @User() user: any) {
+        return this.messageService.findByConversation(id, user.id);
     }
 
     @UseGuards(JwtAuthGuard)

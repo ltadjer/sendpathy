@@ -1,5 +1,18 @@
 <template>
+  <ion-header :translucent="true" class="ion-padding header-page">
+    <ion-toolbar>
+      <ion-item lines="none" class="ion-no-shadow">
+        <ion-back-button :defaultHref="true" :icon="arrowBackOutline" />
+        <div class="avatar-container">
+          <ion-avatar>
+            <img :src="receiver?.avatar" alt="User Avatar" />
+          </ion-avatar>
+        </div>
+        <ion-title>{{receiver?.username}}</ion-title>
+      </ion-item>
 
+    </ion-toolbar>
+  </ion-header>
   <ion-content>
     <ion-list class="ion-padding">
       <ion-item
@@ -7,41 +20,49 @@
         v-for="message in messages"
         :key="message.id"
         :class="{
-          'message-out': message.senderId === currentUser.id,
-          'message-in': message.senderId !== currentUser.id
+          'message-out': message.isSentByCurrentUser,
+          'ion-no-shadow ion-no-padding': !message.isSentByCurrentUser
         }"
         class="ion-margin-bottom"
       >
-        <ion-avatar slot="start">
-          <img :src="message.senderAvatar || '/default-avatar.png'" alt="User Avatar" />
-        </ion-avatar>
-        <ion-label>
-          <h2>{{ message.senderName }}</h2>
-          <p :class="{ 'unread': message.read === false }">{{ message.content }}</p>
-        </ion-label>
-        <ion-note slot="end" class="time">
-          {{ timeSince(message.createdAt) }}
-        </ion-note>
+        <div class="avatar-container">
+          <ion-avatar slot="start" v-if="!message.isSentByCurrentUser">
+            <img :src="message.sender.avatar || '/default-avatar.png'" alt="User Avatar" />
+          </ion-avatar>
+        </div>
+        <div :class="{
+          'message-in': !message.isSentByCurrentUser
+        }"
+        class="message-container">
+          <ion-label>
+            <p :class="{ 'unread': !message.read }">{{ message.content }}</p>
+          </ion-label>
+          <ion-note slot="end" class="time">
+            <sub>{{ timeSince(message.createdAt) }}</sub>
+          </ion-note>
+        </div>
+
       </ion-item>
     </ion-list>
-    <MessageForm @newMessage="addMessage"  :conversation-id="conversationId" :receiver-id="receiverId"  :sender-name="currentUser.username"/>
+    <MessageForm @newMessage="addMessage" :conversation-id="conversationId" :receiver-id="receiver?.id" :sender-name="currentUser.username"/>
   </ion-content>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
-import { IonContent, IonList, IonItem, IonAvatar, IonLabel, IonNote } from '@ionic/vue';
+import { IonToolbar, IonHeader, IonBackButton, IonTitle, IonButtons, IonContent, IonAvatar, IonItem, IonLabel, IonNote, IonList } from '@ionic/vue';
+import { arrowBackOutline } from 'ionicons/icons';
 import WebSocketService from '@/services/websocket.service';
 import MessageForm from '@/components/MessageForm.vue';
 import conversationService from '@/services/conversation.service';
-import { timeSince} from '@/utils/date'
+import { timeSince } from '@/utils/date';
 
 export default defineComponent({
   name: 'MessageList',
-  components: { MessageForm },
+  components: { IonToolbar, IonHeader, IonBackButton, IonTitle, IonButtons, MessageForm, IonContent, IonAvatar, IonItem, IonLabel, IonNote, IonList },
   props: {
     currentUser: {
-      type: String,
+      type: Object,
       required: true
     },
     conversationId: {
@@ -49,71 +70,46 @@ export default defineComponent({
       required: true
     }
   },
-  components: {
-    MessageForm,
-    IonContent,
-    IonList,
-    IonItem,
-    IonAvatar,
-    IonLabel,
-    IonNote,
-
-  },
   data() {
     return {
       messages: [],
     };
   },
   computed: {
-    receiverId() {
-      if (this.conversation) {
-        return this.conversation.user.id !== this.currentUser.id ? this.conversation.user.id : this.conversation.otherUserId;
-      }
-      return null;
+    receiver() {
+      return this.messages[0]?.conversation.users.find(user => user.id !== this.currentUser.id);
     }
+  },
+  setup() {
+    return { arrowBackOutline };
   },
   methods: {
     timeSince,
-    /**
-     * Fetch messages for the selected conversation.
-     */
     async fetchAllMessages() {
-      const response = await conversationService.fetchAllMessages(this.conversationId);
-      this.messages = response;
+      this.messages = await conversationService.fetchAllMessages(this.conversationId);
     },
-    /**
-     * Add a new message to the list.
-     * @param message - The new message to add.
-     */
     addMessage(message) {
-      console.log(message);
       this.messages.push(message);
     },
   },
-  mounted() {
-    // Fetch existing messages when the component is mounted
-    this.fetchAllMessages();
+  async mounted() {
+    await this.fetchAllMessages();
 
-    // Listen for new messages via WebSocket
     const handleNewMessage = (message) => {
       this.addMessage(message);
     };
 
-    // Ensure the listener is only attached once
     WebSocketService.off('newMessage', handleNewMessage);
     WebSocketService.on('newMessage', handleNewMessage);
 
-    // Clean up WebSocket listeners when the component is unmounted
     onUnmounted(() => {
       WebSocketService.off('newMessage', handleNewMessage);
     });
 
-    // Handle WebSocket disconnection
     WebSocketService.socket.on('disconnect', () => {
       console.warn('WebSocket disconnected');
     });
 
-    // Handle WebSocket connection
     WebSocketService.socket.on('connect', () => {
       console.log('WebSocket connected');
     });
@@ -121,3 +117,35 @@ export default defineComponent({
 });
 </script>
 
+<style scoped>
+.message-out {
+  align-self: flex-end;
+  border-radius: 1rem;
+  margin-left: auto;
+  --padding-start: 0;
+  width: fit-content;
+}
+.message-in {
+  align-self: flex-start;
+  border-radius: 1rem;
+  padding: .8rem;
+  box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+.message-container {
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+}
+
+.message-out .message-container {
+  width: fit-content;
+}
+
+.time {
+  margin-left: 1rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+</style>
