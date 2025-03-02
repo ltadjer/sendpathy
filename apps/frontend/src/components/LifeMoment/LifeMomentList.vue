@@ -1,23 +1,4 @@
 <template>
-    <ion-header>
-      <ion-header :translucent="true" class="ion-padding header-page">
-        <ion-toolbar>
-          <ion-item lines="none" class="ion-no-shadow ion-align-items-center">
-            <div class="avatar-container">
-              <ion-avatar slot="start">
-                <img alt="User Avatar" :src="currentUser?.avatar" />
-              </ion-avatar>
-            </div>
-            <ion-title>Moments de vie</ion-title>
-          </ion-item>
-          <ion-buttons slot="end">
-            <ion-button size="small" class="ion-no-shadow">
-              <img alt="Logo" src="@/assets/logo.png" width="50px" />
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-    </ion-header>
     <ion-content>
       <life-moment-form-modal v-if="isLifeMomentFormModalOpen" :lifeMoment="selectedLifeMoment" @close="closeLifeMomentFormModal" />
       <ion-list class="ion-padding">
@@ -69,7 +50,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import {IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonButtons, IonAvatar, IonGrid, IonRow, IonCol, IonIcon, IonPopover, IonText } from '@ionic/vue';
+import {IonContent, IonList, IonItem, IonButton, IonButtons, IonAvatar, IonGrid, IonRow, IonCol, IonIcon, IonPopover, IonText } from '@ionic/vue';
 import { useLifeMomentStore } from '@/stores/life-moment';
 import LifeMomentFormModal from '@/components/LifeMoment/LifeMomentFormModal.vue';
 import { ellipsisHorizontalOutline } from 'ionicons/icons';
@@ -80,9 +61,6 @@ export default defineComponent({
   components: {
     IonButtons,
     IonAvatar,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonList,
     IonItem,

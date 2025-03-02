@@ -1,25 +1,8 @@
 <template>
-    <ion-header :translucent="true" class="ion-padding header-page">
-      <ion-toolbar>
-        <ion-item lines="none" class="ion-no-shadow ion-align-items-center">
-          <div class="avatar-container">
-            <ion-avatar slot="start">
-              <img alt="User Avatar" :src="currentUser?.avatar" />
-            </ion-avatar>
-          </div>
-          <ion-title>Feed</ion-title>
-        </ion-item>
-        <ion-buttons slot="end">
-          <ion-button size="small" class="ion-no-shadow">
-            <img alt="Logo" src="@/assets/logo.png" width="50px" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
     <ion-content>
       <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" :current-user="currentUser" />
       <ion-list class="ion-padding">
-        <post-filter-button class="ion-margin-bottom ion-text-end" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers"></post-filter-button>
+        <post-filter-button v-if="$route.fullPath.includes('feed')" class="ion-margin-bottom ion-text-end" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers"></post-filter-button>
 
         <ion-item
           class="ion-margin-bottom"
@@ -98,7 +81,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonGrid, IonCol, IonRow, IonText, IonTextarea, IonPopover, IonChip, IonLabel } from '@ionic/vue';
+import { IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonGrid, IonCol, IonRow, IonText, IonTextarea, IonPopover, IonChip, IonLabel } from '@ionic/vue';
 import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
 import { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline } from 'ionicons/icons';
@@ -113,9 +96,6 @@ export default defineComponent({
     ToastMessage,
     PostFormModal,
     PostFilterButton,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
     IonList,
     IonItem,

@@ -21,6 +21,16 @@ export class UserService {
     }
     return this.prisma.user.findUnique({
       where: { id },
+      include: {
+        friendshipsReceived: {
+          where: { status: 'ACCEPTED' },
+          include: { requester: true },
+        },
+        friendshipsSent: {
+          where: { status: 'ACCEPTED' },
+          include: { receiver: true },
+        },
+      },
     });
   }
 
@@ -32,6 +42,16 @@ export class UserService {
   async findOneByEmail(email: string) {
     return await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        friendshipsReceived: {
+          where: { status: 'ACCEPTED' },
+          include: { requester: true },
+        },
+        friendshipsSent: {
+          where: { status: 'ACCEPTED' },
+          include: { receiver: true },
+        },
+      },
     });
   }
 

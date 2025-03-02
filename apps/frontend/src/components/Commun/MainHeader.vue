@@ -68,6 +68,8 @@ export default defineComponent({
     openFormModal() {
       if (this.$route.path === '/journal') {
         this.isLifeMomentModalOpen = true;
+      } else if (this.$route.path === '/reservations') {
+        this.$router.push('/reservations/nouvelle-reservation');
       } else {
         this.isPostFormModalOpen = true;
       }

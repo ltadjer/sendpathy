@@ -12,6 +12,7 @@ import ReservationView from '@/views/reservation/ReservationView.vue';
 import NewReservationView from '@/views/reservation/NewReservationView.vue';
 import ReservationSummaryView from '@/views/reservation/ReservationSummaryView.vue';
 import { useAccountStore } from '@/stores/account';
+import ProfileView from '@/views/ProfileView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -26,8 +27,9 @@ const routes: Array<RouteRecordRaw> = [
       { path: '/feed', component: FeedView },
       { path: '/journal', component: LifeMomentView },
       { path: '/reservations', component: ReservationView },
-      { path: '/nouvelle-reservation', component: NewReservationView },
+      { path: '/reservations/nouvelle-reservation', component: NewReservationView },
       { path: '/reservations/summary', component: ReservationSummaryView },
+      { path: '/profil', component: ProfileView}
     ],
     meta: { requiresAuth: true }
   },

@@ -39,6 +39,35 @@ ion-item {
     box-shadow: var(--neumorphism-out-shadow) !important;
     border-radius: 1rem !important;
 }
+
+
+ion-card, ion-item {
+    transition: transform 0.3s ease;
+}
+
+ion-card:hover,
+ion-item:hover {
+    transform: translateY(-5px);
+}
+
+ion-segment-button {
+    border-radius: 1rem;
+    color: #333;
+    box-shadow: var(--neumorphism-out-shadow);
+    width: auto;
+    margin: 0 1rem;
+    --indicator-height: 0;
+}
+
+ion-segment-button:hover {
+    box-shadow: var(--neumorphism-in-shadow);
+    color: #333;
+}
+
+ion-segment-button[aria-selected="true"] {
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
 ion-select {
     box-shadow: var(--neumorphism-out-shadow) !important;
     border-radius: 1rem !important;

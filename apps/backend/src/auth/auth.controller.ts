@@ -69,6 +69,9 @@ export class AuthController {
       avatar: updatedUser.avatar,
       id: updatedUser.id,
       accessCode: updatedUser.accessCode,
+      friendshipsReceived: updatedUser.friendshipsReceived,
+      friendshipsSent: updatedUser.friendshipsSent,
+      biography: updatedUser.biography,
     };
   }
 

@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <reservation-list :reservations="reservations" :current-user="currentUser"/>
+    <reservation-list :reservations="reservations" :current-user="currentUser" :therapists="therapists"/>
   </ion-page>
 </template>
 
@@ -10,12 +10,18 @@ import { IonPage } from '@ionic/vue'
 import { useReservationStore } from '@/stores/reservation'
 import { useAccountStore } from '@/stores/account'
 import ReservationList from '@/components/Reservation/ReservationList.vue'
+import authService from '@/services/auth.service'
 
 export default defineComponent({
   name: 'ReservationView',
   components: {
     ReservationList,
     IonPage
+  },
+  data() {
+    return {
+      therapists: []
+    }
   },
   computed: {
     reservations() {
@@ -27,6 +33,7 @@ export default defineComponent({
   },
   async created() {
     await useReservationStore().fetchAllReservations();
+    this.therapists = await authService.fetchAllTherapists();
   }
 });
 </script>
