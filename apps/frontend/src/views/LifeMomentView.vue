@@ -4,11 +4,13 @@
       <ion-header :translucent="true" class="ion-padding header-page">
         <ion-toolbar>
           <ion-item lines="none" class="ion-no-shadow ion-align-items-center">
-            <div class="avatar-container">
-              <ion-avatar slot="start">
-                <img alt="User Avatar" :src="currentUser?.avatar" />
-              </ion-avatar>
-            </div>
+            <router-link to="/profil">
+              <div class="avatar-container">
+                <ion-avatar slot="start">
+                  <img alt="User Avatar" :src="currentUser?.avatar" />
+                </ion-avatar>
+              </div>
+            </router-link>
             <ion-title>Moments de vie</ion-title>
           </ion-item>
           <ion-buttons slot="end">

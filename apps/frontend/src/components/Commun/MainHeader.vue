@@ -1,48 +1,74 @@
 <template>
   <ion-page>
-    <ion-fab horizontal="center" vertical="bottom">
-      <ion-fab-button @click="openFormModal">
-        <ion-icon :icon="add"></ion-icon>
-      </ion-fab-button>
-    </ion-fab>
-    <ion-tabs>
+    <div class="container">
+      <aside class="sidebar" :class="{ 'hidden': isSidebarHidden }">
+        <ion-item lines="none" class="ion-no-shadow">
+          <div class="avatar-container" @click="showUserProfile(currentUser)">
+            <ion-avatar slot="start">
+              <img alt="User Avatar" :src="currentUser?.avatar" />
+            </ion-avatar>
+          </div>
+        </ion-item>
+
+        <nav>
+          <custom-button :class="{ 'ion-shadow-in': isActiveTab('/feed') }" text="Feed" href="/feed" />
+          <custom-button text="Moments de vie" href="/journal" />
+          <custom-button text="Messages" href="/conversations" />
+          <custom-button text="Consultations" href="/reservations" />
+          <custom-button text="Règles et support" href="/parametres" />
+          <custom-button color="primary" text="Déconnexion" @click="logout" />
+        </nav>
+      </aside>
+
       <ion-router-outlet></ion-router-outlet>
-      <ion-tab-bar slot="bottom" class="ion-margin">
-        <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/feed') }" tab="feed" href="/feed">
+    </div>
+    <div class="mobile-nav">
+      <ion-fab horizontal="center" vertical="bottom">
+        <ion-fab-button @click="openFormModal">
+          <ion-icon :icon="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+      <ion-tabs>
+        <ion-router-outlet></ion-router-outlet>
+        <ion-tab-bar slot="bottom" class="ion-margin">
+          <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/feed') }" tab="feed" href="/feed">
             <ion-icon :icon="homeOutline"></ion-icon>
-        </ion-tab-button>
-        <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/journal') }" tab="libray" href="/journal">
-          <ion-icon :icon="journalOutline" />
-        </ion-tab-button>
-        <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/conversations') }" tab="chatbubblesOutline" href="/conversations">
-          <ion-icon :icon="chatbubblesOutline" />
-        </ion-tab-button>
-        <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/reservations') }" tab="reservations" href="/reservations">
-          <ion-icon :icon="todayOutline" />
-        </ion-tab-button>
-        <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/parametres') }" tab="settings" href="/parametres">
-          <ion-icon :icon="settingsOutline" />
-        </ion-tab-button>
-        <ion-tab-button @click="logout">
-          <ion-icon :icon="logOutOutline" />
-        </ion-tab-button>
-      </ion-tab-bar>
-      <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :current-user="currentUser"/>
-      <life-moment-form-modal v-if="isLifeMomentModalOpen" @close="closeLifeMomentModal"/>
-    </ion-tabs>
+          </ion-tab-button>
+          <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/journal') }" tab="libray" href="/journal">
+            <ion-icon :icon="journalOutline" />
+          </ion-tab-button>
+          <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/conversations') }" tab="chatbubblesOutline" href="/conversations">
+            <ion-icon :icon="chatbubblesOutline" />
+          </ion-tab-button>
+          <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/reservations') }" tab="reservations" href="/reservations">
+            <ion-icon :icon="todayOutline" />
+          </ion-tab-button>
+          <ion-tab-button :class="{ 'ion-shadow-in': isActiveTab('/parametres') }" tab="settings" href="/parametres">
+            <ion-icon :icon="settingsOutline" />
+          </ion-tab-button>
+          <ion-tab-button @click="logout">
+            <ion-icon :icon="logOutOutline" />
+          </ion-tab-button>
+        </ion-tab-bar>
+        <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :current-user="currentUser"/>
+        <life-moment-form-modal v-if="isLifeMomentModalOpen" @close="closeLifeMomentModal"/>
+      </ion-tabs>
+    </div>
+
   </ion-page>
 </template>
 <script lang="ts">
-import { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton } from '@ionic/vue';
+import { IonPage, IonAvatar, IonItem, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, IonButton } from '@ionic/vue';
 import { settingsOutline, homeOutline, chatbubblesOutline, journalOutline, todayOutline, add, logOutOutline } from 'ionicons/icons';
 import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import LifeMomentFormModal from '@/components/LifeMoment/LifeMomentFormModal.vue';
 import { useAccountStore } from '@/stores/account';
 import { defineComponent } from 'vue';
+import CustomButton from '@/components/Commun/CustomButton.vue'
 
 export default defineComponent({
   name: 'MainHeader',
-  components: { IonPage, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, PostFormModal, LifeMomentFormModal },
+  components: { CustomButton, IonPage, IonAvatar, IonItem, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, PostFormModal, LifeMomentFormModal, IonButton },
   data() {
     return {
       homeOutline,
@@ -93,7 +119,91 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 300px; /* Largeur fixe */
+  padding: 20px;
+  background: #f5f5fa;
+  box-shadow: var(--neumorphism-out-shadow);
+  margin: 1rem;
+  border-radius: 1rem;
+  flex-shrink: 0; /* Empêche la réduction */
+  z-index: 100000;
+}
+
+
+ion-router-outlet {
+  flex-grow: 1;
+  margin-left: auto;
+  width: calc(100% - 350px);
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  main {
+    width: 100%;
+  }
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 ion-fab {
   bottom: 59px
 }
+
+custom-button {
+  border-radius: 1rem;
+}
+
+nav ion-button {
+  display: block;
+  margin: 10px 0;
+  text-align: left;
+  color: #333;
+}
+
+.avatar-container {
+  padding: 0.4rem;
+}
+
+ion-avatar {
+  width: 80px;
+  height: 80px;
+}
+
+main {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  ion-router-outlet {
+    width: 100%;
+  }
+  .sidebar {
+    display: none;
+  }
+  .mobile-nav {
+    display: flex;
+  }
+}
 </style>
+

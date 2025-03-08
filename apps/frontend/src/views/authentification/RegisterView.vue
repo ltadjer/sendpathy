@@ -107,9 +107,11 @@ import {
 IonBackButton,
   IonButtons
 } from '@ionic/vue';
+import { arrowBackOutline } from 'ionicons/icons';
 import CustomButton from '@/components/Commun/CustomButton.vue';
-import ToastMessage from '@/components/Commun/ToastMessage.vue'
-import { useAccountStore } from '@/stores/account'
+import ToastMessage from '@/components/Commun/ToastMessage.vue';
+import { useAccountStore } from '@/stores/account';
+
 
 export default defineComponent({
   name: 'RegisterView',
@@ -164,6 +166,9 @@ export default defineComponent({
       this.years.push(year);
     }
   },
+  setup() {
+    return { arrowBackOutline };
+  },
   methods: {
     // Générer plusieurs avatars
     generateAvatars() {
@@ -210,27 +215,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.avatar-selection {
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.avatar-container:hover,
-.avatar-container.selected {
-  box-shadow: var(--neumorphism-in-shadow) !important;
-}
-.avatar-option {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
-  box-shadow: var(--neumorphism-in-shadow) !important;
-}
-
-</style>

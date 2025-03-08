@@ -72,6 +72,8 @@ export class AuthController {
       friendshipsReceived: updatedUser.friendshipsReceived,
       friendshipsSent: updatedUser.friendshipsSent,
       biography: updatedUser.biography,
+      age: updatedUser.age,
+      createdAt: updatedUser.createdAt,
     };
   }
 

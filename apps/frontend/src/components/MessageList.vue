@@ -3,17 +3,19 @@
     <ion-toolbar>
       <ion-item lines="none" class="ion-no-shadow">
         <ion-back-button :defaultHref="true" :icon="arrowBackOutline" />
-        <div class="avatar-container">
-          <ion-avatar>
-            <img :src="receiver?.avatar" alt="User Avatar" />
-          </ion-avatar>
-        </div>
+        <router-link to="/profil">
+          <div class="avatar-container">
+            <ion-avatar slot="start">
+              <img alt="User Avatar" :src="currentUser?.avatar" />
+            </ion-avatar>
+          </div>
+        </router-link>
         <ion-title>{{receiver?.username}}</ion-title>
       </ion-item>
-
     </ion-toolbar>
   </ion-header>
   <ion-content>
+    <!-- TODO: change to have  a ion-item-sliding to add actions like delete -->
     <ion-list class="ion-padding">
       <ion-item
         lines="none"

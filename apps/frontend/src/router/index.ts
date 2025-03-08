@@ -12,7 +12,7 @@ import ReservationView from '@/views/reservation/ReservationView.vue';
 import NewReservationView from '@/views/reservation/NewReservationView.vue';
 import ReservationSummaryView from '@/views/reservation/ReservationSummaryView.vue';
 import { useAccountStore } from '@/stores/account';
-import ProfileView from '@/views/ProfileView.vue'
+import ProfileView from '@/views/ProfileView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -29,7 +29,13 @@ const routes: Array<RouteRecordRaw> = [
       { path: '/reservations', component: ReservationView },
       { path: '/reservations/nouvelle-reservation', component: NewReservationView },
       { path: '/reservations/summary', component: ReservationSummaryView },
-      { path: '/profil', component: ProfileView}
+      { path: '/profil', component: ProfileView},
+      {
+        path: '/user/:userId',
+        name: 'UserProfile',
+        component: ProfileView,
+        props: route => ({ user: route.params.user })
+      },
     ],
     meta: { requiresAuth: true }
   },

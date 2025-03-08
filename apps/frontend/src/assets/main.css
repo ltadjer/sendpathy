@@ -8,6 +8,37 @@ body {
     --ion-text-color: #333 !important;
 }
 
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #FD7DFB50 #f5f5fa;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f5f5fa;
+    border-radius: 1rem;
+    box-shadow: var(--neumorphism-out-shadow);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ion-color-primary);
+    border-radius: 1rem;
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ion-color-primary);
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
+::-webkit-scrollbar-horizontal {
+    height: 4px;
+}
+
 .full-width {
     width: 100%;
 }
@@ -34,7 +65,7 @@ ion-searchbar {
 
 ion-card,
 ion-item {
-    --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%) !important;
+    --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 42%) !important;
     --background: #f5f5fa !important;
     box-shadow: var(--neumorphism-out-shadow) !important;
     border-radius: 1rem !important;
@@ -228,6 +259,28 @@ ion-thumbnail {
     --border-radius: 50%;
 }
 
+.avatar-selection {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.avatar-container:hover,
+.avatar-container.selected {
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+.avatar-option {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
 ion-tab-bar {
     box-shadow: var(--neumorphism-out-shadow) !important;
     --border: none;
@@ -240,6 +293,7 @@ ion-tab-bar {
     padding: 0.6rem;
     box-shadow: var(--neumorphism-out-shadow);
 }
+
 
 .custom-icon:hover,
 .custom-icon:active {

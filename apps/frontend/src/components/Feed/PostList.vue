@@ -22,10 +22,10 @@
                 <ion-item lines="none" class="ion-no-shadow ion-align-items-start">
                   <div class="avatar-container">
                     <ion-avatar slot="start">
-                      <img alt="User Avatar" :src="post.user.avatar" class="avatar-option" />
+                      <img alt="User Avatar" :src="post.user.avatar" />
                     </ion-avatar>
                   </div>
-                  <div>
+                  <div class="ion-padding-top">
                     <ion-text>
                       {{ post.user.username }}
                       <span>{{ post.emotion }}</span>

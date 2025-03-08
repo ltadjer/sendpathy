@@ -45,11 +45,45 @@ export class UserService {
       include: {
         friendshipsReceived: {
           where: { status: 'ACCEPTED' },
-          include: { requester: true },
+          include: {
+            requester: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
         },
         friendshipsSent: {
           where: { status: 'ACCEPTED' },
-          include: { receiver: true },
+          include: {
+            receiver: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
         },
       },
     });
