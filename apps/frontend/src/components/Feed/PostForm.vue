@@ -37,6 +37,7 @@
     @update:selectedTriggers="updateSelectedTriggers"
     :selectedTags="selectedTags"
     :selectedTriggers="selectedTriggers"
+    :post-id="post?.id || ''"
   ></post-settings-modal>
 
   <emotions-modal
@@ -136,14 +137,12 @@ export default defineComponent({
         postId = this.post.id;
       } else {
         const newPost = await usePostStore().createOnePost(formData);
-        postId = newPost.id;
+        await Promise.all([
+          ...this.selectedTags.map(tagId => usePostStore().addTagToPost(newPost.id, tagId)),
+          ...this.selectedTriggers.map(triggerId => usePostStore().addTriggerToPost(newPost.id, triggerId))
+        ]);
+        await usePostStore().fetchAllPosts();
       }
-
-      await Promise.all([
-        ...this.selectedTags.map(tagId => usePostStore().addTagToPost(postId, tagId)),
-        ...this.selectedTriggers.map(triggerId => usePostStore().addTriggerToPost(postId, triggerId))
-      ]);
-
       this.resetForm();
       this.$emit('close');
     },

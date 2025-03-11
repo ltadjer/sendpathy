@@ -62,13 +62,12 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-ion-router-outlet .ion-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 @media (min-width: 768px) {
+  ion-router-outlet .ion-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   ion-content {
     width: 70%
   }

@@ -20,7 +20,7 @@
                   </ion-chip>
                 </ion-list>
                 <ion-item lines="none" class="ion-no-shadow ion-align-items-start">
-                  <div class="avatar-container">
+                  <div class="avatar-container" @click.stop="showUserProfile(post.user)">
                     <ion-avatar slot="start">
                       <img alt="User Avatar" :src="post.user.avatar" />
                     </ion-avatar>
@@ -45,7 +45,6 @@
                 <ion-icon class="custom-icon"
                           :id="'popover-button-' + post.id"
                           @click.stop :icon="ellipsisVerticalOutline"></ion-icon>
-
                 <ion-popover
                   :trigger="'popover-button-' + post.id"
                   :dismiss-on-select="true"
@@ -53,7 +52,7 @@
                   alignment="end"
                 >
                   <ion-list>
-                    <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click="deleteOnePost(post.id)">Supprimer</ion-item>
+                    <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click.stop="deleteOnePost(post.id)">Supprimer</ion-item>
                     <ion-item lines="none" :button="true" :detail="false" @click="reportPost(post.id)">Signaler</ion-item>
                   </ion-list>
                 </ion-popover>
@@ -151,6 +150,9 @@ export default defineComponent({
       });
     }
   },
+  mounted() {
+    console.log('currentUser:', this.currentUser);
+  },
   methods: {
     timeSince,
     editPost(post) {
@@ -190,7 +192,10 @@ export default defineComponent({
     },
     updateSelectedTriggers(triggers) {
       this.selectedTriggers = triggers;
-    }
+    },
+    showUserProfile(user) {
+      this.$router.push({ name: 'UserProfile', params: { userId: user.id } });
+    },
   },
 });
 </script>

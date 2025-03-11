@@ -204,6 +204,9 @@ main {
   .mobile-nav {
     display: flex;
   }
+  ion-tabs {
+    background: var(--ion-color-primary);
+  }
 }
 </style>
 

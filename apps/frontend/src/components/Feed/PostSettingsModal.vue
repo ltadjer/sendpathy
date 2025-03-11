@@ -68,7 +68,8 @@ import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonCo
 import { useTagStore } from '@/stores/tag';
 import { useTriggerStore } from '@/stores/trigger';
 import { closeOutline } from 'ionicons/icons';
-import CustomButton from '@/components/Commun/CustomButton.vue'
+import CustomButton from '@/components/Commun/CustomButton.vue';
+import { usePostStore } from '@/stores/post';
 
 export default defineComponent({
   name: 'PostSettingsModal',
@@ -90,6 +91,9 @@ export default defineComponent({
     selectedTriggers: {
       type: Array,
       default: () => []
+    },
+    postId: {
+      type: String
     }
   },
   data() {
@@ -120,23 +124,31 @@ export default defineComponent({
     closeModal() {
       this.$emit('update:isOpen', false);
     },
-    toggleSelection(type: 'tag' | 'trigger', id: number) {
+    async toggleSelection(type: 'tag' | 'trigger', id: number) {
       if (type === 'tag') {
         if (this.localSelectedTags.includes(id)) {
-          console.log(`Removing tag with id: ${id}`);
           this.localSelectedTags = this.localSelectedTags.filter(tagId => tagId !== id);
+          if (this.postId) {
+            await usePostStore().removeTagFromPost(this.postId, id);
+          }
         } else {
-          console.log(`Adding tag with id: ${id}`);
           this.localSelectedTags.push(id);
+          if (this.postId) {
+            await usePostStore().addTagToPost(this.postId, id);
+          }
         }
         this.updateTags();
       } else if (type === 'trigger') {
         if (this.localSelectedTriggers.includes(id)) {
-          console.log(`Removing trigger with id: ${id}`);
           this.localSelectedTriggers = this.localSelectedTriggers.filter(triggerId => triggerId !== id);
+          if (this.postId) {
+            await usePostStore().removeTriggerFromPost(this.postId, id);
+          }
         } else {
-          console.log(`Adding trigger with id: ${id}`);
           this.localSelectedTriggers.push(id);
+          if (this.postId) {
+            await usePostStore().addTriggerToPost(this.postId, id);
+          }
         }
         this.updateTriggers();
       }
@@ -158,13 +170,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.button-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-bottom: 1.2rem;
-}
-
 ion-content {
   --padding-start: 1rem;
   --padding-end: 1rem;

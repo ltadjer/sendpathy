@@ -199,9 +199,22 @@ ion-button:active,
 ion-fab-button:hover,
 ion-tab-button:hover,
 ion-back-button:hover {
+    --background-hover: transparent;
+    --background-focused: transparent;
+    --background-activated: transparent;
     --box-shadow: var(--neumorphism-in-shadow) !important;
     box-shadow: var(--neumorphism-in-shadow) !important;
 }
+
+ion-fab-button:hover,
+ion-back-button:hover {
+    border-radius: 50%;
+}
+
+ ion-button:hover,
+ ion-button:active {
+     border-radius: 1rem;
+ }
 
 ion-back-button {
     border-radius: 50%;
@@ -230,6 +243,7 @@ ion-icon {
 
 .selected {
     --box-shadow: var(--neumorphism-in-shadow) !important;
+    --border-radius: 1rem !important;
 }
 
 .ion-no-shadow {
@@ -363,4 +377,11 @@ ion-modal ion-grid {
 
 .header-page ion-toolbar .avatar-container {
     margin: 0.8rem;
+}
+
+.button-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 1.2rem;
 }

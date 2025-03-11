@@ -11,7 +11,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list class="ion-padding">
+      <ion-list class="ion-padding button-list">
         <ion-button
           v-for="tag in tags"
           :key="tag.id"

@@ -14,39 +14,21 @@ export class MessageGateway {
   private logger: Logger = new Logger('MessageGateway');
 
   constructor(
-      @Inject(forwardRef(() => MessageService)) private readonly messageService: MessageService
+    @Inject(forwardRef(() => MessageService)) private readonly messageService: MessageService
   ) {}
 
-  /**
-   * Called after the WebSocket server is initialized.
-   * @param server - The WebSocket server instance.
-   */
   afterInit(server: Server) {
     this.logger.log('Init');
   }
 
-  /**
-   * Handles client disconnection.
-   * @param client - The disconnected client socket.
-   */
   handleDisconnect(client: CustomSocket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  /**
-   * Handles client connection.
-   * @param client - The connected client socket.
-   * @param args - Additional arguments.
-   */
   handleConnection(client: CustomSocket, ...args: any[]) {
     this.logger.log(`Client connected: ${client.id}`);
   }
 
-  /**
-   * Handles incoming messages from clients.
-   * @param client - The client socket sending the message.
-   * @param payload - The message payload.
-   */
   @SubscribeMessage('message')
   async handleMessage(@ConnectedSocket() client: CustomSocket, @MessageBody() payload: CreateMessageDto): Promise<void> {
     try {
@@ -56,17 +38,13 @@ export class MessageGateway {
         throw new UnauthorizedException('User not found');
       }
       const message = await this.messageService.create(payload, user.id);
-      this.server.emit('newMessage', message);
+      this.server.to(user.id).to(payload.receiverId).emit('newMessage', message);
     } catch (error) {
       this.logger.error('Error handling message:', error);
       client.emit('exception', { status: 'error', message: 'Internal server error' });
     }
   }
 
-  /**
-   * Sends a message to all connected clients.
-   * @param message - The message to send.
-   */
   sendMessage(message: CreateMessageDto) {
     this.server.emit('newMessage', message);
   }

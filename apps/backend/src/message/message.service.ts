@@ -72,8 +72,16 @@ export class MessageService {
                 senderId: senderId,
                 conversationId: conversation.id, // Link the message to the conversation
             },
+            include: {
+                sender: true,
+                receiver: true,
+                conversation: {
+                    select: { users: true },
+                },
+            },
         });
         this.messageGateway.sendMessage(message);
+
         return message;
     }
 
@@ -96,6 +104,13 @@ export class MessageService {
             data: {
                 ...updateMessageDto,
                 conversationId: message.conversationId, // Ensure the conversationId remains linked
+            },
+            include: {
+                sender: true,
+                receiver: true,
+                conversation: {
+                    select: { users: true },
+                },
             },
         });
     }

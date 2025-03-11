@@ -51,8 +51,8 @@ export const useAccountStore = defineStore('account', {
       try {
         const response = await AuthService.checkAuth();
         this.user = response.data;
+        console.log('User data:', response.data);
         this.isAuthenticated = true;
-        console.log('User data:', response);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
         await this.logout();
