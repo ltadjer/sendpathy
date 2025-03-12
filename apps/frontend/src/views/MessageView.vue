@@ -11,6 +11,11 @@ import {IonPage} from "@ionic/vue";
 import { useAccountStore } from '@/stores/account';
 export default defineComponent({
   components: {MessageList, MessageForm, IonPage},
+  data() {
+    return {
+      conversationId: '',
+    };
+  },
   created() {
     this.conversationId = this.$route.params.id;
   },

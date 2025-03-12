@@ -80,7 +80,6 @@ export class MessageService {
                 },
             },
         });
-        this.messageGateway.sendMessage(message);
 
         return message;
     }

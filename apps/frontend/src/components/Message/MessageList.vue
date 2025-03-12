@@ -8,31 +8,27 @@
             <img alt="User Avatar" :src="receiver?.avatar" />
           </ion-avatar>
         </div>
-        <ion-title>{{receiver?.username}}</ion-title>
+        <ion-title>{{ receiver?.username }}</ion-title>
       </ion-item>
     </ion-toolbar>
   </ion-header>
+
   <ion-content class="message-content" @scroll="onScroll">
     <ion-list class="ion-padding">
       <ion-item
         lines="none"
-        v-for="message in messages"
+        v-for="message in filteredMessages"
         :key="message.id"
-        :class="{
-          'message-out': message.isSentByCurrentUser,
-          'ion-no-shadow ion-no-padding': !message.isSentByCurrentUser
-        }"
+        :class="{ 'message-out': message.isSentByCurrentUser, 'ion-no-shadow': !message.isSentByCurrentUser }"
         class="ion-margin-bottom"
+        @click="openPopover($event, message)"
       >
         <div class="avatar-container">
           <ion-avatar slot="start" v-if="!message.isSentByCurrentUser">
             <img :src="message.sender?.avatar || '/default-avatar.png'" alt="User Avatar" />
           </ion-avatar>
         </div>
-        <div :class="{
-          'message-in': !message.isSentByCurrentUser
-        }"
-             class="message-container">
+        <div class="message-container" :class="{ 'message-in': !message.isSentByCurrentUser }">
           <ion-label>
             <p :class="{ 'unread': !message.read }">{{ message.content }}</p>
           </ion-label>
@@ -40,58 +36,63 @@
             <sub>{{ timeSince(message.createdAt) }}</sub>
           </ion-note>
         </div>
-        <ion-button fill="clear" @click="openPopover(message.id)">
-          <ion-icon name="ellipsis-vertical"></ion-icon>
-        </ion-button>
       </ion-item>
     </ion-list>
   </ion-content>
-  <MessageForm @newMessage="addMessage" :conversation-id="conversationId" :receiver-id="receiver?.id" :sender-name="currentUser.username"/>
-  <MessageActionsPopover
-    :is-open="isPopoverOpen"
-    :message-id="selectedMessageId"
-    :conversation-id="conversationId"
-    :current-user-id="currentUser.id"
-    @close="closePopover"
-    @messageDeleted="removeMessage"
-    @messageDeletedForUser="removeMessageForUser"
+
+  <MessageForm
+    @newMessage="addMessage"
     @editMessage="editMessage"
+    :conversation-id="conversationId"
+    :receiver-id="receiver?.id"
+    :sender-name="currentUser.username"
+    :editingMessage="editingMessage"
   />
+
+  <!--TODO: Add MessagePopover component here -->
+
+  <ion-popover :is-open="popoverOpen" @didDismiss="popoverOpen = false" :event="popoverEvent">
+    <ion-content class="">
+      <ion-list>
+        <ion-item lines="none" button v-if="selectedMessage?.isSentByCurrentUser" @click="editSelectedMessage">Modifier</ion-item>
+        <ion-item lines="none" button @click="deleteMessageForUser">Supprimer pour moi</ion-item>
+        <ion-item lines="none" button v-if="selectedMessage?.isSentByCurrentUser" @click="deleteMessageForAll">Supprimer pour tous</ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-popover>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onUnmounted } from 'vue';
-import { IonToolbar, IonHeader, IonBackButton, IonTitle, IonButtons, IonContent, IonAvatar, IonItem, IonLabel, IonNote, IonList, IonButton, IonIcon } from '@ionic/vue';
+import { defineComponent, onUnmounted } from 'vue';
+import { IonToolbar, IonHeader, IonBackButton, IonTitle, IonContent, IonAvatar, IonItem, IonLabel, IonNote, IonList, IonPopover } from '@ionic/vue';
 import { arrowBackOutline } from 'ionicons/icons';
 import WebSocketService from '@/services/websocket.service';
 import MessageForm from '@/components/Message/MessageForm.vue';
-import MessageActionsPopover from '@/components/Message/MessageActionsPopover.vue';
 import conversationService from '@/services/conversation.service';
 import { timeSince } from '@/utils/date';
 
 export default defineComponent({
   name: 'MessageList',
-  components: { IonToolbar, IonHeader, IonBackButton, IonTitle, IonButtons, MessageForm, IonContent, IonAvatar, IonItem, IonLabel, IonNote, IonList, IonButton, IonIcon, MessageActionsPopover },
+  components: { IonToolbar, IonHeader, IonBackButton, IonTitle, MessageForm, IonContent, IonAvatar, IonItem, IonLabel, IonNote, IonList, IonPopover },
   props: {
-    currentUser: {
-      type: Object,
-      required: true
-    },
-    conversationId: {
-      type: String,
-      required: true
-    }
+    currentUser: { type: Object, required: true },
+    conversationId: { type: String, required: true }
   },
   data() {
     return {
       messages: [],
       page: 1,
       loading: false,
-      isPopoverOpen: false,
-      selectedMessageId: ''
+      popoverOpen: false,
+      popoverEvent: null,
+      selectedMessage: null,
+      editingMessage: null
     };
   },
   computed: {
+    filteredMessages() {
+      return this.messages.filter(message => message.deletedBy !== this.currentUser.id);
+    },
     receiver() {
       return this.messages[0]?.conversation.users.find(user => user.id !== this.currentUser.id);
     }
@@ -107,25 +108,36 @@ export default defineComponent({
       this.messages = [...newMessages, ...this.messages];
       this.loading = false;
     },
+    openPopover(event, message) {
+      this.popoverEvent = event;
+      this.selectedMessage = message;
+      this.popoverOpen = true;
+    },
+    editSelectedMessage() {
+      this.editingMessage = this.selectedMessage;
+      this.popoverOpen = false;
+    },
+    async deleteMessageForAll() {
+      WebSocketService.emit('deleteMessage', { id: this.selectedMessage.id });
+      this.popoverOpen = false;
+    },
+    async deleteMessageForUser() {
+      WebSocketService.emit('deleteMessageForUser', { id: this.selectedMessage.id });
+      this.popoverOpen = false;
+    },
     addMessage(message) {
+      console.log('WebSocket - Nouveau message reçu :', message);
+
       if (!this.messages.find(m => m.id === message.id)) {
         message.isSentByCurrentUser = message.senderId === this.currentUser.id;
         this.messages.push(message);
       }
     },
-    removeMessage(messageId) {
-      this.messages = this.messages.filter(message => message.id !== messageId);
-    },
-    removeMessageForUser(messageId) {
-      const message = this.messages.find(message => message.id === messageId);
-      if (message) {
-        message.deletedBy = this.currentUser.id;
-      }
-    },
-    editMessage(messageId) {
-      const message = this.messages.find(message => message.id === messageId);
-      if (message) {
-        // Implement the logic to edit the message
+    editMessage(updatedMessage) {
+      console.log('WebSocket - Message modifié :', updatedMessage);
+      const index = this.messages.findIndex(m => m.id === updatedMessage.id);
+      if (index !== -1) {
+        this.messages[index].content = updatedMessage.content;
       }
     },
     showUserProfile(user) {
@@ -138,29 +150,25 @@ export default defineComponent({
         await this.fetchMessages(this.page);
       }
     },
-    openPopover(messageId) {
-      this.selectedMessageId = messageId;
-      this.isPopoverOpen = true;
-    },
-    closePopover() {
-      this.isPopoverOpen = false;
-      this.selectedMessageId = '';
-    }
   },
   async mounted() {
     await this.fetchMessages();
 
-    const handleNewMessage = (message) => {
-      if (message.conversationId === this.conversationId) {
-        this.addMessage(message);
-      }
-    };
+    // Écoute des nouveaux messages via WebSocket
+    WebSocketService.on('newMessage', this.addMessage);
+    WebSocketService.on('messageUpdated', this.editMessage);
+    WebSocketService.on('messageDeleted', (messageId) => {
+      this.messages = this.messages.filter(m => m.id !== messageId);
+    });
+    WebSocketService.on('messageDeletedForUser', (messageId) => {
+      this.messages = this.messages.filter(m => m.id !== messageId);
+    });
 
-    WebSocketService.off('newMessage', handleNewMessage);
-    WebSocketService.on('newMessage', handleNewMessage);
-
+    // Nettoyage à la destruction du composant
     onUnmounted(() => {
-      WebSocketService.off('newMessage', handleNewMessage);
+      WebSocketService.off('newMessage', this.addMessage);
+      WebSocketService.off('messageUpdated', this.editMessage);
+      WebSocketService.off('messageDeleted');
     });
 
     WebSocketService.socket.on('disconnect', () => {
@@ -181,33 +189,28 @@ export default defineComponent({
   flex-direction: column-reverse;
 }
 
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+}
+
 .message-out {
   align-self: flex-end;
   border-radius: 1rem;
   margin-left: auto;
-  --padding-start: 0;
   width: fit-content;
 }
+
 .message-in {
   align-self: flex-start;
   border-radius: 1rem;
-  padding: .8rem;
+  padding: 0.8rem;
   box-shadow: var(--neumorphism-in-shadow) !important;
 }
 
-.message-container {
-  justify-content: space-between;
-  display: flex;
-  align-items: center;
+.highlight {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
-.message-out .message-container {
-  width: fit-content;
-}
-
-.time {
-  margin-left: 1rem;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
 </style>
