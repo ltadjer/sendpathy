@@ -9,7 +9,7 @@
           lines="none"
           v-for="post in filteredPosts"
           :key="post.id"
-          @click="editPost(post)"
+          @click.stop="editPost(post)"
         >
           <ion-grid>
             <ion-row>
@@ -44,18 +44,20 @@
               <ion-col size="2" class="ion-text-end">
                 <ion-icon class="custom-icon"
                           :id="'popover-button-' + post.id"
-                          @click.stop :icon="ellipsisVerticalOutline"></ion-icon>
+                          @click.stop
+                          :icon="ellipsisVerticalOutline">
+                </ion-icon>
                 <ion-popover
                   :trigger="'popover-button-' + post.id"
                   :dismiss-on-select="true"
                   side="top"
-                  alignment="end"
-                >
+                  alignment="end">
                   <ion-list>
                     <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click.stop="deleteOnePost(post.id)">Supprimer</ion-item>
                     <ion-item lines="none" :button="true" :detail="false" @click="reportPost(post.id)">Signaler</ion-item>
                   </ion-list>
                 </ion-popover>
+
               </ion-col>
             </ion-row>
             <ion-row>
@@ -150,9 +152,6 @@ export default defineComponent({
       });
     }
   },
-  mounted() {
-    console.log('currentUser:', this.currentUser);
-  },
   methods: {
     timeSince,
     editPost(post) {
@@ -194,6 +193,7 @@ export default defineComponent({
       this.selectedTriggers = triggers;
     },
     showUserProfile(user) {
+      console.log('Show user profile:', user);
       this.$router.push({ name: 'UserProfile', params: { userId: user.id } });
     },
   },

@@ -8,7 +8,7 @@
               <img alt="User Avatar" :src="currentUser?.avatar" />
             </ion-avatar>
           </div>
-          <ion-title>Nouvelle réservation</ion-title>
+          <ion-title>{{ reservationId ? 'Modifier la réservation' : 'Nouvelle réservation' }}</ion-title>
         </ion-item>
         <ion-buttons slot="end">
           <ion-button size="small" class="ion-no-shadow">
@@ -18,71 +18,44 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list class="ion-padding">
-        <ion-title>
-          <h1 class="gradient-text">Échangeons</h1>
-        </ion-title>
-        <ion-grid>
-          <ion-row>
-            <ion-col class="ion-text-center">
-              <ion-item lines="none">
-                <ion-label>Psychologue</ion-label>
-                <ion-select class="ion-no-shadow" v-model="selectedTherapist" placeholder="Choisir un psychologue">
-                  <ion-select-option v-for="therapist in therapists" :key="therapist.id" :value="therapist.id">
-                    {{ therapist.firstName }} {{ therapist.lastName }}
-                  </ion-select-option>
-                </ion-select>
-              </ion-item>
-            </ion-col>
-          </ion-row>
-          <ion-row>
-            <ion-col>
-              <ion-accordion-group class="ion-shadow-out rounded-accordion">
-              <ion-accordion class="ion-shadow-out ion-margin-bottom" v-for="(slots, date) in availableSlotsByDate" :key="date">
-                  <ion-item lines="none" slot="header" class="ion-no-shadow">
-                    <ion-label>{{ date }}</ion-label>
-                  </ion-item>
-                  <ion-list slot="content">
-                    <ion-chip v-for="slot in slots" :key="slot.id" @click="selectSlot(slot)"
-                              :class="{ 'ion-shadow-in': selectedSlot === slot.id }">
-                      <span class="gradient-text">{{ formatTime(slot.startTime) }}</span>
-                    </ion-chip>
-                  </ion-list>
-                </ion-accordion>
-              </ion-accordion-group>
-            </ion-col>
-          </ion-row>
-
-        </ion-grid>
-        <div class="ion-text-center ion-margin-top">
-          <custom-button text="Réserver" @click="submitReservation"></custom-button>
-        </div>
-      </ion-list>
+      <ReservationForm
+        :available-slots-by-date="availableSlotsByDate"
+        v-model:selected-slot="selectedSlot"
+        :therapists="therapists"
+        v-model:selected-therapist="selectedTherapist"
+        :reservation-id="reservationId"
+        @reservation-submitted="handleReservationSubmitted"
+      />
+      <ToastMessage/>
     </ion-content>
   </ion-page>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 import availableSlotService from '@/services/available-slot.service';
 import authService from '@/services/auth.service';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion, IonRadioGroup, IonRadio, IonButton, IonAvatar, IonButtons, IonChip, IonGrid, IonRow, IonCol } from '@ionic/vue';
-import { useReservationStore } from '@/stores/reservation';
-import { formatDate, formatTime } from '@/utils/date';
-import CustomButton from '@/components/Commun/CustomButton.vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonAvatar, IonButtons, IonButton } from '@ionic/vue';
 import { useAccountStore } from '@/stores/account';
+import ToastMessage from '@/components/Commun/ToastMessage.vue';
+import ReservationForm from '@/components/Reservation/ReservationForm.vue';
+import { useReservationStore } from '@/stores/reservation';
+import { formatDate } from '@/utils/date';
 
-export default {
+export default defineComponent({
   data() {
     return {
       availableSlotsByDate: {},
       selectedSlot: null,
       therapists: [],
       selectedTherapist: null,
+      reservationId: null,
     };
   },
   components: {
-    CustomButton,
-    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonSelect, IonSelectOption, IonAccordionGroup, IonAccordion, IonRadioGroup, IonRadio, IonButton, IonAvatar, IonButtons, IonChip, IonGrid, IonRow, IonCol
+    ToastMessage,
+    ReservationForm,
+    IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonAvatar, IonButtons, IonButton
   },
   computed: {
     currentUser() {
@@ -93,11 +66,15 @@ export default {
     const slots = await availableSlotService.fetchAllAvailableSlots();
     this.availableSlotsByDate = this.groupSlotsByDate(slots);
     this.therapists = await authService.fetchAllTherapists();
+    this.reservationId = this.$route.params.reservationId;
+    if (this.reservationId) {
+      await this.loadReservationData();
+    }
   },
   methods: {
     formatDate,
-    formatTime,
     groupSlotsByDate(slots) {
+      slots.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
       return slots.reduce((acc, slot) => {
         const date = this.formatDate(slot.startTime);
         if (!acc[date]) {
@@ -107,29 +84,14 @@ export default {
         return acc;
       }, {});
     },
-    async submitReservation() {
-      if (!this.selectedSlot || !this.selectedTherapist) {
-        alert('Please select a slot and a therapist');
-        return;
-      }
-      await useReservationStore().createOneReservation({
-        slotId: this.selectedSlot,
-        therapistId: this.selectedTherapist,
-      });
-      alert('Reservation created successfully');
+    async loadReservationData() {
+      const reservation = await useReservationStore().fetchOneReservationById(this.reservationId);
+      this.selectedSlot = reservation.slotId;
+      this.selectedTherapist = reservation.slot.therapistId;
     },
-    selectSlot(slot) {
-      this.selectedSlot = slot.id;
-      console.log('Selected slot', slot);
-    },
-  },
-};
+    handleReservationSubmitted() {
+      this.$router.push({ name: 'ReservationList' });
+    }
+  }
+});
 </script>
-<style scoped>
-
-ion-accordion, ion-accordion ion-item {
-  --background: none;
-  background-color: transparent;
-  border-radius: 1rem;
-}
-</style>

@@ -91,9 +91,6 @@ export default defineComponent({
   setup() {
     return { happyOutline, optionsOutline, paperPlaneOutline };
   },
-  mounted() {
-    console.log('currentUser:', this.currentUser);
-  },
   emits: ['post-updated', 'close'],
   data() {
     return {
@@ -116,7 +113,6 @@ export default defineComponent({
           this.emotion = newPost.emotion;
           this.selectedTags = newPost.tags || [];
           this.selectedTriggers = newPost.triggers || [];
-          console.log('newPost:', newPost);
         } else {
           this.resetForm();
         }
@@ -167,7 +163,6 @@ export default defineComponent({
       this.selectedTriggers = triggers;
     },
     updateEmotion(emoji) {
-      console.log('emoji:', emoji);
       this.emotion = emoji;
     },
     openEmojiModal() {

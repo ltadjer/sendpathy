@@ -110,6 +110,16 @@ export default  {
     const response = await api.get('/users/therapists');
     console.log('fetchAllTherapists', response);
     return response.data;
+  },
+
+  async findOneById(id: string) {
+    try {
+      const response = await api.get(`/users/${id}`);
+      console.log('findOneById', response);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

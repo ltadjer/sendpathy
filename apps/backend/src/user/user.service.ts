@@ -23,28 +23,6 @@ export class UserService {
       where: { id },
       include: {
         friendshipsReceived: {
-          where: { status: 'ACCEPTED' },
-          include: { requester: true },
-        },
-        friendshipsSent: {
-          where: { status: 'ACCEPTED' },
-          include: { receiver: true },
-        },
-      },
-    });
-  }
-
-  /**
-   * Trouve un utilisateur par son email.
-   * @param email - L'email de l'utilisateur.
-   * @returns L'utilisateur correspondant à l'email.
-   */
-  async findOneByEmail(email: string) {
-    return await this.prisma.user.findUnique({
-      where: { email },
-      include: {
-        friendshipsReceived: {
-          where: { status: 'ACCEPTED' },
           include: {
             requester: {
               include: {
@@ -65,7 +43,59 @@ export class UserService {
           },
         },
         friendshipsSent: {
-          where: { status: 'ACCEPTED' },
+          include: {
+            receiver: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Trouve un utilisateur par son email.
+   * @param email - L'email de l'utilisateur.
+   * @returns L'utilisateur correspondant à l'email.
+   */
+  async findOneByEmail(email: string) {
+    return await this.prisma.user.findUnique({
+      where: { email },
+      include: {
+        friendshipsReceived: {
+          include: {
+            requester: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        friendshipsSent: {
           include: {
             receiver: {
               include: {

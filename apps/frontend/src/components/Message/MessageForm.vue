@@ -83,3 +83,14 @@ export default defineComponent({
 });
 </script>
 
+<style scoped>
+ion-button {
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+}
+
+ion-input {
+  margin-top: 0.6rem !important;
+  margin-bottom: 0.6rem !important;
+}
+</style>

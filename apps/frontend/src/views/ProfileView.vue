@@ -8,7 +8,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content>
+    <ion-content v-if="user">
       <ion-item lines="none" class="ion-margin">
         <ion-grid class="ion-padding">
           <ion-row>
@@ -25,8 +25,20 @@
                   <ion-title class="ion-no-padding">{{ user?.username }}</ion-title>
                 </div>
                 <custom-button slot="end" text="Modifier" @click="openModal" v-if="isCurrentUser" />
-                <ion-button slot="end" @click="toggleFriendship" v-if="!isCurrentUser">
-                  {{ isFriend ? 'Remove Friend' : 'Add Friend' }}
+                <ion-button slot="end" @click="toggleFriendship" v-if="!isCurrentUser && !isFriend && !isPendingFriendship && !isPendingSentFriendship">
+                  Add Friend
+                </ion-button>
+                <ion-button slot="end" @click="acceptFriendship" v-if="!isCurrentUser && isPendingFriendship">
+                  Accept
+                </ion-button>
+                <ion-button slot="end" @click="declineFriendship" v-if="!isCurrentUser && isPendingFriendship">
+                  Decline
+                </ion-button>
+                <ion-button slot="end" @click="removePendingRequest" v-if="!isCurrentUser && isPendingSentFriendship">
+                  Remove Request
+                </ion-button>
+                <ion-button slot="end" @click="toggleFriendship" v-if="!isCurrentUser && isFriend">
+                  Remove Friend
                 </ion-button>
               </ion-item>
             </ion-col>
@@ -83,7 +95,6 @@
     </ion-content>
   </ion-page>
 </template>
-
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonAvatar, IonButtons, IonButton, IonLabel, IonInput, IonModal, IonFooter, IonIcon, IonGrid,
@@ -135,7 +146,10 @@ export default defineComponent({
       initialSegment: 'followers',
       selectedUser: null,
       username: '',
-      biography: ''
+      biography: '',
+      user: null,
+      isFriend: false,
+      isPendingFriendship: false,
     };
   },
   setup() {
@@ -146,34 +160,21 @@ export default defineComponent({
     const currentUser = accountStore.user;
     const userId = route.params.userId;
 
-    const user = ref(null);
-    const isFriend = ref(false);
 
-    if (currentUser.id === userId) {
-      user.value = currentUser;
-    } else {
-      const followers = currentUser.friendshipsReceived?.filter(friendship => friendship.status === 'ACCEPTED').map(friendship => friendship.requester) || [];
-      const followings = currentUser.friendshipsSent?.filter(friendship => friendship.status === 'ACCEPTED').map(friendship => friendship.receiver) || [];
-      user.value = followers.find(user => user.id === userId) || followings.find(user => user.id === userId) || {};
-      isFriend.value = !!followers.find(user => user.id === userId) || !!followings.find(user => user.id === userId);
-    }
-    // TODO: récuperer l'id de la friendship pour la supprimer et tenir en compte de si c'est deja accepted ou pas
-    const toggleFriendship = async () => {
-      if (isFriend.value) {
-        // Remove friend
-        await friendshipStore.deleteOneFriendship(user.value.id);
-      } else {
-        // Add friend
-        await friendshipStore.createOneFriendship(user.value.id);
-      }
-      isFriend.value = !isFriend.value;
-    };
-
-    return { arrowBackOutline, closeOutline, router, accountStore, user, isFriend, toggleFriendship };
+    return { arrowBackOutline, closeOutline, router, accountStore, currentUser, userId, friendshipStore };
   },
   async created() {
     await usePostStore().fetchAllPosts();
-    await useLifeMomentStore().fetchLifeMoments();
+    if (this.isCurrentUser) {
+      await useLifeMomentStore().fetchLifeMoments();
+      this.user = this.currentUser;
+    } else {
+      this.user = await this.accountStore.findOneById(this.userId);
+      console.log('this.user', this.user);
+      this.isFriend = !!this.followers.find(user => user.id === this.userId) || !!this.followings.find(user => user.id === this.userId);
+    }
+    this.isPendingFriendship = !!this.pendingFriendships.find(user => user.id === this.userId);
+
   },
   computed: {
     currentUser() {
@@ -186,19 +187,33 @@ export default defineComponent({
       return useLifeMomentStore().lifeMoments.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     },
     filteredPosts() {
-      return this.posts.filter(post => post.userId === this.user.id);
+      return this.posts.filter(post => post.userId === this.user?.id);
     },
     filteredLifeMoments() {
       return this.lifeMoments.filter(lifeMoment => lifeMoment.userId === this.user.id);
     },
     followers() {
+      console.log('this.user', this.user.friendshipsReceived?.filter(friendship => friendship.status === 'ACCEPTED').map(friendship => friendship.requester));
       return this.user ? this.user.friendshipsReceived?.filter(friendship => friendship.status === 'ACCEPTED').map(friendship => friendship.requester) : [];
     },
     followings() {
       return this.user ? this.user.friendshipsSent?.filter(friendship => friendship.status === 'ACCEPTED').map(friendship => friendship.receiver) : [];
     },
     isCurrentUser() {
-      return this.currentUser.id === this.user.id;
+      return this.currentUser.id ===  this.$route.params.userId;
+    },
+    pendingFriendships() {
+      return this.currentUser ? this.currentUser.friendshipsReceived?.filter(friendship => friendship.status === 'PENDING').map(friendship => friendship.requester) : [];
+    },
+    pendingSentFriendships() {
+      return this.currentUser ? this.currentUser.friendshipsSent?.filter(friendship => friendship.status === 'PENDING').map(friendship => friendship.receiver) : [];
+    },
+    isPendingSentFriendship() {
+      return !!this.pendingSentFriendships.find(user => user.id === this.userId);
+    },
+    currentFriendship() {
+      return this.currentUser.friendshipsSent?.find(friendship => friendship.receiverId === this.userId) ||
+        this.currentUser.friendshipsReceived?.find(friendship => friendship.requesterId === this.userId);
     }
   },
   methods: {
@@ -228,6 +243,28 @@ export default defineComponent({
     },
     showUserProfile(user) {
       this.router.push({ name: 'UserProfile', params: { userId: user.id } });
+    },
+    async toggleFriendship() {
+      if (this.isFriend) {
+        await this.friendshipStore.deleteOneFriendship(this.currentFriendship.id);
+        this.isFriend = false;
+      } else {
+        await this.friendshipStore.createOneFriendship({ requesterId: this.currentUser.id, receiverId: this.user.id });
+        this.isPendingSentFriendship = true;
+      }
+    },
+    async acceptFriendship() {
+      await this.friendshipStore.acceptFriendship(this.currentFriendship.id);
+      this.isPendingFriendship = false;
+      this.isFriend = true;
+    },
+    async declineFriendship() {
+      await this.friendshipStore.deleteOneFriendship(this.currentFriendship.id);
+      this.isPendingFriendship = false;
+    },
+    async removePendingRequest() {
+      await this.friendshipStore.deleteOneFriendship(this.currentFriendship.id);
+      this.isPendingSentFriendship = false;
     }
   }
 });

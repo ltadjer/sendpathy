@@ -104,7 +104,6 @@ export default defineComponent({
   },
   computed: {
     tags() {
-      console.log('tags', useTagStore().tags);
       return useTagStore().tags;
     },
     triggers() {

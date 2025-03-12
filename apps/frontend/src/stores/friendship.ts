@@ -18,5 +18,16 @@ export const useFriendshipStore = defineStore('friendship', {
       await friendshipService.deleteOneFriendship(id);
       this.friendships = this.friendships.filter((l) => l.id !== id);
     },
+    async acceptFriendship(id: string) {
+      try {
+        const updatedFriendship = await friendshipService.acceptFriendship(id);
+        const index = this.friendships.findIndex(f => f.id === id);
+        if (index !== -1) {
+          this.friendships[index] = updatedFriendship;
+        }
+      } catch (error) {
+        console.error('Failed to accept friendship:', error);
+      }
+    },
   },
 });

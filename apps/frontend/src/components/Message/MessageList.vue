@@ -13,13 +13,18 @@
     </ion-toolbar>
   </ion-header>
 
-  <ion-content class="message-content" @scroll="onScroll">
+  <ion-content
+    class="message-content"
+    forceOverscroll="true"
+    scrollEvents="true"
+    @ionScroll="onScroll"
+  >
     <ion-list class="ion-padding">
       <ion-item
         lines="none"
         v-for="message in filteredMessages"
         :key="message.id"
-        :class="{ 'message-out': message.isSentByCurrentUser, 'ion-no-shadow': !message.isSentByCurrentUser }"
+        :class="{ 'message-out': message.isSentByCurrentUser, 'ion-no-shadow': !message.isSentByCurrentUser, }"
         class="ion-margin-bottom"
         @click="openPopover($event, message)"
       >
@@ -49,16 +54,12 @@
     :editingMessage="editingMessage"
   />
 
-  <!--TODO: Add MessagePopover component here -->
-
   <ion-popover :is-open="popoverOpen" @didDismiss="popoverOpen = false" :event="popoverEvent">
-    <ion-content class="">
-      <ion-list>
-        <ion-item lines="none" button v-if="selectedMessage?.isSentByCurrentUser" @click="editSelectedMessage">Modifier</ion-item>
-        <ion-item lines="none" button @click="deleteMessageForUser">Supprimer pour moi</ion-item>
-        <ion-item lines="none" button v-if="selectedMessage?.isSentByCurrentUser" @click="deleteMessageForAll">Supprimer pour tous</ion-item>
-      </ion-list>
-    </ion-content>
+    <ion-list>
+      <ion-item lines="none" button v-if="selectedMessage?.isSentByCurrentUser" @click="editSelectedMessage">Modifier</ion-item>
+      <ion-item lines="none" button @click="deleteMessageForUser">Supprimer pour moi</ion-item>
+      <ion-item lines="none" button v-if="selectedMessage?.isSentByCurrentUser" @click="deleteMessageForAll">Supprimer pour tous</ion-item>
+    </ion-list>
   </ion-popover>
 </template>
 
@@ -81,12 +82,14 @@ export default defineComponent({
   data() {
     return {
       messages: [],
-      page: 1,
       loading: false,
       popoverOpen: false,
       popoverEvent: null,
       selectedMessage: null,
-      editingMessage: null
+      editingMessage: null,
+      page: 1,
+      limit: 10,
+      allMessagesLoaded: false
     };
   },
   computed: {
@@ -102,11 +105,26 @@ export default defineComponent({
   },
   methods: {
     timeSince,
-    async fetchMessages(page = 1) {
+    async fetchMessages() {
+      if (this.loading || this.allMessagesLoaded) return;
       this.loading = true;
-      const newMessages = await conversationService.fetchAllMessages(this.conversationId, page);
-      this.messages = [...newMessages, ...this.messages];
+      const newMessages = await conversationService.fetchMessages(this.conversationId, this.page, this.limit);
+      if (newMessages.length < this.limit) {
+        this.allMessagesLoaded = true;
+      }
+      this.messages = [...newMessages, ...this.messages]; // Prepend new messages
+      this.page += 1;
       this.loading = false;
+    },
+    onScroll(event) {
+      const scrollTop = event.detail.scrollTop;
+      console.log('Scroll position:', scrollTop);
+
+      // Charger plus de messages uniquement si on est en haut
+      if (scrollTop <= 10) {
+        console.log('Fetching older messages...');
+        this.fetchMessages();
+      }
     },
     openPopover(event, message) {
       this.popoverEvent = event;
@@ -126,15 +144,12 @@ export default defineComponent({
       this.popoverOpen = false;
     },
     addMessage(message) {
-      console.log('WebSocket - Nouveau message reçu :', message);
-
       if (!this.messages.find(m => m.id === message.id)) {
         message.isSentByCurrentUser = message.senderId === this.currentUser.id;
         this.messages.push(message);
       }
     },
     editMessage(updatedMessage) {
-      console.log('WebSocket - Message modifié :', updatedMessage);
       const index = this.messages.findIndex(m => m.id === updatedMessage.id);
       if (index !== -1) {
         this.messages[index].content = updatedMessage.content;
@@ -143,18 +158,10 @@ export default defineComponent({
     showUserProfile(user) {
       this.$router.push({ name: 'UserProfile', params: { userId: user.id } });
     },
-    async onScroll(event) {
-      const { scrollTop } = event.target;
-      if (scrollTop === 0 && !this.loading) {
-        this.page += 1;
-        await this.fetchMessages(this.page);
-      }
-    },
   },
   async mounted() {
     await this.fetchMessages();
 
-    // Écoute des nouveaux messages via WebSocket
     WebSocketService.on('newMessage', this.addMessage);
     WebSocketService.on('messageUpdated', this.editMessage);
     WebSocketService.on('messageDeleted', (messageId) => {
@@ -164,7 +171,6 @@ export default defineComponent({
       this.messages = this.messages.filter(m => m.id !== messageId);
     });
 
-    // Nettoyage à la destruction du composant
     onUnmounted(() => {
       WebSocketService.off('newMessage', this.addMessage);
       WebSocketService.off('messageUpdated', this.editMessage);
@@ -208,9 +214,9 @@ export default defineComponent({
   box-shadow: var(--neumorphism-in-shadow) !important;
 }
 
-.highlight {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+ion-popover::part(content) {
+  --background: transparent !important;
+  --border-radius: 1rem;
 }
 
 </style>

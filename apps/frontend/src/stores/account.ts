@@ -136,5 +136,15 @@ export const useAccountStore = defineStore('account', {
         console.error('Failed to reset password:', error);
       }
     },
+
+    async findOneById(id: string) {
+      try {
+        const response = await AuthService.findOneById(id);
+        console.log('User data:', response.data);
+        return response;
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    }
   },
 });

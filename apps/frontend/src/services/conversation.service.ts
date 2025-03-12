@@ -5,7 +5,6 @@ export default {
      */
     async fetchAllConversations() {
         const response = await api.get('/conversations');
-        console.log(response.data);
         return response.data;
     },
     async createOneConversation(conversation: any) {
@@ -20,9 +19,13 @@ export default {
     /**
      * Fetch messages for a specific conversation.
      * @param conversationId - The ID of the conversation.
+     * @param page - The page number.
+     * @param limit - The number of messages per page.
      */
-    async fetchAllMessages(conversationId: string) {
-        const response = await api.get(`/conversations/${conversationId}/messages`);
+    async fetchMessages(conversationId, page, limit) {
+        const response = await api.get(`/conversations/${conversationId}/messages`, {
+            params: { page, limit }
+        });
         return response.data;
     },
 
@@ -33,17 +36,6 @@ export default {
      */
     async sendMessage(conversationId: string, messageContent: string) {
         const response = await api.post(`/conversations/${conversationId}/messages`, { content: messageContent });
-        return response.data;
-    },
-
-    /**
-     * Update a message in a specific conversation.
-     * @param conversationId - The ID of the conversation.
-     * @param messageId - The ID of the message.
-     * @param messageContent - The new content of the message.
-     */
-    async updateOneMessage(conversationId: string, messageId: string, messageContent: string) {
-        const response = await api.put(`/conversations/${conversationId}/messages/${messageId}`, { content: messageContent });
         return response.data;
     },
 

@@ -18,10 +18,16 @@ export class MessageService {
         return this.prisma.message.findMany();
     }
 
-    async findByConversation(conversationId: string, userId: string) {
+    async findByConversation(conversationId: string, userId: string, page: number, limit: number) {
+        if (!conversationId) {
+            throw new Error('conversationId is required');
+        }
+
+        const skip = (page - 1) * limit;
         const messages = await this.prisma.message.findMany({
             where: { conversationId: conversationId },
-            orderBy: { createdAt: 'asc' },
+            orderBy: { createdAt: 'desc' },
+            skip: skip, take:parseInt(limit.toString(), 12),
             include: {
                 sender: true,
                 receiver: true,

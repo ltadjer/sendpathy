@@ -16,11 +16,7 @@
               <h1 class="gradient-text ion-input-spacing">Hâte de te connaître !</h1>
             </ion-text>
             <form @submit.prevent="register" class="ion-text-left form-container">
-
-              <!-- Bouton pour générer des avatars -->
               <ion-button expand="block" color="primary" @click="generateAvatars">Générer un avatar</ion-button>
-
-              <!-- Affichage des avatars générés -->
               <div class="avatar-selection">
                 <div v-for="(avatar, index) in avatars" :key="index" class="avatar-container"
                      :class="{ 'selected': avatar === selectedAvatar }"
@@ -33,7 +29,6 @@
                 </div>
               </div>
 
-              <!-- Champs du formulaire -->
               <ion-input
                 class="ion-input-spacing"
                 placeholder="Email"

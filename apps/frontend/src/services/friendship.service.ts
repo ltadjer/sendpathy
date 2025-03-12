@@ -10,4 +10,9 @@ export default {
     return response.data;
   },
 
+  async acceptFriendship(friendshipId) {
+    const response = await api.patch(`/friendships/${friendshipId}/accept`);
+    return response.data;
+  }
+
 }

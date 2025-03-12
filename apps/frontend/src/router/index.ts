@@ -26,8 +26,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: '/conversations', component: ConversationView },
       { path: '/feed', component: FeedView },
       { path: '/journal', component: LifeMomentView },
-      { path: '/reservations', component: ReservationView },
-      { path: '/reservations/nouvelle-reservation', component: NewReservationView },
+      { path: '/reservations', name: 'ReservationList', component: ReservationView },
       { path: '/reservations/summary', component: ReservationSummaryView },
       { path: '/profil', component: ProfileView},
       {
@@ -36,6 +35,12 @@ const routes: Array<RouteRecordRaw> = [
         component: ProfileView,
         props: route => ({ user: route.params.user })
       },
+      {
+        path: '/reservations/nouvelle-reservation/:reservationId?',
+        name: 'ReservationForm',
+        component: NewReservationView,
+        props: true
+      }
     ],
     meta: { requiresAuth: true }
   },

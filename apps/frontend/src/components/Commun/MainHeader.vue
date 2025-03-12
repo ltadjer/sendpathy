@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <div class="container">
+    <div class="container" v-if="isDesktop">
       <aside class="sidebar" :class="{ 'hidden': isSidebarHidden }">
         <ion-item lines="none" class="ion-no-shadow">
           <div class="avatar-container" @click="showUserProfile(currentUser)">
@@ -22,7 +22,7 @@
 
       <ion-router-outlet></ion-router-outlet>
     </div>
-    <div class="mobile-nav">
+    <div v-else class="mobile-nav">
       <ion-fab horizontal="center" vertical="bottom">
         <ion-fab-button @click="openFormModal">
           <ion-icon :icon="add"></ion-icon>
@@ -88,15 +88,18 @@ export default defineComponent({
     },
     currentRoute() {
       return this.$route.path;
-    }
+    },
+    isDesktop() {
+      return window.innerWidth > 992;
+    },
   },
   methods: {
     openFormModal() {
       if (this.$route.path === '/journal') {
         this.isLifeMomentModalOpen = true;
       } else if (this.$route.path === '/reservations') {
-        this.$router.push('/reservations/nouvelle-reservation');
-      } else {
+        this.$router.push('/reservations/nouvelle-reservation/');
+      } else if (this.$route.path === '/feed') {
         this.isPostFormModalOpen = true;
       }
     },
@@ -147,10 +150,6 @@ ion-router-outlet {
     flex-direction: column;
   }
 
-  .sidebar {
-    display: none;
-  }
-
   main {
     width: 100%;
   }
@@ -190,19 +189,9 @@ main {
   padding: 20px;
 }
 
-.mobile-nav {
-  display: none;
-}
-
 @media (max-width: 768px) {
   ion-router-outlet {
     width: 100%;
-  }
-  .sidebar {
-    display: none;
-  }
-  .mobile-nav {
-    display: flex;
   }
   ion-tabs {
     background: var(--ion-color-primary);

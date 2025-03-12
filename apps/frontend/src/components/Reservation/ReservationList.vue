@@ -57,10 +57,14 @@
           <ion-grid>
             <ion-row>
               <ion-col size="6">
-                <ion-button expand="block" fill="clear" class="ion-no-shadow"> <span class="gradient-text">Déplacer le RDV </span></ion-button>
+                <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="updateReservation(reservation.id)">
+                  <span class="gradient-text">Déplacer le RDV</span>
+                </ion-button>
               </ion-col>
               <ion-col size="6">
-                <ion-button expand="block" fill="clear" class="ion-no-shadow"><span class="gradient-text">Annuler le RDV</span></ion-button>
+                <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="deleteOneReservation(reservation.id)">
+                  <span class="gradient-text">Annuler le RDV</span>
+                </ion-button>
               </ion-col>
             </ion-row>
           </ion-grid>
@@ -74,6 +78,7 @@ import { defineComponent } from 'vue';
 import { IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar, IonAvatar, IonButtons, IonButton, IonCard, IonCardTitle, IonCardSubtitle, IonCardContent, IonCardHeader, IonGrid, IonRow, IonCol, IonIcon, IonSegment, IonSegmentButton } from '@ionic/vue';
 import { enterOutline } from 'ionicons/icons';
 import { formatTime } from '@/utils/date';
+import { useReservationStore } from '@/stores/reservation'
 
 export default defineComponent({
   name: 'ReservationList',
@@ -126,7 +131,13 @@ export default defineComponent({
     },
     getTherapistName(therapistId: string) {
       const therapist = this.therapists?.find(t => t.id === therapistId);
-      return therapist ? `${therapist.firstName} ${therapist.lastName}` : 'Unknown Therapist';
+      return therapist ? `${therapist.firstName} ${therapist.lastName}` : 'Inconnu';
+    },
+    async updateReservation(reservationId) {
+      this.$router.push({ name: 'ReservationForm', params: { reservationId } });
+    },
+    async deleteOneReservation(reservationId) {
+      await useReservationStore().deleteOneReservation(reservationId);
     }
   }
 });
