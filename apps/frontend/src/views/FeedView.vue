@@ -69,7 +69,7 @@ export default defineComponent({
     align-items: center;
   }
   ion-content {
-    width: 70%
+    width: 90%
   }
 }
 

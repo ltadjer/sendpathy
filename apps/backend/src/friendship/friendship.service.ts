@@ -10,12 +10,11 @@ export class FriendshipService {
     async create(createFriendshipDto: CreateFriendshipDto) {
 
         // Check if the friendship already exists
+        // Check if the friendship already exists
         const existingFriendship = await this.prisma.friendship.findFirst({
             where: {
-                OR: [
-                    { requesterId: createFriendshipDto.requesterId, receiverId: createFriendshipDto.receiverId },
-                    { requesterId: createFriendshipDto.receiverId, receiverId: createFriendshipDto.requesterId },
-                ],
+                requesterId: createFriendshipDto.requesterId,
+                receiverId: createFriendshipDto.receiverId,
             },
         });
 

@@ -99,7 +99,11 @@ export default defineComponent({
       comment.showReplies = !comment.showReplies;
     },
     async deleteComment(comment) {
-      await usePostStore().deleteCommentFromPost(this.postId, comment.id);
+      if (comment.parentId) {
+        await usePostStore().deleteCommentFromComment(comment.parentId, comment.id);
+      } else {
+        await usePostStore().deleteCommentFromPost(this.postId, comment.id);
+      }
     },
     async toggleLike(comment) {
       if (comment.isLiked) {

@@ -9,6 +9,7 @@ export const useFriendshipStore = defineStore('friendship', {
     async createOneFriendship(friendship: any) {
       try {
         const newFriendship = await friendshipService.createOneFriendship(friendship);
+        console.log('newFriendship:', newFriendship);
         this.friendships.push(newFriendship);
       } catch (error) {
         console.error('Failed to add friendship:', error);

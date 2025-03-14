@@ -13,10 +13,10 @@
     <ion-content>
       <ion-segment v-model="selectedSegment" class="ion-padding">
         <ion-segment-button value="followers" :class="{'ion-shadow-in': selectedSegment === 'followers'}">
-          <ion-label><span :class="{'gradient-text': selectedSegment === 'followers'}">Followers</span></ion-label>
+          <ion-label><span :class="{'gradient-text': selectedSegment === 'followers'}">Confidents</span></ion-label>
         </ion-segment-button>
         <ion-segment-button value="followings" :class="{'ion-shadow-in': selectedSegment === 'followings'}">
-          <ion-label><span :class="{'gradient-text': selectedSegment === 'followings'}">Followings</span></ion-label>
+          <ion-label><span :class="{'gradient-text': selectedSegment === 'followings'}">Confidences</span></ion-label>
         </ion-segment-button>
       </ion-segment>
       <ion-list class="ion-padding">

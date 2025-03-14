@@ -15,9 +15,14 @@
           <custom-button text="Moments de vie" href="/journal" />
           <custom-button text="Messages" href="/conversations" />
           <custom-button text="Consultations" href="/reservations" />
-          <custom-button text="Règles et support" href="/parametres" />
-          <custom-button color="primary" text="Déconnexion" @click="logout" />
         </nav>
+
+        <div class="rounded-buttons">
+          <custom-button class="ion-margin-end" :icon="settingsOutline" href="/parametres" />
+          <custom-button color="primary" @click="logout" :icon="logOutOutline" />
+        </div>
+
+
       </aside>
 
       <ion-router-outlet></ion-router-outlet>
@@ -128,7 +133,7 @@ export default defineComponent({
 }
 
 .sidebar {
-  width: 300px; /* Largeur fixe */
+  width: 280px; /* Largeur fixe */
   padding: 20px;
   background: #f5f5fa;
   box-shadow: var(--neumorphism-out-shadow);
@@ -136,16 +141,21 @@ export default defineComponent({
   border-radius: 1rem;
   flex-shrink: 0; /* Empêche la réduction */
   z-index: 100000;
+  display: flex
+;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
 }
 
 
 ion-router-outlet {
   flex-grow: 1;
   margin-left: auto;
-  width: calc(100% - 350px);
+  width: calc(100% - 300px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .container {
     flex-direction: column;
   }
@@ -159,13 +169,15 @@ nav {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 80%;
 }
+
 ion-fab {
   bottom: 59px
 }
 
-custom-button {
-  border-radius: 1rem;
+.rounded-buttons ion-button {
+  --border-radius: 50% !important;
 }
 
 nav ion-button {
@@ -177,6 +189,7 @@ nav ion-button {
 
 .avatar-container {
   padding: 0.4rem;
+  margin-right: 20px;
 }
 
 ion-avatar {
@@ -189,7 +202,7 @@ main {
   padding: 20px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   ion-router-outlet {
     width: 100%;
   }

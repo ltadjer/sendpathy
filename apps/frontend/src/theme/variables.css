@@ -81,8 +81,8 @@ http://ionicframework.com/docs/theming/ */
 
     /* Neumorphism */
     --neumorphism-out-shadow:
-            -5px -5px 10px 0px rgba(255, 255, 255, 0.9),  /* Ombre claire */
-            10px 10px 20px 0px rgba(214, 200, 223, 0.7); /* Ombre sombre */
+            -5px -5px 10px 0px rgba(255, 255, 255, 0.8),  /* Ombre claire */
+            5px 5px 20px 0px rgba(214, 200, 223, 0.7); /* Ombre sombre */
 
     --neumorphism-in-shadow:
             inset 5px 5px 10px 0px rgba(214, 200, 223, 0.5),  /* Inner shadow */

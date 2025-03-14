@@ -7,8 +7,8 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-
-    <ion-content v-if="user">
+    <!-- TODO: Add a component -->
+    <ion-content :fullscreen="true" v-if="user">
       <ion-item lines="none" class="ion-margin">
         <ion-grid class="ion-padding">
           <ion-row>
@@ -25,25 +25,10 @@
                   <ion-title class="ion-no-padding">{{ user?.username }}</ion-title>
                 </div>
                 <custom-button slot="end" text="Modifier" @click="openModal" v-if="isCurrentUser" />
-                <ion-button slot="end" @click="toggleFriendship" v-if="!isCurrentUser && !isFriend && !isPendingFriendship && !isPendingSentFriendship">
-                  Add Friend
-                </ion-button>
-                <ion-button slot="end" @click="acceptFriendship" v-if="!isCurrentUser && isPendingFriendship">
-                  Accept
-                </ion-button>
-                <ion-button slot="end" @click="declineFriendship" v-if="!isCurrentUser && isPendingFriendship">
-                  Decline
-                </ion-button>
-                <ion-button slot="end" @click="removePendingRequest" v-if="!isCurrentUser && isPendingSentFriendship">
-                  Remove Request
-                </ion-button>
-                <ion-button slot="end" @click="toggleFriendship" v-if="!isCurrentUser && isFriend">
-                  Remove Friend
-                </ion-button>
               </ion-item>
             </ion-col>
           </ion-row>
-          <ion-row>
+          <ion-row v-if="user.biography">
             <ion-col>
               <ion-text class="ion-padding-start">{{ user?.biography }}</ion-text>
             </ion-col>
@@ -58,14 +43,25 @@
             <ion-col size="4" @click="openFriendshipsModal('followers')">
               <ion-text>
                 <h2>{{ followers?.length }}</h2>
-                <p>Followers</p>
+                <p>Confidents</p>
               </ion-text>
             </ion-col>
             <ion-col size="4" @click="openFriendshipsModal('followings')">
               <ion-text>
                 <h2>{{ followings?.length }}</h2>
-                <p>Following</p>
+                <p>Confidences</p>
               </ion-text>
+            </ion-col>
+          </ion-row>
+          <ion-row class="flex-end">
+            <ion-col class="flex-end">
+                <custom-button text="Envoyer une onde" @click="handleFriendshipAction" v-if="!isCurrentUser && !isPendingFriendship && !isPendingSentFriendship && !isOnlyFollower && !isOnlyFollowing" />
+                <custom-button text="Répondre à l’onde" @click="handleFriendshipAction" v-if="!isCurrentUser && !isPendingFriendship && !isPendingSentFriendship && isOnlyFollower" />
+
+                <custom-button text="Accepter la connexion" @click="acceptFriendship" v-if="!isCurrentUser && isPendingFriendship" />
+                <custom-button text="Ignorer la connexion" @click="declineFriendship" v-if="!isCurrentUser && isPendingFriendship" />
+                <custom-button text="Supprimer la demande" @click="removePendingRequest" v-if="!isCurrentUser && isPendingSentFriendship" />
+                <custom-button text="Rompre le lien" @click="handleFriendshipAction" v-if="!isCurrentUser && isOnlyFollowing" />
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -148,7 +144,6 @@ export default defineComponent({
       username: '',
       biography: '',
       user: null,
-      isFriend: false,
       isPendingFriendship: false,
     };
   },
@@ -160,7 +155,6 @@ export default defineComponent({
     const currentUser = accountStore.user;
     const userId = route.params.userId;
 
-
     return { arrowBackOutline, closeOutline, router, accountStore, currentUser, userId, friendshipStore };
   },
   async created() {
@@ -170,11 +164,8 @@ export default defineComponent({
       this.user = this.currentUser;
     } else {
       this.user = await this.accountStore.findOneById(this.userId);
-      console.log('this.user', this.user);
-      this.isFriend = !!this.followers.find(user => user.id === this.userId) || !!this.followings.find(user => user.id === this.userId);
     }
     this.isPendingFriendship = !!this.pendingFriendships.find(user => user.id === this.userId);
-
   },
   computed: {
     currentUser() {
@@ -193,7 +184,6 @@ export default defineComponent({
       return this.lifeMoments.filter(lifeMoment => lifeMoment.userId === this.user.id);
     },
     followers() {
-      console.log('this.user', this.user.friendshipsReceived?.filter(friendship => friendship.status === 'ACCEPTED').map(friendship => friendship.requester));
       return this.user ? this.user.friendshipsReceived?.filter(friendship => friendship.status === 'ACCEPTED').map(friendship => friendship.requester) : [];
     },
     followings() {
@@ -214,6 +204,12 @@ export default defineComponent({
     currentFriendship() {
       return this.currentUser.friendshipsSent?.find(friendship => friendship.receiverId === this.userId) ||
         this.currentUser.friendshipsReceived?.find(friendship => friendship.requesterId === this.userId);
+    },
+    isOnlyFollower() {
+      return !this.followers.find(user => user.id === this.currentUser.id) && this.followings.find(user => user.id === this.currentUser.id);
+    },
+    isOnlyFollowing() {
+      return this.followers.find(user => user.id === this.currentUser.id) && !this.followings.find(user => user.id === this.currentUser.id);
     }
   },
   methods: {
@@ -244,12 +240,12 @@ export default defineComponent({
     showUserProfile(user) {
       this.router.push({ name: 'UserProfile', params: { userId: user.id } });
     },
-    async toggleFriendship() {
+    async handleFriendshipAction() {
       if (this.isFriend) {
         await this.friendshipStore.deleteOneFriendship(this.currentFriendship.id);
         this.isFriend = false;
       } else {
-        await this.friendshipStore.createOneFriendship({ requesterId: this.currentUser.id, receiverId: this.user.id });
+        await this.friendshipStore.createOneFriendship({ requesterId: this.currentUser.id, receiverId: this.user.id, status: 'PENDING' });
         this.isPendingSentFriendship = true;
       }
     },
@@ -270,6 +266,10 @@ export default defineComponent({
 });
 </script>
 <style scoped>
+ion-grid {
+  padding: 0;
+}
+
 .sub-header {
   font-size: 0.9rem;
   color: gray;
@@ -291,16 +291,33 @@ custom-button {
   align-self: end;
 }
 
+ion-back-button {
+  --icon-font-size: 1rem;
+  min-width: 24px;
+  min-height: 24px;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
 ion-text h2 {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
 ion-text p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: gray;
+}
+
+@media (min-width: 768px) {
+  h2 {
+    font-size: 1.5rem;
+  }
+  p {
+    font-size: 1rem;
+  }
 }
 
 .stats ion-col {
@@ -321,4 +338,21 @@ ion-item {
   margin-bottom: 0.5rem;
 }
 
+ion-item:first-child {
+  --inner-padding-end: 0 !important;
+  margin-right: 1rem;
+}
+ion-grid {
+  margin-right: 1rem;
+  padding-bottom: 1rem;
+}
+.flex-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+ion-header {
+  background: var(--ion-color-primary);
+  padding: 0 1rem;
+}
 </style>

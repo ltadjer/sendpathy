@@ -183,14 +183,14 @@ ion-checkbox::part(mark) {
 }
 
 ion-button {
-    --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%) !important;
-    --background: #f5f5fa !important;
+    --background: var(--ion-color-primary) !important;
     --box-shadow: var(--neumorphism-out-shadow) !important;
     --border-radius: 1rem !important;
     background: transparent;
     border: none;
     --padding-top: 14px;
     --padding-bottom: 14px;
+    text-transform: none !important;
 }
 
 /* When hovered */

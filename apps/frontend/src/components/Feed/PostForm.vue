@@ -189,4 +189,9 @@ ion-item {
 .custom-textarea textarea {
   padding: 1rem;
 }
+
+.avatar-option {
+  width: 48px;
+  height: 48px;
+}
 </style>

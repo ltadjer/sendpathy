@@ -133,30 +133,45 @@ export const usePostStore = defineStore('post', {
     async addCommentToComment(parentCommentId: string, formData: any) {
       try {
         const response = await commentService.addCommentToComment(parentCommentId, formData);
-        this.posts.map(post => {
-          post.comments.map(comment => {
-            if (comment.id === parentCommentId) {
-              comment.replies.push(response.data);
-            }
-          });
-        })
+        this.posts.forEach(post => {
+          post.comments = this.addCommentRecursive(post.comments, parentCommentId, response.data);
+        });
       } catch (error) {
         console.error('Failed to add comment to comment:', error);
       }
     },
+
+    addCommentRecursive(comments: any[], parentCommentId: string, newComment: any): any[] {
+      return comments.map(comment => {
+        if (comment.id === parentCommentId) {
+          comment.replies.push(newComment);
+        } else if (comment.replies && comment.replies.length > 0) {
+          comment.replies = this.addCommentRecursive(comment.replies, parentCommentId, newComment);
+        }
+        return comment;
+      });
+    },
     async deleteCommentFromComment(parentCommentId: string, commentId: string) {
       try {
         await commentService.deleteCommentFromComment(parentCommentId, commentId);
-        this.posts.map(post => {
-          post.comments.map(comment => {
-            if (comment.id === parentCommentId) {
-              comment.replies = comment.replies.filter(reply => reply.id !== commentId);
-            }
-          });
+        this.posts.forEach(post => {
+          post.comments = this.removeCommentRecursive(post.comments, commentId);
         });
       } catch (error) {
         console.error('Failed to delete comment from comment:', error);
       }
+    },
+
+    removeCommentRecursive(comments: any[], commentId: string): any[] {
+      return comments.map(comment => {
+        if (comment.id === commentId) {
+          return null;
+        }
+        if (comment.replies && comment.replies.length > 0) {
+          comment.replies = this.removeCommentRecursive(comment.replies, commentId);
+        }
+        return comment;
+      }).filter(comment => comment !== null);
     },
 
     async likePost(postId: string) {

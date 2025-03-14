@@ -55,7 +55,7 @@
           <ion-col size="10">
             <ion-item lines="none" class="ion-no-shadow">
               <div class="avatar-container ion-no-margin">
-                <ion-avatar>
+                <ion-avatar class="avatar-option">
                   <img :src="currentUser.avatar" :alt="currentUser.username" class="avatar-option">
                 </ion-avatar>
               </div>
@@ -197,12 +197,20 @@ export default defineComponent({
 ion-grid {
   margin-top: 1rem !important;
 }
+
+.avatar-container {
+  margin-bottom: 0.5rem;
+}
+.avatar-option {
+  width: 48px;
+  height: 48px;
+}
 .custom-modal {
   --height: 75%;
   --border-radius: 1rem 1rem 0 0 !important;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 992px) {
   .custom-modal {
     --border-radius: 1rem !important;
   }
@@ -227,7 +235,6 @@ ion-footer ion-grid {
 
 .add-comment-fixed {
   box-shadow: var(--neumorphism-out-shadow);
-  padding: 10px;
 }
 
 div {

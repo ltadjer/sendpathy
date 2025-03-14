@@ -37,3 +37,35 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+.gradient-text {
+  background: none;
+  color: #555555;
+  font-weight: normal;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: inherit;
+  transition: background 0.3s ease, -webkit-text-fill-color 0.3s ease;
+}
+
+ion-button:hover .gradient-text,
+ion-button:active .gradient-text,
+ion-button:focus .gradient-text {
+  background: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
+  -webkit-background-clip: text;
+  color: transparent;
+  font-weight: bold;
+}
+
+/* Ajout de l'effet gradient pour le bouton actif dans le menu */
+ion-button.ion-shadow-in .gradient-text {
+  background: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+nav ion-button {
+  border-radius: 1rem;
+}
+</style>
