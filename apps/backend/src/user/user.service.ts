@@ -174,10 +174,16 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
+    console.log('updateUserDto', updateUserDto)
+    console.log('id', await this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+    }))
+    await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
+    return await this.findOne(id);
   }
 
   /**
@@ -295,13 +301,10 @@ export class UserService {
   }
 
   async validateAccessCode(userId: string, accessCode: string): Promise<boolean> {
-    console.log('ccessCode', accessCode);
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { accessCode: true },
     });
-
-    console.log('user -validate', user);
 
     if (!user || !(await bcrypt.compare(accessCode, user.accessCode))) {
       return false;

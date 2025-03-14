@@ -48,6 +48,9 @@
           <ion-input label="Pseudo" class="ion-input-spacing" v-model="username" placeholder="Pseudo"/>
         </ion-item>
         <ion-item lines="none" class="ion-no-shadow">
+          <ion-input label="Âge" class="ion-input-spacing" v-model="age" placeholder="Âge" type="number"/>
+        </ion-item>
+        <ion-item lines="none" class="ion-no-shadow">
           <ion-textarea
             label="Biographie"
             class="ion-input-spacing"
@@ -63,11 +66,13 @@
     </ion-content>
   </ion-modal>
 </template>
+
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonButton, IonIcon, IonContent, IonItem, IonLabel, IonInput, IonTextarea, IonList, IonGrid, IonRow, IonCol, IonAvatar } from '@ionic/vue';
 import { closeOutline } from 'ionicons/icons';
 import CustomButton from '@/components/Commun/CustomButton.vue';
+import { useAccountStore } from '@/stores/account';
 
 export default defineComponent({
   name: 'ProfileEditModal',
@@ -78,7 +83,7 @@ export default defineComponent({
       required: true
     },
     currentUser: {
-      type: Object as PropType<{ username: string; biography: string; avatar: string }>,
+      type: Object as PropType<{ username: string; biography: string; avatar: string; age: number }>,
       required: true
     }
   },
@@ -87,6 +92,7 @@ export default defineComponent({
       username: this.currentUser.username,
       biography: this.currentUser.biography,
       selectedAvatar: this.currentUser.avatar,
+      age: this.currentUser.age,
       avatars: []
     };
   },
@@ -97,8 +103,15 @@ export default defineComponent({
     closeModal() {
       this.$emit('close');
     },
-    saveChanges() {
-      this.$emit('save', { username: this.username, biography: this.biography, avatar: this.selectedAvatar });
+    async saveChanges() {
+      const updatedUser = {
+        username: this.username,
+        biography: this.biography,
+        avatar: this.selectedAvatar,
+        age: parseInt(this.age)
+      };
+      await useAccountStore().updateUser(updatedUser);
+      this.$emit('save', updatedUser);
       this.closeModal();
     },
     generateAvatars() {

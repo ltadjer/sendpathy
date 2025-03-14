@@ -1,5 +1,4 @@
 <template>
-    <ion-content>
       <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" :current-user="currentUser" />
       <ion-list class="ion-padding">
         <post-filter-button v-if="$route.fullPath.includes('feed')" class="ion-margin-bottom ion-text-end" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers"></post-filter-button>
@@ -77,7 +76,6 @@
         <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId" :current-user="currentUser"></post-comment-modal>
       </ion-list>
       <ToastMessage />
-    </ion-content>
 </template>
 
 <script lang="ts">

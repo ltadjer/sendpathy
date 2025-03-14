@@ -49,6 +49,29 @@ body {
     height: 95vh;
     flex-direction: column;
 }
+
+ion-alert .alert-wrapper {
+    border-radius: 1rem !important;
+}
+
+ion-alert .alert-radio-group{
+    border-top: 1px solid #FD7DFB10 !important;
+    border-bottom: 1px solid #FD7DFB10 !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+.alert-button {
+    box-shadow: var(--neumorphism-out-shadow);
+    border-radius: 1rem !important;
+    color: #333 !important;
+}
+
+ion-alert .alert-button:hover {
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
+/* TODO: Add more custom styles here for ion alert */
+
 ion-header,
 ion-footer {
     box-shadow:none !important;

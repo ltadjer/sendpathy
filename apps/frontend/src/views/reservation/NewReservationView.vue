@@ -95,3 +95,19 @@ export default defineComponent({
   }
 });
 </script>
+<style scoped>
+
+@media (min-width: 1024px) {
+  .ion-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  ion-content {
+    width: 60%;
+  }
+
+}
+
+
+</style>

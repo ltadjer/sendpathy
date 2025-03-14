@@ -28,7 +28,9 @@
       @access-code-set="fetchLifeMoments"
       @access-code-validated="fetchLifeMoments">
     </access-code-modal>
-    <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" :current-user="currentUser" />
+    <ion-content>
+      <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" :current-user="currentUser" />
+    </ion-content>
   </ion-page>
 </template>
 
@@ -38,7 +40,7 @@ import LifeMomentList from '@/components/LifeMoment/LifeMomentList.vue';
 import AccessCodeModal from '@/components/LifeMoment/AccessCodeModal.vue';
 import { useLifeMomentStore } from '@/stores/life-moment';
 import { useAccountStore } from '@/stores/account';
-import { IonPage,IonAvatar, IonHeader, IonToolbar, IonItem, IonTitle, IonButtons, IonButton, } from '@ionic/vue';
+import { IonPage,IonAvatar, IonHeader, IonToolbar, IonItem, IonTitle, IonButtons, IonButton, IonContent } from '@ionic/vue';
 
 export default defineComponent({
   name: 'LifeMomentView',
@@ -46,6 +48,7 @@ export default defineComponent({
     IonAvatar, IonHeader, IonToolbar, IonItem, IonTitle, IonButtons, IonButton,
     AccessCodeModal,
     LifeMomentList,
+    IonContent,
     IonPage
   },
   data() {
@@ -90,3 +93,15 @@ export default defineComponent({
   }
 });
 </script>
+<style scoped>
+@media (min-width: 1024px) {
+  ion-router-outlet .ion-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  ion-content {
+    width: 90%
+  }
+}
+</style>

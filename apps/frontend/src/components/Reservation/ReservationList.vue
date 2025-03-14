@@ -18,59 +18,63 @@
   </ion-header>
 
   <ion-content>
-      <ion-segment v-model="selectedSegment" class="ion-padding">
-        <ion-segment-button value="upcoming" :class="{'ion-shadow-in': selectedSegment === 'upcoming'}">
-          <ion-label><span :class="{'gradient-text': selectedSegment === 'upcoming'}">A venir</span></ion-label>
-        </ion-segment-button>
-        <ion-segment-button value="past" :class="{'ion-shadow-in': selectedSegment === 'past'}">
-          <ion-label><span :class="{'gradient-text': selectedSegment === 'past'}">Passées</span></ion-label>
-        </ion-segment-button>
-      </ion-segment>
+    <ion-segment v-model="selectedSegment" class="ion-padding">
+      <ion-segment-button value="upcoming" :class="{'ion-shadow-in': selectedSegment === 'upcoming'}">
+        <ion-label><span :class="{'gradient-text': selectedSegment === 'upcoming'}">A venir</span></ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="past" :class="{'ion-shadow-in': selectedSegment === 'past'}">
+        <ion-label><span :class="{'gradient-text': selectedSegment === 'past'}">Passées</span></ion-label>
+      </ion-segment-button>
+    </ion-segment>
 
-    <ion-list class="ion-padding-start ion-padding-end">
-      <ion-card v-for="reservation in filteredReservations" :key="reservation.id" class="reservation-card">
-        <ion-card-header>
-          <ion-card-title> Dr {{ getTherapistName(reservation.slot.therapistId) }}
-            <ion-icon class="custom-icon" :icon="enterOutline">
-              <a v-if="reservation.videoCallLink" :href="reservation.videoCallLink" target="_blank">Rejoindre la visioconférence</a>
-            </ion-icon></ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <ion-grid>
-            <ion-row class="ion-padding-start ion-padding-end">
-              <ion-col size="6">
-                <ion-card-subtitle>Service</ion-card-subtitle>
-                <ion-card-title>Psychologue</ion-card-title>
-              </ion-col>
-            </ion-row>
-            <ion-row class="ion-padding-start ion-padding-end">
-              <ion-col size="6">
-                <ion-card-subtitle>Date</ion-card-subtitle>
-                <ion-card-title>{{ formatDate(reservation.slot.startTime) }}</ion-card-title>
-              </ion-col>
-              <ion-col size="6">
-                <ion-card-subtitle>Heure</ion-card-subtitle>
-                <ion-card-title>{{ formatTime(reservation.slot.startTime) }} - {{ formatTime(reservation.slot.endTime) }}</ion-card-title>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-          <ion-grid>
-            <ion-row>
-              <ion-col size="6">
-                <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="updateReservation(reservation.id)">
-                  <span class="gradient-text">Déplacer le RDV</span>
-                </ion-button>
-              </ion-col>
-              <ion-col size="6">
-                <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="deleteOneReservation(reservation.id)">
-                  <span class="gradient-text">Annuler le RDV</span>
-                </ion-button>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        </ion-card-content>
-      </ion-card>
-    </ion-list>
+    <ion-grid class="ion-padding-start ion-padding-end">
+      <ion-row>
+        <ion-col size="12" size-md="6" v-for="reservation in filteredReservations" :key="reservation.id">
+          <ion-card class="reservation-card">
+            <ion-card-header>
+              <ion-card-title> Dr {{ getTherapistName(reservation.slot.therapistId) }}
+                <ion-icon class="custom-icon" :icon="enterOutline">
+                  <a v-if="reservation.videoCallLink" :href="reservation.videoCallLink" target="_blank"></a>
+                </ion-icon></ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-grid>
+                <ion-row class="ion-padding-start ion-padding-end">
+                  <ion-col size="6">
+                    <ion-card-subtitle>Service</ion-card-subtitle>
+                    <ion-card-title>Psychologue</ion-card-title>
+                  </ion-col>
+                </ion-row>
+                <ion-row class="ion-padding-start ion-padding-end">
+                  <ion-col size="6">
+                    <ion-card-subtitle>Date</ion-card-subtitle>
+                    <ion-card-title>{{ formatDate(reservation.slot.startTime) }}</ion-card-title>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-card-subtitle>Heure</ion-card-subtitle>
+                    <ion-card-title>{{ formatTime(reservation.slot.startTime) }} - {{ formatTime(reservation.slot.endTime) }}</ion-card-title>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+              <ion-grid>
+                <ion-row>
+                  <ion-col size="6">
+                    <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="updateReservation(reservation.id)">
+                      <span class="gradient-text">Déplacer le RDV</span>
+                    </ion-button>
+                  </ion-col>
+                  <ion-col size="6">
+                    <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="deleteOneReservation(reservation.id)">
+                      <span class="gradient-text">Annuler le RDV</span>
+                    </ion-button>
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ion-content>
 </template>
 <script lang="ts">
@@ -153,8 +157,7 @@ ion-card-title {
   --color: #333 !important;
 }
 
-ion-card-content,
-ion-grid {
+ion-card-content {
   padding: 0;
 }
 ion-row ion-card-title {

@@ -17,7 +17,9 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-    <post-list :posts="posts" :current-user="currentUser"/>
+    <ion-content>
+      <post-list :posts="posts" :current-user="currentUser"/>
+    </ion-content>
   </ion-page>
 </template>
 
@@ -26,7 +28,7 @@ import { defineComponent, ref } from 'vue';
 import PostList from '@/components/Feed/PostList.vue';
 import { usePostStore } from '@/stores/post';
 import { useAccountStore } from '@/stores/account';
-import { IonPage, IonAvatar, IonHeader, IonToolbar, IonItem, IonTitle, IonButtons, IonButton, IonModal } from '@ionic/vue';
+import { IonPage, IonAvatar, IonHeader, IonToolbar, IonItem, IonTitle, IonButtons, IonButton, IonModal, IonContent } from '@ionic/vue';
 import ProfileView from '@/views/ProfileView.vue';
 
 export default defineComponent({
@@ -36,6 +38,7 @@ export default defineComponent({
     PostList,
     IonPage,
     IonModal,
+    IonContent,
     ProfileView
   },
   data() {
@@ -62,7 +65,7 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   ion-router-outlet .ion-page {
     display: flex;
     justify-content: center;

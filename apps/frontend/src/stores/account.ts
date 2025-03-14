@@ -108,9 +108,9 @@ export const useAccountStore = defineStore('account', {
         if (response) {
           if (response.status === 200 || response.status === 201) {
             toastStore.showToast('Email de réinitialisation de mot de passe envoyé. Veuillez vérifier votre email.', 'primary');
-          } else if(response.data.status === 404) {
+          } else if (response.data.status === 404) {
             toastStore.showToast('Aucun utilisateur trouvé avec cet email.', 'danger');
-          } else if(response.data.status === 400) {
+          } else if (response.data.status === 400) {
             toastStore.showToast('Échec de la demande de réinitialisation de mot de passe.', 'danger');
           }
         }
@@ -145,6 +145,26 @@ export const useAccountStore = defineStore('account', {
       } catch (error) {
         console.error('Failed to fetch user data:', error);
       }
+    },
+
+    async refreshCurrentUser() {
+      try {
+        this.user = await AuthService.findOneById(this.user.id);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    },
+
+    async updateUser(updatedUser) {
+      const toastStore = useToastStore();
+      try {
+        this.user = await AuthService.updateUser(this.user.id, updatedUser);
+        console.log('User updated:', this.user);
+        toastStore.showToast('Profil mis à jour avec succès', 'primary');
+      } catch (error) {
+        toastStore.showToast('Échec de la mise à jour du profil', 'danger');
+        console.error('Failed to update user:', error);
+      }
     }
-  },
+  }
 });

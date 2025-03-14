@@ -77,7 +77,7 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Return the user.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+    return await this.userService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -85,7 +85,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get a user by email' })
   @ApiResponse({ status: 200, description: 'Return the user.' })
   async findOneByEmail(@Param('email') email: string) {
-    return this.userService.findOneByEmail(email);
+    return await this.userService.findOneByEmail(email);
   }
 
   @Post()
@@ -96,7 +96,7 @@ export class UserController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    return await this.userService.create(createUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -108,7 +108,7 @@ export class UserController {
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+    return await this.userService.update(id, updateUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -120,7 +120,7 @@ export class UserController {
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async delete(@Param('id') id: string) {
-    return this.userService.delete(id);
+    return await this.userService.delete(id);
   }
 
 }

@@ -120,6 +120,15 @@ export default  {
     } catch (error) {
       throw error;
     }
+  },
+
+  async updateUser(userId: string, updatedUser: any) {
+    try {
+      const response = await api.patch(`/users/${userId}`, updatedUser);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

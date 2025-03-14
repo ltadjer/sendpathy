@@ -19,7 +19,7 @@ import * as cookieParser from 'cookie-parser';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '15m' },
+      signOptions: { expiresIn: '1d' },
     }),
     PrismaModule,
     UserModule,

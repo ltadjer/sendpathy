@@ -60,6 +60,7 @@ export class FriendshipService {
         const friendship = await this.prisma.friendship.findUnique({
             where: { id },
         });
+        console.log(friendship);
 
         if (!friendship) {
             throw new NotFoundException('Friendship not found.');

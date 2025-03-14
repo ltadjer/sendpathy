@@ -195,11 +195,10 @@ export default defineComponent({
           password: this.password,
           nativeLanguage: this.nativeLanguage,
           age: age,
-          avatar: this.selectedAvatar, // Utilisation de l'avatar sélectionné
+          avatar: this.selectedAvatar,
         };
 
-        const response = await useAccountStore().register(user);
-        console.log('Inscription réussie :', response);
+        await useAccountStore().register(user);
       } catch (error) {
         console.error("Échec de l'inscription :", error);
       }

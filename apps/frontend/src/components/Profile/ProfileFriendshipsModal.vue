@@ -27,7 +27,7 @@
             </ion-avatar>
           </div>
           <ion-label>{{ user.username }}</ion-label>
-          <ion-icon class="custom-icon" :icon="trashOutline" slot="end" @click.stop="removeUser(user.id)" />
+          <ion-icon v-if="isCurrentUser" class="custom-icon" :icon="trashOutline" slot="end" @click.stop="removeUser(user.id)" />
         </ion-item>
       </ion-list>
     </ion-content>
@@ -58,6 +58,10 @@ export default defineComponent({
     },
     initialSegment: {
       type: String as PropType<'followers' | 'followings'>,
+      required: true
+    },
+    isCurrentUser: {
+      type: Boolean,
       required: true
     }
   },
@@ -97,3 +101,10 @@ export default defineComponent({
   }
 });
 </script>
+<style scoped>
+ion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+</style>

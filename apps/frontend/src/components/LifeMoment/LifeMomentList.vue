@@ -1,5 +1,4 @@
 <template>
-    <ion-content>
       <life-moment-form-modal v-if="isLifeMomentFormModalOpen" :lifeMoment="selectedLifeMoment" @close="closeLifeMomentFormModal" />
       <ion-list class="ion-padding">
         <ion-item class="ion-margin-bottom" lines="none" v-for="lifeMoment in lifeMoments" :key="lifeMoment.id" @click="editLifeMoment(lifeMoment)">
@@ -46,7 +45,6 @@
           </ion-grid>
         </ion-item>
       </ion-list>
-    </ion-content>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -148,6 +146,12 @@ export default defineComponent({
 .media-content img {
   border-radius: 1rem;
   box-shadow: var(--neumorphism-out-shadow);
+}
+
+@media (min-width: 768px) {
+  .media-content {
+    max-width: 350px;
+  }
 }
 .overlay-more {
   display: flex;
