@@ -39,18 +39,19 @@ model User {
   receivedMessages Message[]      @relation("ReceivedMessages")
 
   // Relation to the friendships the user has sent
-  friendshipsSent     Friendship[]    @relation("friendshipsSent")
+  friendshipsSent       Friendship[]    @relation("friendshipsSent")
   // Relation to the friendships the user has received
-  friendshipsReceived Friendship[]    @relation("friendshipsReceived")
-  likes               Like[] // Relation to the likes made by the user
-  comments            Comment[] // Relation to the comments made by the user
-  tags                Tag[]           @relation("UserTags")
-  triggers            Trigger[]       @relation("UserTriggers")
-  reservations        Reservation[] // Relation to the reservations made by the user
-  reports             Report[] // Relation to the reports made by the user
-  notifications       Notification[] // Relation to the notifications sent to the user
-  lifeMoments         LifeMoment[] // Relation to the life moments created by the user
-  availableSlots      AvailableSlot[] @relation("UserAvailableSlots") // Add this line
+  friendshipsReceived   Friendship[]    @relation("friendshipsReceived")
+  likes                 Like[] // Relation to the likes made by the user
+  comments              Comment[] // Relation to the comments made by the user
+  tags                  Tag[]           @relation("UserTags")
+  triggers              Trigger[]       @relation("UserTriggers")
+  reservations          Reservation[] // Relation to the reservations made by the user
+  reports               Report[] // Relation to the reports made by the user
+  notificationsReceived Notification[]  @relation("Receiver")
+  notificationsSent     Notification[]  @relation("Sender")
+  lifeMoments           LifeMoment[] // Relation to the life moments created by the user
+  availableSlots        AvailableSlot[] @relation("UserAvailableSlots") // Add this line
 
   accessCode String?
   createdAt  DateTime  @default(now())
@@ -289,15 +290,18 @@ model Report {
 }
 
 model Notification {
-  id        String           @id @default(cuid())
-  userId    String
-  type      NotificationType
-  message   String
+  id         String           @id @default(cuid())
+  receiverId String
+  senderId   String
+  type       NotificationType
+  message    String
   // Relation to the user who receives the notification
-  user      User             @relation(fields: [userId], references: [id])
-  isRead    Boolean          @default(false)
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @default(now())
+  receiver   User             @relation("Receiver", fields: [receiverId], references: [id])
+  // Relation to the user who sends the notification
+  sender     User             @relation("Sender", fields: [senderId], references: [id])
+  isRead     Boolean          @default(false)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @default(now())
 }
 
 enum NotificationType {

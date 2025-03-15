@@ -45,14 +45,26 @@ export class ConversationService {
         }
 
         // Create the conversation
-        return this.prisma.conversation.create({
+        const conversation = await this.prisma.conversation.create({
             data: {
                 users: {
                     connect: createConversationDto.userIds.map(id => ({ id })),
                 },
                 conversationType: createConversationDto.conversationType,
             },
+            include: { users: true, messages: { orderBy: { createdAt: 'desc' }, take: 1 } },
         });
+
+        const receiver = conversation.users.find(user => user.id !== createConversationDto.userIds[0]);
+        return {
+            id: conversation.id,
+            conversationType: conversation.conversationType,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            deletedAt: conversation.deletedAt,
+            user: receiver ? { id: receiver.id, username: receiver.username, avatar: receiver.avatar } : null,
+            lastMessage: conversation.messages[0] || null,
+        };
     }
 
 
@@ -83,7 +95,7 @@ export class ConversationService {
     async findOne(id: string, userId: string) {
         const conversation = await this.prisma.conversation.findUnique({
             where: { id },
-            include: { users: true, messages: true },
+            include: { users: true, messages: { orderBy: { createdAt: 'desc' }, take: 1 } },
         });
 
         if (!conversation || !conversation.users.some(user => user.id === userId)) {
@@ -92,8 +104,13 @@ export class ConversationService {
 
         const receiver = conversation.users.find(user => user.id !== userId);
         return {
-            ...conversation,
-            name: receiver ? receiver.username : 'Unknown',
+            id: conversation.id,
+            conversationType: conversation.conversationType,
+            createdAt: conversation.createdAt,
+            updatedAt: conversation.updatedAt,
+            deletedAt: conversation.deletedAt,
+            user: receiver ? { id: receiver.id, username: receiver.username, avatar: receiver.avatar } : null,
+            lastMessage: conversation.messages[0] || null,
         };
     }
 

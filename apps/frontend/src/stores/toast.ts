@@ -11,7 +11,6 @@ export const useToastStore = defineStore('toast', {
       this.message = message;
       this.color = color;
       this.isOpen = true;
-      console.log('Toast:', message);
     },
     hideToast() {
       this.isOpen = false;

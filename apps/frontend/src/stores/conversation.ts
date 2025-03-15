@@ -13,10 +13,18 @@ export const useConversationStore = defineStore('conversation', {
         console.error('Failed to fetch conversations:', error);
       }
     },
+    async fetchOneConversation(id: string) {
+      try {
+        return await conversationService.fetchOneConversation(id);
+      } catch (error) {
+        console.error('Failed to fetch conversation:', error);
+      }
+    },
     async createOneConversation(conversation: any) {
       try {
         const newConversation = await conversationService.createOneConversation(conversation);
         this.conversations.push(newConversation);
+        return newConversation;
       } catch (error) {
         console.error('Failed to add conversation:', error);
       }
@@ -27,6 +35,22 @@ export const useConversationStore = defineStore('conversation', {
         this.conversations = this.conversations.filter((c) => c.id !== id);
       } catch (error) {
         console.error('Failed to delete conversation:', error);
+      }
+    },
+
+    async markMessagesAsRead(conversationId: string) {
+      try {
+        await conversationService.markMessagesAsRead(conversationId);
+      } catch (error) {
+        console.error('Failed to mark messages as read:', error);
+      }
+    },
+
+    async fetchAllMessages(conversationId: string, page: number, limit: number) {
+      try {
+        return await conversationService.fetchAllMessages(conversationId, page, limit);
+      } catch (error) {
+        console.error('Failed to fetch messages:', error);
       }
     },
   },

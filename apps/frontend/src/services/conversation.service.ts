@@ -7,6 +7,10 @@ export default {
         const response = await api.get('/conversations');
         return response.data;
     },
+    async fetchOneConversation(conversationId: string) {
+        const response = await api.get(`/conversations/${conversationId}`);
+        return response.data;
+    },
     async createOneConversation(conversation: any) {
         const response = await api.post('/conversations', conversation);
         return response.data;
@@ -16,13 +20,17 @@ export default {
         return response.data;
     },
 
+    async markMessagesAsRead(conversationId) {
+        return await api.patch(`/conversations/${conversationId}/mark-read`);
+    },
+
     /**
      * Fetch messages for a specific conversation.
      * @param conversationId - The ID of the conversation.
      * @param page - The page number.
      * @param limit - The number of messages per page.
      */
-    async fetchMessages(conversationId, page, limit) {
+    async fetchAllMessages(conversationId, page, limit) {
         const response = await api.get(`/conversations/${conversationId}/messages`, {
             params: { page, limit }
         });

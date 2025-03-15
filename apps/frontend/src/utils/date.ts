@@ -19,10 +19,10 @@ export function timeSince(date: string): string {
   const days = Math.floor(diffInSeconds / 86400);
 
   if (days > 0) {
-    return ` ${days} j`;
-  } else if (hours > 0) {
-    return `${hours} h`;
+    return createdAt.toLocaleDateString('fr-FR', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  } else if (hours > 0 || minutes > 0) {
+    return createdAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   } else {
-    return `${minutes} min`;
+    return 'À l\'instant';
   }
 }

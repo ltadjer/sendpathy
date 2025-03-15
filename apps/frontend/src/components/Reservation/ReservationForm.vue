@@ -41,7 +41,7 @@
 
     <ion-alert
       :is-open="isAlertOpen"
-      header="Sélectionnez un psychologue"
+      header="Choisir un psychologue"
       :buttons="alertButtons"
       :inputs="alertInputs"
       cssClass="custom-alert"
@@ -86,7 +86,7 @@ export default defineComponent({
         {
           text: 'Annuler',
           role: 'cancel',
-          cssClass: 'alert-button'
+          cssClass: 'alert-button',
         },
         {
           text: 'OK',

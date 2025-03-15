@@ -6,10 +6,16 @@ export const useFriendshipStore = defineStore('friendship', {
     friendships: [] as Array<any>,
   }),
   actions: {
+    async fetchAllFriendships() {
+      try {
+        this.friendships = await friendshipService.fetchAllFriendships();
+      } catch (error) {
+        console.error('Failed to fetch friendships:', error);
+      }
+    },
     async createOneFriendship(friendship: any) {
       try {
         const newFriendship = await friendshipService.createOneFriendship(friendship);
-        console.log('newFriendship:', newFriendship);
         this.friendships.push(newFriendship);
       } catch (error) {
         console.error('Failed to add friendship:', error);

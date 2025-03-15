@@ -66,7 +66,6 @@ export default  {
    * @returns les nouvelles données de l'utilisateur comme réponse API
    */
   async resetPassword(token: string, newPassword: string) {
-    console.log('resetPassword', token, newPassword);
       return await api.post('/auth/reset-password', {
         token: token,
         newPassword: newPassword
@@ -76,7 +75,6 @@ export default  {
   async updateAccessCode(accessCode: string) {
     try {
       const response = await api.patch(`/users/access-code`, { accessCode: accessCode });
-      console.log('updateAccessCode', response);
       return response.data;
     } catch (error) {
       throw error;
@@ -86,7 +84,6 @@ export default  {
   async validateAccessCode(accessCode: string) {
     try {
       const response = await api.post(`/users/validate-access-code`, { accessCode: accessCode });
-      console.log('validateAccessCode', response);
       return response.data;
     } catch (error) {
       throw error;
@@ -96,7 +93,6 @@ export default  {
   async setAccessCode(accessCode: string) {
     try {
       const response = await api.post(`/users/access-code`, { accessCode: accessCode });
-      console.log('setAccessCode', response);
       return response.data;
     } catch (error) {
       throw error;
@@ -108,14 +104,12 @@ export default  {
    */
   async fetchAllTherapists() {
     const response = await api.get('/users/therapists');
-    console.log('fetchAllTherapists', response);
     return response.data;
   },
 
   async findOneById(id: string) {
     try {
       const response = await api.get(`/users/${id}`);
-      console.log('findOneById', response);
       return response.data;
     } catch (error) {
       throw error;

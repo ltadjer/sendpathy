@@ -13,6 +13,7 @@ import NewReservationView from '@/views/reservation/NewReservationView.vue';
 import ReservationSummaryView from '@/views/reservation/ReservationSummaryView.vue';
 import { useAccountStore } from '@/stores/account';
 import ProfileView from '@/views/ProfileView.vue';
+import NotificationView from '@/views/NotificationView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -28,7 +29,11 @@ const routes: Array<RouteRecordRaw> = [
       { path: '/journal', component: LifeMomentView },
       { path: '/reservations', name: 'ReservationList', component: ReservationView },
       { path: '/reservations/summary', component: ReservationSummaryView },
-      { path: '/profil', component: ProfileView},
+      {
+        path: '/notifications',
+        name: 'Notifications',
+        component: NotificationView,
+      },
       {
         path: '/user/:userId',
         name: 'UserProfile',
@@ -44,7 +49,7 @@ const routes: Array<RouteRecordRaw> = [
     ],
     meta: { requiresAuth: true }
   },
-  { path: '/conversations/:id', component: MessageView, meta: { requiresAuth: true }},
+  { path: '/conversations/:conversationId', name: 'ConversationList', component: MessageView, props: true, meta: { requiresAuth: true }},
 
   { path: '/connexion', component: LoginView, meta: { requiresGuest: true } },
   { path: '/inscription', component: RegisterView, meta: { requiresGuest: true } },

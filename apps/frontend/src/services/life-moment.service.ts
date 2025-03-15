@@ -28,7 +28,6 @@ export default {
    */
 
   async createOneLifeMoment(lifeMomentData) {
-    console.log('lifeMomentData', lifeMomentData);
     const response = await api.post('/life-moments', lifeMomentData);
     return response.data;
   },

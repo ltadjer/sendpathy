@@ -75,13 +75,10 @@ export default defineComponent({
         return;
       }
       const accessCode = useAccountStore().user?.accessCode;
-      console.log('access_code', accessCode);
       if (!accessCode) {
-        console.log('No access code');
         this.isAccessCodeModalOpen = true;
         this.hasAccessCode = false;
       } else {
-        console.log('Access code found');
         this.isAccessCodeModalOpen = true;
         this.hasAccessCode = true;
         await this.fetchLifeMoments();

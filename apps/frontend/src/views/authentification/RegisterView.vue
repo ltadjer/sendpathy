@@ -179,7 +179,6 @@ export default defineComponent({
     // Sélectionner un avatar
     selectAvatar(avatar) {
       this.selectedAvatar = avatar;
-      console.log('Avatar sélectionné :', this.selectedAvatar );
     },
     async register() {
       try {

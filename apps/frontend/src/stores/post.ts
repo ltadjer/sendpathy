@@ -29,7 +29,6 @@ export const usePostStore = defineStore('post', {
       const toastStore = useToastStore();
       try {
         const response = await PostService.createOnePost(post);
-        console.log('createOnePost', response);
         if(response && response.status === 201) {
           this.posts.push(response.data);
           toastStore.showToast('Post créé avec succès', 'primary');
@@ -49,7 +48,6 @@ export const usePostStore = defineStore('post', {
         if(response && response.status === 200) {
           const index = this.posts.findIndex((l) => l.id === id);
           this.posts[index] = response.data;
-          console.log('updateOnePost', response);
           toastStore.showToast('Post mis à jour avec succès', 'primary');
         } else {
           toastStore.showToast('Échec de la mise à jour du post', 'danger');
@@ -104,9 +102,7 @@ export const usePostStore = defineStore('post', {
     },
     async addCommentToPost(postId: string, formData: any) {
       try {
-        console.log('formData:', formData);
         const response = await commentService.addCommentToPost(postId, formData);
-        console.log(response.data);
         this.posts = this.posts.map(post => {
           if (post.id === postId) {
             post.comments.push(response.data);

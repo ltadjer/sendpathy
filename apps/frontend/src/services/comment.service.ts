@@ -9,7 +9,6 @@ export default {
     * @param {object} formData The data for the new comment.
    */
   async addCommentToPost(postId, formData) {
-    console.log('formData', formData);
     return api.post(`/comments/post/${postId}`, formData);
   },
 

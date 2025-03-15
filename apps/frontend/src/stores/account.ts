@@ -31,7 +31,6 @@ export const useAccountStore = defineStore('account', {
       const toastStore = useToastStore();
       try {
         const response = await AuthService.login(user);
-        console.log('Login response:', response);
         this.isAuthenticated = true;
         this.user = response.data;
         if (response) {
@@ -51,7 +50,6 @@ export const useAccountStore = defineStore('account', {
       try {
         const response = await AuthService.checkAuth();
         this.user = response.data;
-        console.log('User data:', response.data);
         this.isAuthenticated = true;
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -71,7 +69,6 @@ export const useAccountStore = defineStore('account', {
     async refreshToken() {
       try {
         const response = await AuthService.refreshToken();
-        console.log('Token refreshed:', response);
       } catch (error) {
         console.error('Failed to refresh token:', error);
         await this.logout();
@@ -80,7 +77,6 @@ export const useAccountStore = defineStore('account', {
 
     async validateAccessCode(code: string) {
       try {
-        console.log('Validating access code:', code);
         const response = await AuthService.validateAccessCode(code);
         this.user.accessCode = response;
         return response;
@@ -93,7 +89,6 @@ export const useAccountStore = defineStore('account', {
       try {
         const response = await AuthService.setAccessCode(code);
         this.user.accessCode = response;
-        console.log('Access code set:', response);
         return response;
       } catch (error) {
         console.error('Failed to set access code:', error);
@@ -104,7 +99,6 @@ export const useAccountStore = defineStore('account', {
       const toastStore = useToastStore();
       try {
         const response = await AuthService.requestPasswordReset(email);
-        console.log('Password reset request:', response);
         if (response) {
           if (response.status === 200 || response.status === 201) {
             toastStore.showToast('Email de réinitialisation de mot de passe envoyé. Veuillez vérifier votre email.', 'primary');
@@ -130,7 +124,6 @@ export const useAccountStore = defineStore('account', {
             toastStore.showToast('Échec de la réinitialisation du mot de passe.', 'danger');
           }
         }
-        console.log('Password reset:', response);
       } catch (error) {
         toastStore.showToast('Une erreur est survenue, veuillez réessayez.', 'danger');
         console.error('Failed to reset password:', error);
@@ -159,7 +152,6 @@ export const useAccountStore = defineStore('account', {
       const toastStore = useToastStore();
       try {
         this.user = await AuthService.updateUser(this.user.id, updatedUser);
-        console.log('User updated:', this.user);
         toastStore.showToast('Profil mis à jour avec succès', 'primary');
       } catch (error) {
         toastStore.showToast('Échec de la mise à jour du profil', 'danger');

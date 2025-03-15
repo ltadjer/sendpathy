@@ -63,7 +63,6 @@ export default defineComponent({
     IonInputPasswordToggle
   },
   created() {
-    console.log('LoginView created');
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('message')) {
       this.message = urlParams.get('message') === 'email_confirmed' ? 'Votre compte a bien été confirmé.' : '';

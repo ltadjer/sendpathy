@@ -30,6 +30,7 @@ import ConversationList from '@/components/Message/ConversationList.vue';
 import { IonPage, IonButton, IonButtons, IonTitle, IonSearchbar, IonToolbar, IonItem, IonHeader, IonAvatar } from '@ionic/vue';
 import { useAccountStore } from '@/stores/account'
 import conversationService from '@/services/conversation.service'
+import { useConversationStore } from '@/stores/conversation'
 
 export default defineComponent({
   name: 'ConversationView',
@@ -38,29 +39,21 @@ export default defineComponent({
     ConversationList,
     IonPage
   },
-  data() {
-    return {
-      conversations: [],
-    };
-  },
   computed: {
     conversations() {
-      return [];
+      return useConversationStore().conversations;
     },
     currentUser() {
       return useAccountStore().user;
     },
   },
   methods: {
-    async fetchAllConversations() {
-      this.conversations = await conversationService.fetchAllConversations();
-    },
     showUserProfile(user) {
       this.$router.push({ name: 'UserProfile', params: { userId: user.id } });
     },
   },
   async created() {
-    await this.fetchAllConversations();
+    await useConversationStore().fetchAllConversations();
   },
 });
 </script>

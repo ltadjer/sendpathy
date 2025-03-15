@@ -70,7 +70,31 @@ ion-alert .alert-button:hover {
     box-shadow: var(--neumorphism-in-shadow);
 }
 
-/* TODO: Add more custom styles here for ion alert */
+.alert-button .alert-button-inner:hover,
+.alert-button .alert-button-inner:active {
+    background: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-weight: bold;
+}
+
+ion-alert .alert-radio-icon {
+    border-color: #FD7DFB20 !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+ion-alert .alert-radio-label {
+    color: #333 !important;
+}
+
+[aria-checked=true].sc-ion-alert-md .alert-radio-inner.sc-ion-alert-md {
+    box-shadow: var(--neumorphism-out-shadow) !important;
+    width: 12px;
+    height: 12px;
+    background:  linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 42%) !important;
+}
+
+
 
 ion-header,
 ion-footer {
@@ -257,7 +281,10 @@ ion-icon {
     color: #FD7DFB;
 }
 
-.gradient-text {
+.gradient-text,
+ion-item-option:hover .item-option-text,
+ion-item-option:active .item-option-text,
+ion-item-option:focus .item-option-text {
     background: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
     -webkit-background-clip: text;
     color: transparent;
@@ -331,6 +358,13 @@ ion-tab-bar {
     box-shadow: var(--neumorphism-out-shadow);
 }
 
+ion-back-button {
+    --icon-font-size: 1rem;
+    min-width: 24px;
+    min-height: 24px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
 
 .custom-icon:hover,
 .custom-icon:active {

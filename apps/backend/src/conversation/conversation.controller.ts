@@ -21,8 +21,13 @@ export class ConversationController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@User() user: any) {
-        console.log('this.conversationService.findAll(user.id);', this.conversationService.findAll(user.id))
         return await this.conversationService.findAll(user.id);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':id')
+    async findOne(@Param('id') id: string, @User() user: any) {
+        return await this.conversationService.findOne(id, user.id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -51,5 +56,11 @@ export class ConversationController {
     async delete(@Param('id') id: string, @User() user: any) {
         await this.conversationService.delete(id, user.id);
         return {message: "Conversation deleted"};
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(':conversationId/mark-read')
+    async markMessagesAsRead(@Param('conversationId') conversationId: string, @User() user: any) {
+        return await this.messageService.markMessagesAsRead(conversationId, user.id);
     }
 }

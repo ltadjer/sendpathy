@@ -47,7 +47,6 @@ export const useLifeMomentStore = defineStore('lifeMoment', {
     },
 
     async deleteOneContent(contentId: string) {
-      console.log('contentId', contentId);
       await lifeMomentService.deleteOneContent(contentId);
     }
   },

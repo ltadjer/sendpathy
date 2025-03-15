@@ -1,6 +1,10 @@
 import api from './api.service';
 
 export default {
+  async fetchAllFriendships() {
+    const response = await api.get('/friendships');
+    return response.data;
+  },
   async createOneFriendship(friendshipData) {
     return await api.post('/friendships', friendshipData);
   },

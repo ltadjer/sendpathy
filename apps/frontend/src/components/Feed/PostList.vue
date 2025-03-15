@@ -191,7 +191,6 @@ export default defineComponent({
       this.selectedTriggers = triggers;
     },
     showUserProfile(user) {
-      console.log('Show user profile:', user);
       this.$router.push({ name: 'UserProfile', params: { userId: user.id } });
     },
   },

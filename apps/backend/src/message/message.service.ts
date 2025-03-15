@@ -141,4 +141,17 @@ export class MessageService {
             data: { deletedBy: userId },
         });
     }
+
+    async markMessagesAsRead(conversationId: string, userId: string) {
+        return await this.prisma.message.updateMany({
+            where: {
+                conversationId: conversationId,
+                receiverId: userId,
+                read: false,
+            },
+            data: {
+                read: true,
+            },
+        });
+    }
 }

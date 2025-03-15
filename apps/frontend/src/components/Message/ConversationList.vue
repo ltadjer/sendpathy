@@ -14,18 +14,18 @@
           </div>
           <ion-label>
             <h2>{{ conversation.user?.username }}</h2>
-            <p :class="{ 'last-message': true, 'unread': conversation.lastMessage?.read === false }">
+            <p :class="{ 'last-message': true, 'unread': conversation.lastMessage?.read === false && conversation.lastMessage?.senderId !== currentUser.id }">
               {{ conversation.lastMessage?.content }}
             </p>
           </ion-label>
           <ion-note slot="end" class="time">
             {{ timeSince(conversation.lastMessage?.createdAt) }}
           </ion-note>
-          <ion-badge v-if="conversation.lastMessage?.read === false" color="secondary" slot="end">1</ion-badge>
+          <ion-badge v-if="conversation.lastMessage?.read === false && conversation.lastMessage?.senderId !== currentUser.id" color="secondary" slot="end">1</ion-badge>
         </ion-item>
         <ion-item-options side="end">
-          <ion-item-option @click="deleteConversation(conversation.id)">
-            Supprimer
+          <ion-item-option @click="deleteOneConversation(conversation.id)">
+            <span class="item-option-text">Supprimer</span>
           </ion-item-option>
         </ion-item-options>
       </ion-item-sliding>
@@ -37,6 +37,7 @@
 import { defineComponent } from 'vue';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonAvatar, IonButtons, IonButton, IonLabel, IonNote, IonBadge, IonSearchbar, IonItemSliding, IonItemOptions, IonItemOption } from '@ionic/vue';
 import { timeSince } from '@/utils/date';
+import { useConversationStore } from '@/stores/conversation'
 
 export default defineComponent({
   name: 'ConversationList',
@@ -62,18 +63,21 @@ export default defineComponent({
   },
   computed: {
     filteredConversations() {
-      return this.conversations.filter(conversation =>
-        conversation.user?.username.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+      return this.conversations
+        .filter(conversation => conversation.user?.username.toLowerCase().includes(this.searchTerm.toLowerCase()))
+        .filter(conversation => conversation.lastMessage?.deletedBy !== this.currentUser.id);
     },
   },
   methods: {
-    selectConversation(conversation) {
+    async selectConversation(conversation) {
+      await this.markMessagesAsRead(conversation.id);
       this.$router.push(`/conversations/${conversation.id}`);
     },
-    deleteConversation(conversationId) {
-      // Logic to delete the conversation
-      console.log('Delete conversation:', conversationId);
+    async markMessagesAsRead(conversationId) {
+      await useConversationStore().markMessagesAsRead(conversationId);
+    },
+    async deleteOneConversation(conversationId) {
+      await useConversationStore().deleteOneConversation(conversationId);
     },
     timeSince,
   },

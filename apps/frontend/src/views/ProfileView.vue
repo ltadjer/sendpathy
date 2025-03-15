@@ -60,7 +60,8 @@
                 <custom-button text="Accepter la connexion" @click="acceptFriendship" v-if="!isCurrentUser && isPendingFriendship" />
                 <custom-button text="Ignorer la connexion" @click="declineFriendship" v-if="!isCurrentUser && isPendingFriendship" />
                 <custom-button text="Supprimer la demande" @click="removePendingRequest" v-if="!isCurrentUser && isPendingSentFriendship" />
-                <custom-button text="Rompre le lien" @click="removeFriendship" v-if="!isCurrentUser && (isOnlyFollower || isOnlyFollowing || isFriend) && !isPendingFriendship" />
+              <custom-button text="Écrire" @click="createOneConversation" v-if="canMessageUser" />
+              <custom-button text="Rompre le lien" @click="removeFriendship" v-if="!isCurrentUser && (isOnlyFollower || isOnlyFollowing || isFriend) && !isPendingFriendship" />
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -106,6 +107,7 @@ import ProfileFriendshipsModal from '@/components/Profile/ProfileFriendshipsModa
 import { useRouter, useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/account';
 import { useFriendshipStore } from '@/stores/friendship';
+import { useConversationStore } from '@/stores/conversation';
 
 export default defineComponent({
   name: 'ProfilePage',
@@ -162,6 +164,7 @@ export default defineComponent({
       this.user = this.currentUser;
     } else {
       this.user = await useAccountStore().findOneById(this.userId);
+      useConversationStore().fetchAllConversations();
     }
     this.isPendingFriendship = !!this.pendingFriendships.find(user => user.id === this.userId);
     this.isPendingSentFriendship = !!this.pendingSentFriendships.find(user => user.id === this.userId);
@@ -177,6 +180,9 @@ export default defineComponent({
     },
     lifeMoments() {
       return useLifeMomentStore().lifeMoments.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    },
+    conversations() {
+      return useConversationStore().conversations;
     },
     filteredPosts() {
       return this.posts.filter(post => post.userId === this.user?.id);
@@ -197,7 +203,6 @@ export default defineComponent({
       return this.currentUser ? this.currentUser.friendshipsReceived?.filter(friendship => friendship.status === 'PENDING').map(friendship => friendship.requester) : [];
     },
     pendingSentFriendships() {
-      console.log(this.currentUser);
       return this.currentUser ? this.currentUser.friendshipsSent?.filter(friendship => friendship.status === 'PENDING').map(friendship => friendship.receiver) : [];
     },
     currentFriendship() {
@@ -214,6 +219,9 @@ export default defineComponent({
     },
     isDesktop() {
       return window.innerWidth > 992;
+    },
+    canMessageUser() {
+      return this.isFriend || this.isOnlyFollower || this.isOnlyFollowing;
     },
   },
   methods: {
@@ -293,11 +301,25 @@ export default defineComponent({
       this.isFriend = false;
     },
     async removePendingRequest() {
-      console.log(this.currentFriendship);
       await useFriendshipStore().deleteOneFriendship(this.currentFriendship.id);
       this.isPendingSentFriendship = false;
+    },
+    async createOneConversation() {
+      const existingConversation = this.conversations.find(conversation =>
+        conversation.user && conversation.user.id === this.user.id
+      );
+
+      if (existingConversation) {
+        this.$router.push({ name: 'ConversationList', params: { conversationId: existingConversation.id } });
+      } else {
+        const conversation = await useConversationStore().createOneConversation({
+          userIds: [this.user.id, this.currentUser.id],
+          conversationType: 'PRIVATE'
+        });
+        this.$router.push({ name: 'ConversationList', params: { conversationId: conversation?.id } });
+      }
     }
-  }
+  },
 });
 </script>
 <style scoped>
@@ -324,14 +346,6 @@ ion-avatar {
 
 custom-button {
   align-self: end;
-}
-
-ion-back-button {
-  --icon-font-size: 1rem;
-  min-width: 24px;
-  min-height: 24px;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
 }
 
 ion-text h2 {
