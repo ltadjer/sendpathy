@@ -1,40 +1,299 @@
+@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:ital,wght@0,300..700;1,300..700&family=Quicksand:wght@300..700&display=swap');
+* {
+    font-family: "Inclusive Sans", serif;
+}
+
 body {
     --ion-background-color: #f5f5fa !important;
     --ion-text-color: #333 !important;
 }
 
-ion-header {
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #FD7DFB50 #f5f5fa;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f5f5fa;
+    border-radius: 1rem;
+    box-shadow: var(--neumorphism-out-shadow);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ion-color-primary);
+    border-radius: 1rem;
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ion-color-primary);
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
+::-webkit-scrollbar-horizontal {
+    height: 4px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    height: 95vh;
+    flex-direction: column;
+}
+
+ion-alert .alert-wrapper {
+    border-radius: 1rem !important;
+}
+
+ion-alert .alert-radio-group{
+    border-top: 1px solid #FD7DFB10 !important;
+    border-bottom: 1px solid #FD7DFB10 !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+.alert-button {
+    box-shadow: var(--neumorphism-out-shadow);
+    border-radius: 1rem !important;
+    color: #333 !important;
+}
+
+ion-alert .alert-button:hover {
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
+.alert-button .alert-button-inner:hover,
+.alert-button .alert-button-inner:active {
+    background: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
+    -webkit-background-clip: text;
+    color: transparent;
+    font-weight: bold;
+}
+
+ion-alert .alert-radio-icon {
+    border-color: #FD7DFB20 !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+ion-alert .alert-radio-label {
+    color: #333 !important;
+}
+
+[aria-checked=true].sc-ion-alert-md .alert-radio-inner.sc-ion-alert-md {
+    box-shadow: var(--neumorphism-out-shadow) !important;
+    width: 12px;
+    height: 12px;
+    background:  linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 42%) !important;
+}
+
+
+
+ion-header,
+ion-footer {
     box-shadow:none !important;
+}
+
+ion-searchbar {
+    --border-radius: 1rem !important;
+    --box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+.no-background {
+    --background: none !important;
 }
 
 ion-card,
 ion-item {
-    --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%) !important;
+    --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 42%) !important;
     --background: #f5f5fa !important;
-    box-shadow: var(--neumorphism-box-shadow) !important;
+    box-shadow: var(--neumorphism-out-shadow) !important;
     border-radius: 1rem !important;
 }
 
-ion-button {
-    --color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%) !important;
+
+ion-card, ion-item {
+    transition: transform 0.3s ease;
+}
+
+ion-card:hover,
+ion-item:hover {
+    transform: translateY(-5px);
+}
+
+ion-segment-button {
+    border-radius: 1rem;
+    color: #333;
+    box-shadow: var(--neumorphism-out-shadow);
+    width: auto;
+    margin: 0 1rem;
+    --indicator-height: 0;
+}
+
+ion-segment-button:hover {
+    box-shadow: var(--neumorphism-in-shadow);
+    color: #333;
+}
+
+ion-segment-button[aria-selected="true"] {
+    box-shadow: var(--neumorphism-in-shadow);
+}
+
+ion-select {
+    box-shadow: var(--neumorphism-out-shadow) !important;
+    border-radius: 1rem !important;
+    padding-left: 1rem;
+}
+
+ion-select::part(icon) {
+    font-size: 20px !important;
+    color: #9747ff !important;
+    margin-left: auto !important;
+}
+
+ion-fab-button, ion-popover {
+    --box-shadow: var(--neumorphism-out-shadow) !important;
+}
+
+ion-popover ion-item {
+    border-radius:  0 !important;
+    --background-activated: none;
+    --background-focused: none;
+    --background-hover: none;
+}
+
+ion-radio-group ion-item {
+    box-shadow: none !important;
     --background: #f5f5fa !important;
-    --box-shadow: var(--neumorphism-box-shadow) !important;
+    --color: #333 !important;
+    margin: 0.6rem 0;
+    transition: 0.3s ease;
+}
+
+ion-radio-group ion-item::part(native) {
+    padding: 0 !important;
+}
+
+ion-radio-group ion-item {
+    --inner-padding-start: 0 !important;
+    --inner-padding-end: 0 !important;
+}
+
+ion-radio-group ion-radio {
+    padding: 0 1rem;
+}
+ion-radio-group ion-radio:hover,
+ion-radio-group ion-radio[aria-checked="true"],
+ion-radio-group ion-radio:focus-within {
+    box-shadow: var(--neumorphism-in-shadow) !important;
+    color: var(--ion-color-secondary) !important;
+    font-weight: bold;
+}
+
+ion-popover {
+    --offset-y: 26px;
+    /*--width: 450px;*/
+}
+
+ion-select-popover {
     border-radius: 1rem !important;
 }
 
-ion-button {
-    background: transparent; /* Fond transparent pour laisser apparaître le texte et l'icône */
-    border: none; /* Pas de bordure */
+ion-popover ion-list {
+    box-shadow:  none !important;
+    padding: 0 !important;
 }
+
+ion-checkbox::part(container) {
+    --border-radius: 50%;
+    box-shadow: var(--neumorphism-out-shadow);
+    height: 1.2rem;
+    width: 1.2rem;
+}
+
+ion-checkbox {
+    --checkbox-background-checked: var(--ion-color-secondary);
+    --checkbox-color-checked: var(--ion-color-primary);
+}
+
+ion-checkbox::part(mark) {
+    stroke-width: 3px;
+    stroke: var(--ion-color-primary);
+    padding: 1rem !important;
+}
+
+ion-button {
+    --background: var(--ion-color-primary) !important;
+    --box-shadow: var(--neumorphism-out-shadow) !important;
+    --border-radius: 1rem !important;
+    background: transparent;
+    border: none;
+    --padding-top: 14px;
+    --padding-bottom: 14px;
+    text-transform: none !important;
+}
+
+/* When hovered */
+ion-button:hover,
+ion-button:active,
+ion-fab-button:hover,
+ion-tab-button:hover,
+ion-back-button:hover {
+    --background-hover: transparent;
+    --background-focused: transparent;
+    --background-activated: transparent;
+    --box-shadow: var(--neumorphism-in-shadow) !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+ion-fab-button:hover,
+ion-back-button:hover {
+    border-radius: 50%;
+}
+
+ ion-button:hover,
+ ion-button:active {
+     border-radius: 1rem;
+ }
+
+ion-back-button {
+    border-radius: 50%;
+    box-shadow: var(--neumorphism-out-shadow);
+    --icon-font-size: 1.2rem;
+    --color: var(--ion-color-secondary);
+}
+ion-input {
+    box-shadow: var(--neumorphism-in-shadow) !important;
+    border-radius: 1rem !important;
+    margin-bottom: 1rem;
+    --padding-start: 1rem !important;
+    --padding-end: 1rem !important;
+}
+
 ion-icon {
     color: #FD7DFB;
 }
 
-.gradient-text {
-    display: inline-block; /* Assure que le texte occupe un bloc en ligne */
+.gradient-text,
+ion-item-option:hover .item-option-text,
+ion-item-option:active .item-option-text,
+ion-item-option:focus .item-option-text {
     background: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
-    -webkit-background-clip: text; /* Applique le fond comme un clip pour le texte */
-    color: transparent; /* Le texte devient transparent pour ne montrer que le fond dégradé */
+    -webkit-background-clip: text;
+    color: transparent;
+    font-weight: bold;
+}
+
+.selected {
+    --box-shadow: var(--neumorphism-in-shadow) !important;
+    --border-radius: 1rem !important;
 }
 
 .ion-no-shadow {
@@ -42,15 +301,144 @@ ion-icon {
     box-shadow: none !important;
 }
 
+.ion-shadow-out {
+    --box-shadow: var(--neumorphism-out-shadow) !important;
+    box-shadow: var(--neumorphism-out-shadow) !important;
+}
+
+.ion-shadow-in {
+    --box-shadow: var(--neumorphism-in-shadow) !important;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+ion-chip {
+    box-shadow: var(--neumorphism-out-shadow);
+}
+ion-list {
+    --background: none !important;
+    background-color: transparent !important;
+    background: none !important;
+}
 ion-thumbnail {
     --border-radius: 50%;
 }
 
+.avatar-selection {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.avatar-container:hover,
+.avatar-container.selected {
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+.avatar-option {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
 ion-tab-bar {
-    box-shadow: var(--neumorphism-box-shadow) !important;
+    box-shadow: var(--neumorphism-out-shadow) !important;
     --border: none;
     border-radius: 1rem !important;
 }
 
+.custom-icon {
+    font-size: 1.5rem;
+    border-radius: 50%;
+    padding: 0.6rem;
+    box-shadow: var(--neumorphism-out-shadow);
+}
+
+ion-back-button {
+    --icon-font-size: 1rem;
+    min-width: 24px;
+    min-height: 24px;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.custom-icon:hover,
+.custom-icon:active {
+    box-shadow: var(--neumorphism-in-shadow) !important;
+}
+
+ion-modal::part(handle) {
+    background: var(--ion-color-primary);
+    box-shadow: var(--neumorphism-out-shadow);
+    margin-top: 1rem!important;
+    height: 0.6rem;
+    width: 6rem;
+    /*border-radius: 1rem;*/
+}
+
+@media (min-width: 768px) {
+    ion-modal {
+        --border-radius: 1rem !important;
+    }
+}
+
+ion-modal ion-grid {
+    margin-top: 3rem !important;
+}
+
+@media (min-width: 768px) {
+    ion-modal ion-grid {
+        margin-top: 1rem !important;
+    }}
+
+.form-container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .form-container {
+        width: 380px;
+    }
+}
+
+.ion-input-spacing {
+    margin-bottom: 1.6rem;
+}
+
+.avatar-container {
+    box-shadow: var(--neumorphism-out-shadow);
+    border-radius: 50%;
+    padding: 0.3rem;
+    margin-right: 0.5rem;
+    margin-bottom: 1.2rem;
+    display: flex;
+}
 
 
+.avatar-container ion-avatar {
+    box-shadow: var(--neumorphism-in-shadow);
+    width: 48px;
+    height: 48px;
+}
+
+.header-page ion-toolbar,
+.footer-page ion-toolbar {
+    box-shadow: var(--neumorphism-out-shadow);
+    border-radius: 1rem;
+}
+
+.header-page ion-toolbar .avatar-container {
+    margin: 0.8rem;
+}
+
+.button-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 1.2rem;
+}

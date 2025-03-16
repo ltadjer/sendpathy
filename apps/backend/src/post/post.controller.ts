@@ -57,10 +57,10 @@ export class PostController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a post by ID' })
-  @ApiResponse({ status: 200, description: 'The post has been successfully deleted.' })
+  @ApiResponse({ status: 204, description: 'The post has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'Post not found.' })
   async delete(@Param('id') id: string) {
-    return this.postService.delete(id);
+    return await this.postService.delete(id);
   }
 
   @UseGuards(JwtAuthGuard)

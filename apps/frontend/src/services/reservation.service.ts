@@ -5,8 +5,12 @@ export default {
    * Fetch all reservations for the logged-in user.
    */
   async fetchAllReservations() {
-    const response = await api.get('/reservations');
-    return response.data;
+    try {
+      const response = await api.get('/reservations');
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch reservations:', error);
+    }
   },
 
   /**
@@ -15,8 +19,12 @@ export default {
    * @param {string} reservationId The ID of the reservation to fetch.
    */
   async fetchOneReservationById(reservationId) {
-    const response = await api.get(`/reservations/${reservationId}`);
-    return response.data;
+    try {
+      const response = await api.get(`/reservations/${reservationId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch reservation:', error);
+    }
   },
 
   /**
@@ -25,8 +33,12 @@ export default {
    * @param {object} reservationData The data for the new reservation.
    */
   async createOneReservation(reservationData) {
-    const response = await api.post('/reservations', reservationData);
-    return response.data;
+    try {
+      const response = await api.post('/reservations', reservationData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to create reservation:', error);
+    }
   },
 
   /**
@@ -36,8 +48,12 @@ export default {
    * @param {object} reservationData The new data for the reservation.
    */
   async updateOneReservation(reservationId, reservationData) {
-    const response = await api.patch(`/reservations/${reservationId}`, reservationData);
-    return response.data;
+    try {
+      const response = await api.patch(`/reservations/${reservationId}`, reservationData);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to update reservation:', error);
+    }
   },
 
   /**
@@ -46,8 +62,11 @@ export default {
    * @param {string} reservationId The ID of the reservation to delete.
    */
   async deleteOneReservation(reservationId) {
-    const response = await api.delete(`/reservations/${reservationId}`);
-    return response.data;
+    try {
+      await api.delete(`/reservations/${reservationId}`);
+    } catch (error) {
+      console.error('Failed to delete reservation:', error);
+    }
   },
 
 

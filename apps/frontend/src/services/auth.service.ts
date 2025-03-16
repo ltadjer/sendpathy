@@ -7,24 +7,48 @@ export default  {
    * @returns Les données de la réponse de l'API.
    */
   async register(user: any) {
-    try {
-      const response = await api.post('/auth/register', user)
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    return await api.post('/auth/register/user', user)
   },
   /**
    * Connecte un utilisateur.
    * @param user - Les informations de l'utilisateur pour la connexion.
    * @returns les nouvelles données de l'utilisateur comme réponse API, y compris les tokens
    */
-  async login(user: any) {
+  async login(user) {
+    return await api.post('/auth/login', user);
+  },
+
+  /**
+   * Déconnecte un utilisateur.
+   */
+  async logout() {
+      await api.post('/auth/logout')
+  },
+
+  /**
+   * Vérifie si un utilisateur est connecté.
+   * @returns les nouvelles données de l'utilisateur comme réponse API
+   */
+
+  async checkAuth() {
     try {
-      const response = await api.post('/auth/login', user)
-      return response.data
+      return await api.get('/auth/me'); // Une route pour retourner les infos utilisateur
     } catch (error) {
       throw error
+    }
+  },
+
+  /**
+   * Rafraîchit le token d'accès.
+   * @returns les nouvelles données de l'utilisateur comme réponse API
+   */
+
+  async refreshToken() {
+    try {
+      const response = await api.post('/auth/refresh-token');
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   },
   /**
@@ -33,12 +57,7 @@ export default  {
    * @returns les nouvelles données de l'utilisateur comme réponse API
    */
   async requestPasswordReset(email: string) {
-    try {
-      const response = await api.post('/auth/request-password-reset', { email })
-      return response.data
-    } catch (error) {
-      throw error
-    }
+      return await api.post('/auth/request-password-reset', { email })
   },
   /**
    * Réinitialise le mot de passe d'un utilisateur.
@@ -47,38 +66,33 @@ export default  {
    * @returns les nouvelles données de l'utilisateur comme réponse API
    */
   async resetPassword(token: string, newPassword: string) {
-    try {
-      const response = await api.post('/auth/reset-password', { token, newPassword })
-      return response.data
-    } catch (error) {
-      throw error
-    }
+      return await api.post('/auth/reset-password', {
+        token: token,
+        newPassword: newPassword
+      })
   },
 
-  async updateAccessCode(token: string, accessCode: string) {
+  async updateAccessCode(accessCode: string) {
     try {
-      const response = await api.patch(`/users/access-code`, { token, accessCode });
-      console.log('updateAccessCode', response);
+      const response = await api.patch(`/users/access-code`, { accessCode: accessCode });
       return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  async validateAccessCode(token: string, accessCode: string) {
+  async validateAccessCode(accessCode: string) {
     try {
-      const response = await api.post(`/users/validate-access-code`, { token, accessCode });
-      console.log('validateAccessCode', response);
+      const response = await api.post(`/users/validate-access-code`, { accessCode: accessCode });
       return response.data;
     } catch (error) {
       throw error;
     }
   },
 
-  async setAccessCode(token: string, accessCode: string) {
+  async setAccessCode(accessCode: string) {
     try {
-      const response = await api.post(`/users/access-code`, { token, accessCode });
-      console.log('setAccessCode', response);
+      const response = await api.post(`/users/access-code`, { accessCode: accessCode });
       return response.data;
     } catch (error) {
       throw error;
@@ -92,5 +106,23 @@ export default  {
     const response = await api.get('/users/therapists');
     return response.data;
   },
+
+  async findOneById(id: string) {
+    try {
+      const response = await api.get(`/users/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async updateUser(userId: string, updatedUser: any) {
+    try {
+      const response = await api.patch(`/users/${userId}`, updatedUser);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 

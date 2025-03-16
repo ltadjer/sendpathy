@@ -28,7 +28,6 @@ export default {
    */
 
   async createOneLifeMoment(lifeMomentData) {
-    console.log('lifeMomentData', lifeMomentData);
     const response = await api.post('/life-moments', lifeMomentData);
     return response.data;
   },
@@ -55,6 +54,15 @@ export default {
 
   async getEmojis() {
     return Object.values(Emojis);
-  }
+  },
 
+  async deleteOneContent(contentId) {
+    try {
+      const response = await api.delete(`/contents/content/${contentId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error while deleting content', error);
+      throw error;
+    }
+  }
 }

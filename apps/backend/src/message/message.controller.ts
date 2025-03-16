@@ -32,7 +32,6 @@ export class MessageController {
     @ApiResponse({ status: 201, description: 'The message has been successfully created.' })
     @ApiResponse({ status: 400, description: 'Bad request.' })
     async create(@Body() createMessageDto: CreateMessageDto, @User() user: any) {
-        console.log('user', user);
         return this.messageService.create(createMessageDto, user.id);
     }
 

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import PostService from '@/services/post.service';
 import commentService from '@/services/comment.service'
 import likeService from '@/services/like.service'
+import { useToastStore } from './toast';
 
 export const usePostStore = defineStore('post', {
   state: () => ({
@@ -15,36 +16,53 @@ export const usePostStore = defineStore('post', {
         console.error('Failed to fetch posts:', error);
       }
     },
-    async addPost(post: any) {
+    async fetchOnePostById(postId: string) {
       try {
-        const newPost = await PostService.createOnePost(post);
-        this.posts.push(newPost);
+        await PostService.fetchOnePostById(postId);
+        const index = this.posts.findIndex((l) => l.id === postId);
+        this.posts[index] = response.data;
       } catch (error) {
+        console.error('Failed to fetch post:', error);
+      }
+    },
+    async createOnePost(post: any) {
+      const toastStore = useToastStore();
+      try {
+        const response = await PostService.createOnePost(post);
+        if(response && response.status === 201) {
+          this.posts.push(response.data);
+          toastStore.showToast('Post créé avec succès', 'primary');
+          return response.data;
+        } else {
+          toastStore.showToast('Échec de la création du post', 'danger');
+        }
+      } catch (error) {
+        toastStore.showToast('Une error est survenue, veuillez réessayer', 'danger');
         console.error('Failed to add post:', error);
       }
     },
-    async updatePost(id: string, post: any) {
+    async updateOnePost(id: string, post: any) {
+      const toastStore = useToastStore();
       try {
-        const updatedPost = await PostService.updateOnePost(id, post);
-        const index = this.posts.findIndex((l) => l.id === id);
-        this.posts[index] = updatedPost;
+        const response = await PostService.updateOnePost(id, post);
+        if(response && response.status === 200) {
+          const index = this.posts.findIndex((l) => l.id === id);
+          this.posts[index] = response.data;
+          toastStore.showToast('Post mis à jour avec succès', 'primary');
+        } else {
+          toastStore.showToast('Échec de la mise à jour du post', 'danger');
+        }
       } catch (error) {
+        toastStore.showToast('Une error est survenue, veuillez réessayer', 'danger');
         console.error('Failed to update post:', error);
       }
     },
-    async deletePost(id: string) {
+    async deleteOnePost(id: string) {
       try {
         await PostService.deleteOnePost(id);
         this.posts = this.posts.filter((l) => l.id !== id);
       } catch (error) {
         console.error('Failed to delete post:', error);
-      }
-    },
-    async fetchOnePostById(postId: string) {
-      try {
-        return await PostService.fetchOnePostById(postId);
-      } catch (error) {
-        console.error('Failed to fetch post:', error);
       }
     },
     async addTagToPost(postId: string, tagId: string) {
@@ -111,30 +129,45 @@ export const usePostStore = defineStore('post', {
     async addCommentToComment(parentCommentId: string, formData: any) {
       try {
         const response = await commentService.addCommentToComment(parentCommentId, formData);
-        this.posts.map(post => {
-          post.comments.map(comment => {
-            if (comment.id === parentCommentId) {
-              comment.replies.push(response.data);
-            }
-          });
-        })
+        this.posts.forEach(post => {
+          post.comments = this.addCommentRecursive(post.comments, parentCommentId, response.data);
+        });
       } catch (error) {
         console.error('Failed to add comment to comment:', error);
       }
     },
+
+    addCommentRecursive(comments: any[], parentCommentId: string, newComment: any): any[] {
+      return comments.map(comment => {
+        if (comment.id === parentCommentId) {
+          comment.replies.push(newComment);
+        } else if (comment.replies && comment.replies.length > 0) {
+          comment.replies = this.addCommentRecursive(comment.replies, parentCommentId, newComment);
+        }
+        return comment;
+      });
+    },
     async deleteCommentFromComment(parentCommentId: string, commentId: string) {
       try {
         await commentService.deleteCommentFromComment(parentCommentId, commentId);
-        this.posts.map(post => {
-          post.comments.map(comment => {
-            if (comment.id === parentCommentId) {
-              comment.replies = comment.replies.filter(reply => reply.id !== commentId);
-            }
-          });
+        this.posts.forEach(post => {
+          post.comments = this.removeCommentRecursive(post.comments, commentId);
         });
       } catch (error) {
         console.error('Failed to delete comment from comment:', error);
       }
+    },
+
+    removeCommentRecursive(comments: any[], commentId: string): any[] {
+      return comments.map(comment => {
+        if (comment.id === commentId) {
+          return null;
+        }
+        if (comment.replies && comment.replies.length > 0) {
+          comment.replies = this.removeCommentRecursive(comment.replies, commentId);
+        }
+        return comment;
+      }).filter(comment => comment !== null);
     },
 
     async likePost(postId: string) {

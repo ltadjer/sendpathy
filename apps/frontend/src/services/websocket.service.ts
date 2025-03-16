@@ -4,12 +4,8 @@ class WebSocketService {
     public socket: Socket;
 
     constructor() {
-        const token = localStorage.getItem('access_token');
         this.socket = io('https://api.sendpathy.aaa/events', {
             transports: ['websocket'],
-            auth: {
-                token: token
-            }
         });
 
         // Handle WebSocket connection

@@ -5,6 +5,8 @@ import { verify } from 'jsonwebtoken';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+
+
     /**
      * Determines if a request is authorized based on the context type.
      * @param context - The execution context.
@@ -24,7 +26,7 @@ export class JwtAuthGuard implements CanActivate {
      */
     private validateHttpRequest(context: ExecutionContext): boolean {
         const request = context.switchToHttp().getRequest();
-        const token = this.extractTokenFromHeader(request.headers.authorization);
+        const token = request.cookies['access_token'];
         if (!token) {
             throw new UnauthorizedException('Token not found');
         }
@@ -39,7 +41,7 @@ export class JwtAuthGuard implements CanActivate {
      */
     private validateWsRequest(context: ExecutionContext): boolean {
         const client: CustomSocket = context.switchToWs().getClient();
-        const token = client.handshake.auth.token;
+        const token = client.handshake.auth.token || client.handshake.headers.cookie?.split('; ').find(c => c.startsWith('access_token='))?.split('=')[1];
         if (!token) {
             throw new UnauthorizedException('Token not found');
         }

@@ -1,50 +1,66 @@
 <template>
   <ion-card class="ion-no-padding">
     <ion-card-content>
-      <ion-item class="ion-no-shadow" lines="none">
-        <ion-thumbnail slot="start">
-          <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-        </ion-thumbnail>
-        <ion-textarea v-model="content" placeholder="Qu'est-ce qui te tracasse ?"></ion-textarea>
-      </ion-item>
-      <ion-grid>
-        <ion-row class="ion-justify-content-center">
-          <ion-col size="auto">
-            <img alt="img" src="/img/fond-sendpathy.svg" class="image" />
-          </ion-col>
-        </ion-row>
-        <ion-row>
-          <ion-col size="10">
-            <ion-button color="primary" @click="openEmojiModal">
-              <ion-icon :icon="happyOutline" class="gradient-icon" color="secondary"></ion-icon>
-            </ion-button>
-            <ion-button @click="openSettingsModal">
-              <ion-icon :icon="optionsOutline" class="gradient-icon"></ion-icon>
-            </ion-button>
-          </ion-col>
-          <ion-col size="2" class="ion-text-right">
-            <ion-button @click="submitPost">
-              <ion-icon :icon="paperPlaneOutline"></ion-icon>
-            </ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+      <form @submit.prevent="submitPost">
+        <ion-item class="ion-no-shadow ion-align-items-start" lines="none">
+          <div class="avatar-container">
+            <ion-avatar slot="start">
+              <img alt="User Avatar" :src="currentUser?.avatar" class="avatar-option" />
+            </ion-avatar>
+          </div>
+          <ion-textarea
+            v-model="content"
+            placeholder="Qu'est-ce qui te tracasse ?"
+            class="custom-textarea"
+            rows="5"
+          ></ion-textarea>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="8">
+              <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
+              <custom-button :icon="optionsOutline" @click="openSettingsModal"></custom-button>
+            </ion-col>
+            <ion-col size="4" class="ion-text-right">
+              <custom-button text="Publier" type="submit"></custom-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </form>
     </ion-card-content>
   </ion-card>
-  <post-settings-modal v-if="isSettingsModalOpen" @close="closeSettingsModal" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers" :selectedTags="selectedTags" :selectedTriggers="selectedTriggers"></post-settings-modal>
-  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></emotions-modal>
+
+  <post-settings-modal
+    :isOpen="isSettingsModalOpen"
+    @update:isOpen="isSettingsModalOpen = $event"
+    @update:selectedTags="updateSelectedTags"
+    @update:selectedTriggers="updateSelectedTriggers"
+    :selectedTags="selectedTags"
+    :selectedTriggers="selectedTriggers"
+    :post-id="post?.id || ''"
+  ></post-settings-modal>
+
+  <emotions-modal
+    :isOpen="isEmojiModalOpen"
+    @update:isOpen="isEmojiModalOpen = $event"
+    @emoji-selected="updateEmotion"
+    :selected-emoji="emotion"
+  ></emotions-modal>
 </template>
+
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow, IonThumbnail } from '@ionic/vue';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonInput, IonButton, IonIcon, IonGrid, IonCol, IonRow, IonAvatar } from '@ionic/vue';
+import CustomButton from '@/components/Commun/CustomButton.vue';
 import PostSettingsModal from '@/components/Feed/PostSettingsModal.vue';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
 import { happyOutline, optionsOutline, paperPlaneOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
+
 export default defineComponent({
   name: 'PostForm',
   components: {
-    IonThumbnail,
+    IonAvatar,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -59,15 +75,23 @@ export default defineComponent({
     IonCol,
     IonRow,
     PostSettingsModal,
-    EmotionsModal
+    EmotionsModal,
+    CustomButton
   },
   props: {
-    post: Object
+    post: {
+      type: Object,
+      required: true
+    },
+    currentUser: {
+      type: Object,
+      required: true
+    }
   },
   setup() {
     return { happyOutline, optionsOutline, paperPlaneOutline };
   },
-  emits: ['post-updated'],
+  emits: ['post-updated', 'close'],
   data() {
     return {
       content: '',
@@ -105,20 +129,18 @@ export default defineComponent({
 
       let postId;
       if (this.post && this.post.id) {
-        await usePostStore().updatePost(this.post.id, formData);
+        await usePostStore().updateOnePost(this.post.id, formData);
         postId = this.post.id;
       } else {
-        const response = await usePostStore().addPost(formData);
-        postId = response.id;
+        const newPost = await usePostStore().createOnePost(formData);
+        await Promise.all([
+          ...this.selectedTags.map(tagId => usePostStore().addTagToPost(newPost.id, tagId)),
+          ...this.selectedTriggers.map(triggerId => usePostStore().addTriggerToPost(newPost.id, triggerId))
+        ]);
+        await usePostStore().fetchAllPosts();
       }
-
-      await Promise.all([
-        ...this.selectedTags.map(tagId => usePostStore().addTagToPost(postId, tagId)),
-        ...this.selectedTriggers.map(triggerId => usePostStore().addTriggerToPost(postId, triggerId))
-      ]);
-
       this.resetForm();
-      this.$emit('post-updated');
+      this.$emit('close');
     },
     resetForm() {
       this.content = '';
@@ -141,7 +163,6 @@ export default defineComponent({
       this.selectedTriggers = triggers;
     },
     updateEmotion(emoji) {
-      console.log('emoji:', emoji);
       this.emotion = emoji;
     },
     openEmojiModal() {
@@ -150,6 +171,27 @@ export default defineComponent({
   },
 });
 </script>
-<style scoped>
 
+<style scoped>
+ion-item {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
+}
+
+.custom-textarea {
+  background-image: url('/img/fond-sendpathy.svg');
+  background-size: cover;
+  background-position: center;
+  height: 300px;
+  resize: none;
+}
+
+.custom-textarea textarea {
+  padding: 1rem;
+}
+
+.avatar-option {
+  width: 48px;
+  height: 48px;
+}
 </style>

@@ -85,6 +85,11 @@ export class PostService {
                 ...createPostDto,
                 user: { connect: { id: userId } },
             },
+            include: {
+                user: true,
+                tags: true,
+                triggers: true,
+            },
         });
     }
 
@@ -92,6 +97,11 @@ export class PostService {
         return await this.prisma.post.update({
             where: { id },
             data: updatePostDto,
+            include: {
+                user: true,
+                tags: true,
+                triggers: true,
+            },
         });
     }
 

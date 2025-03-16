@@ -11,7 +11,6 @@ import { UserService } from 'src/user/user.service';
 import { MailerService } from 'src/mailer/mailer.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CreateTherapistDto } from 'src/user/dto/create-therapist.dto';
-import slugify from 'slugify'
 
 @Injectable()
 export class AuthService {
@@ -51,7 +50,7 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
     const payload = { email: user.email, id: user.id };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '3600s' });
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
     await this.userService.updateRefreshToken(user.id, refreshToken);
     return {
@@ -59,8 +58,12 @@ export class AuthService {
       refresh_token: refreshToken,
       email: user.email,
       accessCode: user.accessCode,
+      avatar: user.avatar,
+      username: user.username,
+      id: user.id,
     };
   }
+
   /**
    * Rafraîchit le jeton d'accès en utilisant le refresh token.
    * @param token - Le refresh token.
@@ -69,6 +72,9 @@ export class AuthService {
    */
   async refreshToken(token: string) {
     try {
+      if(!token) {
+        throw new UnauthorizedException('Invalid refresh token');
+      }
       const payload = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
@@ -76,11 +82,10 @@ export class AuthService {
       if (!user) {
         throw new UnauthorizedException('Invalid refresh token');
       }
-      const newAccessToken = this.jwtService.sign(
-        { email: payload.email, sub: payload.sub },
-        { expiresIn: '3600s' },
-      );
-      return { access_token: newAccessToken };
+      const newAccessToken = this.jwtService.sign({ email: payload.email, id: payload.id }, { expiresIn: '15m' });
+      const newRefreshToken = this.jwtService.sign({ email: payload.email, id: payload.id }, { expiresIn: '7d' });
+      await this.userService.updateRefreshToken(user.id, newRefreshToken);
+      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (e) {
       throw new UnauthorizedException('Invalid refresh token');
     }

@@ -1,51 +1,68 @@
 <template>
-  <ion-card class="neumorphic-card">
-    <ion-card-header>
-      <ion-card-title>{{ lifeMoment ? 'Edit LifeMoment' : 'New LifeMoment' }}</ion-card-title>
-    </ion-card-header>
+  <ion-card>
     <ion-card-content>
-      <ion-item class="neumorphic-item">
-        <ion-label position="static">Content</ion-label>
-        <ion-textarea v-model="content" placeholder="What's on your mind?"></ion-textarea>
-      </ion-item>
-      <ion-item class="neumorphic-item">
-        <ion-label position="static">Image/Video</ion-label>
-        <input type="file" @change="onFileChange" accept="image/*,video/*" />
-      </ion-item>
-      <ion-item class="neumorphic-item">
-        <ion-label position="floating">Audio</ion-label>
-        <ion-button @click="startRecording" :disabled="isRecording">Start Recording</ion-button>
-        <ion-button @click="stopRecording" :disabled="!isRecording">Stop Recording</ion-button>
-      </ion-item>
-      <ion-button color="primary" @click="openEmojiModal" class="neumorphic-button">
-        <ion-icon :icon="happyOutline"></ion-icon>
-      </ion-button>
-      <ion-button expand="full" @click="submitLifeMoment" class="neumorphic-button">{{ lifeMoment ? 'Update' : 'LifeMoment' }}</ion-button>
+      <form @submit.prevent="submitLifeMoment">
+        <div v-if="contents.length" :class="`media-grid media-count-${contents.length}`">
+          <div v-for="(content, index) in contents" :key="index" class="media-item">
+            <div v-if="content.type.startsWith('image/')">
+              <img :src="getImageUrl(content)" alt="Image" class="media-content" />
+              <ion-buttons class="delete-icon">
+                <custom-button @button-click="deleteOneContent(content, index)" :icon="closeOutline"></custom-button>
+              </ion-buttons>
+            </div>
+            <div v-else-if="content.type.startsWith('video/')">
+              <video :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls class="media-content"></video>
+              <ion-icon name="close-circle" class="delete-icon" @click="deleteOneContent(index)"></ion-icon>
+            </div>
+            <div v-else-if="content.type.startsWith('audio/')">
+              <audio :src="`https://api.sendpathy.aaa${content.fileUrl}`" controls class="media-content"></audio>
+              <ion-icon name="close-circle" class="delete-icon" @click="deleteOneContent(index)"></ion-icon>
+            </div>
+          </div>
+        </div>
+        <ion-item class="ion-no-shadow" lines="none">
+          <ion-textarea v-model="content" placeholder="Comment te sens-tu aujourd'hui?" class="custom-textarea" rows="5"></ion-textarea>
+        </ion-item>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="8">
+              <custom-button :icon="happyOutline" @click="openEmojiModal"></custom-button>
+              <custom-button :icon="imageOutline" @click="triggerFileInput"></custom-button>
+              <input type="file" ref="fileInput" @change="onFileChange" accept="image/*,video/*" style="display: none;" />
+              <custom-button :icon="isRecording ? stopOutline : micOutline" @click="toggleRecording"></custom-button>
+            </ion-col>
+            <ion-col size="4" class="ion-text-end">
+              <custom-button text="Partager" type="submit"></custom-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </form>
     </ion-card-content>
   </ion-card>
-  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion"></emotions-modal>
+  <emotions-modal :isOpen="isEmojiModalOpen" @update:isOpen="isEmojiModalOpen = $event" @emoji-selected="updateEmotion" :selected-emoji="emotion"></emotions-modal>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { IonIcon, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonTextarea, IonButton } from '@ionic/vue';
-import { useLifeMomentStore } from '@/stores/life-moment';
+import { IonCard, IonCardContent, IonItem, IonTextarea, IonGrid, IonRow, IonCol, IonIcon } from '@ionic/vue';
+import { happyOutline, imageOutline, micOutline, stopOutline, closeOutline } from 'ionicons/icons';
+import CustomButton from '@/components/Commun/CustomButton.vue';
 import EmotionsModal from '@/components/Commun/EmotionsModal.vue';
-import { happyOutline } from 'ionicons/icons';
+import { useLifeMomentStore } from '@/stores/life-moment';
 
 export default defineComponent({
   name: 'LifeMomentForm',
   components: {
-    IonIcon,
+    IonCol,
+    CustomButton,
     IonCard,
-    IonCardHeader,
-    IonCardTitle,
     IonCardContent,
     IonItem,
-    IonLabel,
     IonTextarea,
-    IonButton,
-    EmotionsModal
+    EmotionsModal,
+    IonGrid,
+    IonRow,
+    IonIcon
   },
   props: {
     lifeMoment: Object
@@ -53,6 +70,7 @@ export default defineComponent({
   data() {
     return {
       content: '',
+      emotion: '',
       file: null,
       base64Image: '',
       isRecording: false,
@@ -60,57 +78,49 @@ export default defineComponent({
       mediaRecorder: null,
       isEmojiModalOpen: false,
       contents: [],
+      isFileInputTriggered: false,
     };
-  },
-  setup() {
-    return { happyOutline };
   },
   watch: {
     lifeMoment: {
       immediate: true,
-      handler(newLifeMoment) {
-        if (newLifeMoment) {
-          this.content = newLifeMoment.content;
-          this.emotion = newLifeMoment.emotion;
-          this.contents = newLifeMoment.contents;
+      handler(newVal) {
+        if(newVal) {
+          this.content = newVal.content;
+          this.emotion = newVal.emotion;
+          this.contents = newVal.contents || [];
         } else {
           this.resetForm();
         }
-      }
-    }
+      },
+    },
   },
+  setup() {
+    return { happyOutline, imageOutline, micOutline, stopOutline, closeOutline };
+  },
+  emits: ['close', 'button-click'],
   methods: {
-    async submitLifeMoment() {
-      let base64Content = null;
-      if (this.file) {
-        base64Content = await this.getFileBase64(this.file);
-      }
-      const formData = {
-        content: this.content,
-        emotion: this.emotion ? this.emotion : '',
-        contents: [
-          {
-            base64Content: base64Content,
-            type: this.file ? this.file.type : null,
-            content: this.content ? this.content : null,
-            originalName: this.file ? this.file.name : null,
-            size: this.file ? this.file.size : null,
-            order: 1
-          }
-        ]
-      };
-      if (this.lifeMoment && this.lifeMoment.id) {
-        await useLifeMomentStore().updateLifeMoment(this.lifeMoment.id, formData);
-      } else {
-        await useLifeMomentStore().addLifeMoment(formData);
+    triggerFileInput() {
+      if (!this.isFileInputTriggered && this.$refs.fileInput) {
+        this.isFileInputTriggered = true;
+        this.$refs.fileInput.click();
       }
     },
     onFileChange(event) {
+      this.isFileInputTriggered = false;
       const file = event.target.files[0];
       if (this.validateFile(file)) {
         this.file = file;
         this.getFileBase64(this.file).then(base64 => {
           this.base64Image = base64;
+          this.contents.push({
+            type: file.type,
+            content: '',
+            base64Content: base64,
+            originalName: file.name,
+            size: file.size,
+            order: this.contents.length + 1
+          });
         });
       }
     },
@@ -141,6 +151,19 @@ export default defineComponent({
         reader.readAsDataURL(file);
       });
     },
+    getImageUrl(content) {
+      if (content.fileUrl && content.fileUrl.startsWith('/uploads')) {
+        return `https://api.sendpathy.aaa${content.fileUrl}`;
+      }
+      return `data:${content.type};base64,${content.base64Content}`;
+    },
+    toggleRecording() {
+      if (this.isRecording) {
+        this.stopRecording();
+      } else {
+        this.startRecording();
+      }
+    },
     startRecording() {
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
@@ -163,11 +186,35 @@ export default defineComponent({
       this.isRecording = false;
     },
     updateEmotion(emoji) {
-      console.log('emoji:', emoji);
       this.emotion = emoji;
     },
     openEmojiModal() {
       this.isEmojiModalOpen = true;
+    },
+    async deleteOneContent(content, index) {
+      if (content.id) {
+        await useLifeMomentStore().deleteOneContent(content.id);
+        const updatedLifeMoment = await useLifeMomentStore().fetchOneLifeMomentById(this.lifeMoment.id);
+        this.contents = updatedLifeMoment.contents;
+      } else {
+        this.contents.splice(index, 1);
+      }
+    },
+    async submitLifeMoment() {
+      const formData = {
+        content: this.content,
+        emotion: this.emotion ? this.emotion : '',
+        contents: this.contents ? this.contents : [],
+      };
+
+      if (this.lifeMoment && this.lifeMoment.id) {
+        await useLifeMomentStore().updateOneLifeMoment(this.lifeMoment.id, formData);
+      } else {
+        await useLifeMomentStore().createOneLifeMoment(formData);
+      }
+
+      this.resetForm();
+      this.$emit('close');
     },
     resetForm() {
       this.content = '';
@@ -182,3 +229,63 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+ion-item {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
+}
+
+.custom-textarea {
+  background-image: url('/img/fond-sendpathy.svg');
+  background-size: cover;
+  background-position: center;
+  height: 300px;
+  resize: none;
+  padding: 1rem;
+}
+
+.media-grid {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+.media-count-1 {
+  grid-template-columns: 1fr;
+}
+
+.media-count-2, .media-count-3, .media-count-4, .media-count-5,
+.media-count-6, .media-count-7, .media-count-8, .media-count-9, .media-count-10 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.media-count-3 {
+  grid-template-rows: auto auto;
+}
+
+.media-count-4, .media-count-5 {
+  grid-template-rows: 1fr 1fr;
+}
+
+.media-item {
+  position: relative;
+}
+.media-content {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1rem;
+  box-shadow: var(--neumorphism-out-shadow);
+  padding: 6px;
+}
+
+.media-content img {
+  border-radius: 1rem;
+}
+
+.delete-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+</style>

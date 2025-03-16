@@ -6,7 +6,7 @@ http://ionicframework.com/docs/theming/ */
     /** primary **/
     --ion-color-primary: #f5f5fa;
     --ion-color-primary-rgb: 35, 152, 158;
-    --ion-color-primary-contrast: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
+    --ion-color-primary-contrast: #f5f5fa;
     --ion-color-primary-contrast-rgb: 255, 255, 255;
     --ion-color-primary-shade: #1e868a;
     --ion-color-primary-tint: #38a2a7;
@@ -80,15 +80,17 @@ http://ionicframework.com/docs/theming/ */
     --ion-fab-button-color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
 
     /* Neumorphism */
-    --neumorphism-box-shadow:
-            -5px -5px 10px 0px rgba(255, 255, 255, 0.9),  /* Ombre claire */
-            10px 10px 20px 0px rgba(214, 200, 223, 0.7); /* Ombre sombre */
+    --neumorphism-out-shadow:
+            -5px -5px 10px 0px rgba(255, 255, 255, 0.8),  /* Ombre claire */
+            5px 5px 20px 0px rgba(214, 200, 223, 0.7); /* Ombre sombre */
+
+    --neumorphism-in-shadow:
+            inset 5px 5px 10px 0px rgba(214, 200, 223, 0.5),  /* Inner shadow */
+            inset -5px -5px 10px 0px rgba(255, 255, 255, 1);  /* Inner highlight */
 
     --ion-item-background: #f5f5fa;
     --ion-item-color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
 
-    --ion-toolbar-background: #f5f5fa;
-    --ion-toolbar-color: linear-gradient(-119.774deg, rgba(151, 71, 255, 60%) 0%, #FD7DFB 82%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -171,7 +173,7 @@ http://ionicframework.com/docs/theming/ */
         --ion-background-color: #F5F5FA;
         --ion-background-color-rgb: 0, 0, 0;
 
-        --ion-text-color: #f5f5fa;
+        --ion-text-color: #333333;
         --ion-text-color-rgb: 255, 255, 255;
 
         --ion-color-step-50: #0d0d0d;

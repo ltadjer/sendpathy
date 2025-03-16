@@ -4,7 +4,6 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { MessageGateway } from './message.gateway';
 
-
 @Injectable()
 export class MessageService {
     constructor(private prisma: PrismaService, private messageGateway: MessageGateway) {}
@@ -19,16 +18,33 @@ export class MessageService {
         return this.prisma.message.findMany();
     }
 
-    async findByConversation(conversationId: string) {
-        return this.prisma.message.findMany({
+    async findByConversation(conversationId: string, userId: string, page: number, limit: number) {
+        if (!conversationId) {
+            throw new Error('conversationId is required');
+        }
+
+        const skip = (page - 1) * limit;
+        const messages = await this.prisma.message.findMany({
             where: { conversationId: conversationId },
-            orderBy: { createdAt: 'asc' },
+            orderBy: { createdAt: 'desc' },
+            skip: skip, take:parseInt(limit.toString(), 12),
+            include: {
+                sender: true,
+                receiver: true,
+                conversation: {
+                    select: { users: true },
+                },
+            },
         });
+
+        return messages.map(message => ({
+            ...message,
+            isSentByCurrentUser: message.senderId === userId,
+        }));
     }
 
     async create(createMessageDto: CreateMessageDto, senderId: string) {
         // Check if a conversation exists between the users
-        console.log('senderId', senderId);
         const conversation = await this.prisma.conversation.findFirst({
             where: {
                 AND: [
@@ -62,8 +78,15 @@ export class MessageService {
                 senderId: senderId,
                 conversationId: conversation.id, // Link the message to the conversation
             },
+            include: {
+                sender: true,
+                receiver: true,
+                conversation: {
+                    select: { users: true },
+                },
+            },
         });
-        this.messageGateway.sendMessage(message);
+
         return message;
     }
 
@@ -87,6 +110,13 @@ export class MessageService {
                 ...updateMessageDto,
                 conversationId: message.conversationId, // Ensure the conversationId remains linked
             },
+            include: {
+                sender: true,
+                receiver: true,
+                conversation: {
+                    select: { users: true },
+                },
+            },
         });
     }
 
@@ -109,6 +139,19 @@ export class MessageService {
         return this.prisma.message.update({
             where: { id: messageId },
             data: { deletedBy: userId },
+        });
+    }
+
+    async markMessagesAsRead(conversationId: string, userId: string) {
+        return await this.prisma.message.updateMany({
+            where: {
+                conversationId: conversationId,
+                receiverId: userId,
+                read: false,
+            },
+            data: {
+                read: true,
+            },
         });
     }
 }

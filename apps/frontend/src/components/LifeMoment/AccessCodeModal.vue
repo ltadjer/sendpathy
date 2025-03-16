@@ -1,17 +1,12 @@
 <template>
   <ion-modal :is-open="isOpen" :backdrop-dismiss="false">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ hasAccessCode ? 'Enter Access Code' : 'Set Access Code' }}</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <ion-item>
-        <ion-label position="floating">Access Code</ion-label>
-        <ion-input v-model="accessCode" type="password"></ion-input>
-      </ion-item>
-      <ion-button expand="full" @click="handleAccessCode">{{ hasAccessCode ? 'Enter' : 'Set' }} Access Code</ion-button>
-    </ion-content>
+      <ion-card class="ion-padding ion-no-shadow">
+          <ion-label position="stacked">{{ hasAccessCode ? 'Entrer le code d\'accès' : 'Définir un code d\'accès' }}</ion-label>
+          <ion-input v-model="accessCode" type="password"></ion-input>
+          <div class="ion-text-end">
+            <custom-button :text="hasAccessCode ? 'Entrer' : 'Définir'" @click="handleAccessCode"></custom-button>
+          </div>
+      </ion-card>
   </ion-modal>
 </template>
 
@@ -25,13 +20,16 @@ import {
   IonContent,
   IonItem,
   IonLabel,
-  IonInput
+  IonInput,
+  IonCard,
 } from '@ionic/vue';
-import authService from '@/services/auth.service.ts'
+import CustomButton from '@/components/Commun/CustomButton.vue'
+import { useAccountStore } from '@/stores/account.ts'
 
 export default {
   name: 'AccessCodeModal',
   components: {
+    CustomButton,
     IonModal,
     IonHeader,
     IonToolbar,
@@ -40,15 +38,12 @@ export default {
     IonContent,
     IonItem,
     IonLabel,
-    IonInput
+    IonInput,
+    IonCard,
   },
   props: {
     isOpen: {
       type: Boolean,
-      required: true
-    },
-    token: {
-      type: String,
       required: true
     },
     hasAccessCode: {
@@ -65,8 +60,7 @@ export default {
     async handleAccessCode() {
       try {
         if (this.hasAccessCode) {
-          console.log('Validating access code');
-          const isValid = await authService.validateAccessCode(this.token, this.accessCode);
+          const isValid = await useAccountStore().validateAccessCode(this.accessCode);
           if (isValid) {
             this.$emit('access-code-validated');
             this.closeModal();
@@ -74,8 +68,7 @@ export default {
             console.error('Invalid access code');
           }
         } else {
-         this.accessCode =  await authService.setAccessCode(this.token, this.accessCode);
-          localStorage.setItem('access_code', this.accessCode);
+         this.accessCode =  await useAccountStore().setAccessCode(this.accessCode);
           this.$emit('access-code-set');
           this.closeModal();
         }
@@ -85,8 +78,16 @@ export default {
     },
     closeModal() {
       this.$emit('update:isOpen', false);
-      console.log('Closing modal', this.isOpen);
     }
   }
 };
 </script>
+<style scoped>
+ion-modal {
+  --width: fit-content;
+  --height: fit-content;
+  --min-width: 350px;
+  --max-width: 350px;
+  --border-radius: 1rem;
+}
+</style>

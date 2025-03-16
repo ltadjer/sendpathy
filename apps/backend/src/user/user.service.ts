@@ -16,8 +16,53 @@ export class UserService {
    * @returns L'utilisateur correspondant à l'ID.
    */
   async findOne(id: string) {
+    if (!id) {
+      throw new Error('User ID is required');
+    }
     return this.prisma.user.findUnique({
-      where: { id }
+      where: { id },
+      include: {
+        friendshipsReceived: {
+          include: {
+            requester: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        friendshipsSent: {
+          include: {
+            receiver: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -27,8 +72,50 @@ export class UserService {
    * @returns L'utilisateur correspondant à l'email.
    */
   async findOneByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: { email }
+    return await this.prisma.user.findUnique({
+      where: { email },
+      include: {
+        friendshipsReceived: {
+          include: {
+            requester: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        friendshipsSent: {
+          include: {
+            receiver: {
+              include: {
+                friendshipsReceived: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+                friendshipsSent: {
+                  include: {
+                    requester: true,
+                    receiver: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -37,7 +124,25 @@ export class UserService {
    * @returns Une liste de tous les utilisateurs.
    */
   async findAll() {
-    return this.prisma.user.findMany();
+    return await this.prisma.user.findMany();
+  }
+
+  /**
+   * Trouve tous les thérapeutes.
+   * @returns Une liste de tous les thérapeutes.
+   */
+
+  async findAllTherapists() {
+    return await this.prisma.user.findMany({
+      where: { role: 'THERAPIST' },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        biography: true,
+        email: true,
+      },
+    });
   }
 
   /**
@@ -69,11 +174,16 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async update(id: string, updateUserDto: UpdateUserDto) {
-    console.log('updateUserDto', updateUserDto);
-    return this.prisma.user.update({
+    console.log('updateUserDto', updateUserDto)
+    console.log('id', await this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+    }))
+    await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
+    return await this.findOne(id);
   }
 
   /**
@@ -162,6 +272,9 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async updateRefreshToken(userId: string, refreshToken: string) {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
     return await this.prisma.user.update({
       where: { id: userId },
       data: { refreshToken },
@@ -174,15 +287,12 @@ export class UserService {
    * @returns L'utilisateur correspondant au refresh token.
    */
   async findByRefreshToken(refreshToken: string) {
-    console.log('refreshToken', refreshToken);
     return await this.prisma.user.findFirst({ where: { refreshToken } });
   }
 
   async updateAccessCode(userId: string, accessCode: string) {
-    console.log('accessCode', accessCode);
     const salt = await bcrypt.genSalt();
     const hashedAccessCode = await bcrypt.hash(accessCode, salt);
-    console.log('hashedAccessCode', hashedAccessCode);
     const user = await this.prisma.user.update({
       where: { id: userId },
       data: { accessCode: hashedAccessCode },
@@ -195,24 +305,11 @@ export class UserService {
       where: { id: userId },
       select: { accessCode: true },
     });
-    if (!user || !user.accessCode) {
+
+    if (!user || !(await bcrypt.compare(accessCode, user.accessCode))) {
       return false;
     }
-    return bcrypt.compare(accessCode, user.accessCode);
-  }
-
-  async findAllTherapists() {
-    return this.prisma.user.findMany({
-      where: { role: 'THERAPIST' },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        biography: true,
-        email: true,
-        slug: true,
-      },
-    });
+    return true;
   }
 
 }

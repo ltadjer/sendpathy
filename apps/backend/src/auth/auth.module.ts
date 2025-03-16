@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { UserModule } from 'src/user/user.module';
 import { CodeAuthMiddleware } from 'src/life-moment/middleware/code-auth.middleware';
+import * as cookieParser from 'cookie-parser';
 
 @Module({
   controllers: [AuthController],
@@ -18,11 +19,15 @@ import { CodeAuthMiddleware } from 'src/life-moment/middleware/code-auth.middlew
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '3600s' },
+      signOptions: { expiresIn: '1d' },
     }),
     PrismaModule,
     UserModule,
     MailerModule,
    ],
 })
-export class AuthModule {}
+export class AuthModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(cookieParser()).forRoutes('*');
+  }
+}

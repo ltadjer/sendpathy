@@ -28,10 +28,13 @@ import { ReservationModule } from './reservation/reservation.module';
 import { ReservationService } from './reservation/reservation.service'
 import { AvailableSlotController } from './available-slot/available-slot.controller';
 import { AvailableSlotService } from './available-slot/available-slot.service';
+import { NotificationController } from './notification/notification.controller';
+import { NotificationService } from './notification/notification.service';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
-  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, MessageModule, ConversationModule, FriendshipModule, CommentModule, LikeModule, TriggerModule, TagModule, LifeMomentModule, ContentModule, ReservationModule],
-  controllers: [AppController, CommentController, LikeController, TriggerController, TagController, ReservationController, AvailableSlotController],
-  providers: [AppService, CommentService, LikeService, TriggerService, TagService, ReservationService, AvailableSlotService],
+  imports: [AuthModule, UserModule, PrismaModule, MailerModule, PostModule, MessageModule, ConversationModule, FriendshipModule, CommentModule, LikeModule, TriggerModule, TagModule, LifeMomentModule, ContentModule, ReservationModule, NotificationModule],
+  controllers: [AppController, CommentController, LikeController, TriggerController, TagController, ReservationController, AvailableSlotController, NotificationController],
+  providers: [AppService, CommentService, LikeService, TriggerService, TagService, ReservationService, AvailableSlotService, NotificationService],
 })
 export class AppModule {}

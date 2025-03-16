@@ -1,79 +1,100 @@
 <template>
-  <ion-page>
-    <ion-header collapse="fade" class="ion-padding">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-button size="small" class="ion-no-shadow">
-            <ion-avatar>
-              <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-            </ion-avatar>
-          </ion-button>
-          </ion-buttons>
-        <ion-title>Feed</ion-title>
-        <ion-buttons slot="end">
-          <ion-button size="small" class="ion-no-shadow">
-            <img alt="Logo" src="@/assets/logo.png" width="80px" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <post-form :post="selectedPost"></post-form>
+      <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :post="selectedPost" :current-user="currentUser" />
       <ion-list class="ion-padding">
-        <ion-item class="ion-margin-bottom" lines="none" v-for="post in posts" :key="post.id" @click="editPost(post)">
+        <post-filter-button v-if="$route.fullPath.includes('feed')" class="ion-margin-bottom ion-text-end" @update:selectedTags="updateSelectedTags" @update:selectedTriggers="updateSelectedTriggers"></post-filter-button>
+
+        <ion-item
+          class="ion-margin-bottom"
+          lines="none"
+          v-for="post in filteredPosts"
+          :key="post.id"
+          @click.stop="editPost(post)"
+        >
           <ion-grid>
             <ion-row>
-              <ion-col size="2">
-                <ion-thumbnail>
-                  <img alt="Silhouette of mountains" src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
-                </ion-thumbnail>
+              <ion-col size="10">
+                <ion-list v-if="post.tags && post.tags.length > 0 || post.triggers && post.triggers.length > 0" class="ion-padding-bottom">
+                  <ion-chip v-for="element in [...post.tags, ...post.triggers]" :key="element.id" class="ion-margin-top">
+                    <span class="gradient-text">{{ element.name }}</span>
+                  </ion-chip>
+                </ion-list>
+                <ion-item lines="none" class="ion-no-shadow ion-align-items-start">
+                  <div class="avatar-container" @click.stop="showUserProfile(post.user)">
+                    <ion-avatar slot="start">
+                      <img alt="User Avatar" :src="post.user.avatar" />
+                    </ion-avatar>
+                  </div>
+                  <div class="ion-padding-top">
+                    <ion-text>
+                      {{ post.user.username }}
+                      <span>{{ post.emotion }}</span>
+                    </ion-text>
+                    <p>
+                      <ion-textarea
+                        class="ion-margin-top"
+                        :auto-grow="true"
+                        :value="post.content"
+                      >
+                      </ion-textarea>
+                    </p>
+                  </div>
+                </ion-item>
               </ion-col>
-              <ion-col size="8">
-                <p>
-                  {{ post.user.username }}
-                  <span>{{ post.emotion }}</span>
-                </p>
-                <p>{{ post.content }}</p>
-              </ion-col>
-              <ion-col size="auto">
-                <ion-button @click.stop="deletePost(post.id)" class="ion-no-shadow">
-                  <ion-icon :icon="trashOutline"></ion-icon>
-                </ion-button>
+              <ion-col size="2" class="ion-text-end">
+                <ion-icon class="custom-icon"
+                          :id="'popover-button-' + post.id"
+                          @click.stop
+                          :icon="ellipsisVerticalOutline">
+                </ion-icon>
+                <ion-popover
+                  :trigger="'popover-button-' + post.id"
+                  :dismiss-on-select="true"
+                  side="top"
+                  alignment="end">
+                  <ion-list>
+                    <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click.stop="deleteOnePost(post.id)">Supprimer</ion-item>
+                    <ion-item lines="none" :button="true" :detail="false" @click="reportPost(post.id)">Signaler</ion-item>
+                  </ion-list>
+                </ion-popover>
+
               </ion-col>
             </ion-row>
             <ion-row>
               <ion-col size="auto">
-                  <ion-icon @click.stop="openCommentModal(post.id)" :icon="chatbubbleOutline"></ion-icon>
+                <ion-icon class="custom-icon" @click.stop="openCommentModal(post.id)" :icon="chatbubbleOutline"></ion-icon>
               </ion-col>
               <ion-col size="auto">
-                  <ion-icon @click.stop="toggleLike(post)" :icon="post.isLiked ? heart : heartOutline"></ion-icon>
-                  <span v-if="post.likes">{{ post.likes.length }}</span>
+                <ion-icon class="custom-icon" @click.stop="toggleLike(post)" :icon="post.isLiked ? heart : heartOutline"></ion-icon>
+                <span v-if="post.likes">{{ post.likes.length }}</span>
+              </ion-col>
+              <ion-col class="ion-text-end">
+                <ion-text>{{ timeSince(post.createdAt) }}</ion-text>
               </ion-col>
             </ion-row>
           </ion-grid>
-          <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId"></post-comment-modal>
         </ion-item>
+        <post-comment-modal v-if="isCommentModalOpen" :comments="comments" @close="closeCommentModal" :post-id="selectedPostId" :current-user="currentUser"></post-comment-modal>
       </ion-list>
-    </ion-content>
-  </ion-page>
+      <ToastMessage />
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonThumbnail, IonGrid, IonCol, IonRow } from '@ionic/vue';
-import PostForm from '@/components/Feed/PostForm.vue';
+import { defineComponent } from 'vue';
+import { IonContent, IonList, IonItem, IonButton, IonIcon, IonAvatar, IonButtons, IonGrid, IonCol, IonRow, IonText, IonTextarea, IonPopover, IonChip, IonLabel } from '@ionic/vue';
+import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import PostCommentModal from '@/components/Feed/PostCommentModal.vue';
-import { chatbubbleOutline, heart, heartOutline, trashOutline } from 'ionicons/icons';
+import { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
+import PostFilterButton from '@/components/Feed/PostFilterButton.vue';
+import ToastMessage from '@/components/Commun/ToastMessage.vue'
+import { timeSince } from '@/utils/date';
 
 export default defineComponent({
   name: 'PostList',
   components: {
-    IonThumbnail,
-    IonPage,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
+    ToastMessage,
+    PostFormModal,
+    PostFilterButton,
     IonContent,
     IonList,
     IonItem,
@@ -84,20 +105,34 @@ export default defineComponent({
     IonGrid,
     IonCol,
     IonRow,
-    PostForm,
+    IonText,
+    IonTextarea,
+    IonPopover,
+    IonChip,
+    IonLabel,
     PostCommentModal
   },
   setup() {
-    return { chatbubbleOutline, heart, heartOutline, trashOutline };
+    return { chatbubbleOutline, heart, heartOutline, trashOutline, ellipsisVerticalOutline };
   },
   data() {
     return {
       selectedPostId: null,
       isCommentModalOpen: false,
+      isPostFormModalOpen: false,
+      selectedTags: [],
+      selectedTriggers: []
     };
   },
   props: {
-    posts: Array,
+    posts: {
+      type: Array,
+      required: true
+    },
+    currentUser: {
+      type: Object,
+      required: true
+    }
   },
   computed: {
     selectedPost() {
@@ -105,15 +140,28 @@ export default defineComponent({
       return postStore.posts.find(post => post.id === this.selectedPostId);
     },
     comments() {
-      return this.selectedPost ? this.selectedPost.comments : [];
+      return this.selectedPost ? this.selectedPost.comments.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
+    },
+    filteredPosts() {
+      return this.posts.filter(post => {
+        const hasSelectedTags = this.selectedTags.length === 0 || post.tags.some(tag => this.selectedTags.includes(tag.id));
+        const hasSelectedTriggers = this.selectedTriggers.length === 0 || post.triggers.some(trigger => this.selectedTriggers.includes(trigger.id));
+        return hasSelectedTags && hasSelectedTriggers;
+      });
     }
   },
   methods: {
+    timeSince,
     editPost(post) {
       this.selectedPostId = post.id;
+      this.isPostFormModalOpen = true;
     },
-    async deletePost(postId) {
-      await usePostStore().deletePost(postId);
+    async deleteOnePost(postId) {
+      await usePostStore().deleteOnePost(postId);
+    },
+    async reportPost(postId) {
+      // Add your report post logic here
+      console.log(`Reported post with id: ${postId}`);
     },
     openCommentModal(postId) {
       this.selectedPostId = postId;
@@ -131,7 +179,42 @@ export default defineComponent({
         await usePostStore().likePost(post.id);
         post.isLiked = true;
       }
-    }
+    },
+    closePostFormModal() {
+      this.isPostFormModalOpen = false;
+      this.selectedPostId = null;
+    },
+    updateSelectedTags(tags) {
+      this.selectedTags = tags;
+    },
+    updateSelectedTriggers(triggers) {
+      this.selectedTriggers = triggers;
+    },
+    showUserProfile(user) {
+      this.$router.push({ name: 'UserProfile', params: { userId: user.id } });
+    },
   },
 });
 </script>
+
+<style scoped>
+ion-grid {
+  padding: 1rem;
+}
+
+ion-item:not(ion-popover ion-item) {
+  --padding-start: 0px;
+  --inner-padding-end: 0px;
+}
+
+ion-popover ion-list {
+  padding: 4px !important;
+  box-shadow: var(--neumorphism-out-shadow) !important;
+}
+
+ion-popover ion-item:hover {
+  --box-shadow: var(--neumorphism-in-shadow) !important;
+  color: var(--ion-color-secondary) !important;
+  font-weight: bold;
+}
+</style>

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { CreateConversationDto } from './dto/create-conversation.dto';
 import { UpdateConversationDto } from './dto/update-conversation.dto';
@@ -21,16 +21,24 @@ export class ConversationController {
     @UseGuards(JwtAuthGuard)
     @Get()
     async findAll(@User() user: any) {
-        return this.conversationService.findAll(user.id);
+        return await this.conversationService.findAll(user.id);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Get(':id')
+    async findOne(@Param('id') id: string, @User() user: any) {
+        return await this.conversationService.findOne(id, user.id);
+    }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':id/messages')
+    @Get(':conversationId/messages')
     @ApiResponse({ status: 200, description: 'Return messages for the conversation.' })
     @ApiResponse({ status: 404, description: 'Conversation not found.' })
-    async findMessagesByConversation(@Param('id') id: string) {
-        return this.messageService.findByConversation(id);
+    async findMessagesByConversation( @Param('conversationId') conversationId: string,
+                                      @User() user: any,
+                                      @Query('page') page: number = 1,
+                                      @Query('limit') limit: number = 12) {
+        return this.messageService.findByConversation(conversationId, user.id, page, limit);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -48,5 +56,11 @@ export class ConversationController {
     async delete(@Param('id') id: string, @User() user: any) {
         await this.conversationService.delete(id, user.id);
         return {message: "Conversation deleted"};
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(':conversationId/mark-read')
+    async markMessagesAsRead(@Param('conversationId') conversationId: string, @User() user: any) {
+        return await this.messageService.markMessagesAsRead(conversationId, user.id);
     }
 }

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Res, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
@@ -7,24 +7,30 @@ import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { CreateTherapistDto } from 'src/user/dto/create-therapist.dto';
 import slugify from 'slugify';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UserService } from '../user/user.service';
+import { User } from '../user/decorators/user.decorator';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private userService: UserService) {}
 
   /**
    * Logs in a user and returns JWT tokens.
    * @param req - The login request data.
+   * @param res
    */
   @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
-  @ApiBody({ type: LoginDto })
-  async login(@Body() req: LoginDto) {
-    return this.authService.login(req.email, req.password);
+  async login(@Body() req: LoginDto, @Res() res: Response) {
+    const user = await this.authService.login(req.email, req.password);
+    res.cookie('access_token', user.access_token, { httpOnly: true, secure: true});
+    res.cookie('refresh_token', user.refresh_token, { httpOnly: true, secure: true});
+    // ne pas envoyer les tokens, mais le reste des données de l'utilisateur
+    return res.send({ email: user.email, avatar: user.avatar, username: user.username, id: user.id, accessCode: user.accessCode });
   }
-
   /**
    * Registers a new user.
    * @param createUserDto - The data transfer object containing user details.
@@ -37,7 +43,38 @@ export class AuthController {
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: any) {
     createUserDto.slug = slugify(createUserDto.username, { lower: true });
-    return this.authService.register(createUserDto);
+    return await this.authService.register(createUserDto);
+  }
+
+ //TODO: Add a route to logout a user
+  @Post('logout')
+  @ApiOperation({ summary: 'Logout a user' })
+  @ApiResponse({ status: 200, description: 'User logged out successfully.' })
+  async logout(@Req() req: any, @Res() res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+    return res.send({ message: 'Logged out successfully' });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  @ApiOperation({ summary: 'Get user profile' })
+  @ApiResponse({ status: 200, description: 'User profile retrieved successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async getProfile(@User() user: any) {
+    const updatedUser = await this.userService.findOneByEmail(user.email);
+    return {
+      email: updatedUser.email,
+      username: updatedUser.username,
+      avatar: updatedUser.avatar,
+      id: updatedUser.id,
+      accessCode: updatedUser.accessCode,
+      friendshipsReceived: updatedUser.friendshipsReceived,
+      friendshipsSent: updatedUser.friendshipsSent,
+      biography: updatedUser.biography,
+      age: updatedUser.age,
+      createdAt: updatedUser.createdAt,
+    };
   }
 
   /**
@@ -53,7 +90,7 @@ export class AuthController {
   async registerTherapist(@Body() createTherapistDto: CreateTherapistDto) {
     createTherapistDto.slug = slugify(`${createTherapistDto.firstName} ${createTherapistDto.lastName}`, { lower: true });
     createTherapistDto.role = 'THERAPIST';
-    return this.authService.register(createTherapistDto);
+    return await this.authService.register(createTherapistDto);
   }
 
   /**
@@ -67,7 +104,6 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Failed to confirm email.' })
   async confirmEmail(@Query('token') token: string, @Res() res: Response) {
     try {
-      console.log('token', token);
       await this.authService.confirmEmail(token);
       return res.redirect('https://sendpathy.aaa/connexion?message=email_confirmed');
     } catch (error) {
@@ -83,9 +119,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({ status: 200, description: 'Password reset email sent.' })
   @ApiResponse({ status: 400, description: 'Failed to send password reset email.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
   @ApiBody({ schema: { type: 'object', properties: { email: { type: 'string', description: 'Email of the user' } } } })
   async requestPasswordReset(@Body('email') email: string) {
-    return this.authService.requestPasswordReset(email);
+    return await this.authService.requestPasswordReset(email);
   }
 
   /**
@@ -99,19 +136,23 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Failed to reset password.' })
   @ApiBody({ schema: { type: 'object', properties: { token: { type: 'string', description: 'Reset token' }, newPassword: { type: 'string', description: 'New password' } } } })
   async resetPassword(@Body('token') token: string, @Body('newPassword') newPassword: string) {
-    return this.authService.resetPassword(token, newPassword);
+    return await this.authService.resetPassword(token, newPassword);
   }
 
   /**
    * Refreshes the JWT token using a refresh token.
-   * @param refreshTokenDto - The data transfer object containing the refresh token.
+   * @param req - The request object.
+   * @param res - The response object.
    */
   @Post('refresh-token')
   @ApiOperation({ summary: 'Refresh JWT token' })
   @ApiResponse({ status: 200, description: 'Token refreshed successfully.' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token.' })
-  @ApiBody({ type: RefreshTokenDto })
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshToken(refreshTokenDto.refreshToken);
+  async refreshToken(@Req() req: any, @Res() res: Response) {
+    const refreshToken = req.cookies['refresh_token'];
+    const { accessToken, refreshToken: newRefreshToken } = await this.authService.refreshToken(refreshToken);
+    res.cookie('access_token', accessToken, { httpOnly: true, secure: true, maxAge: 15 * 60 * 1000 });
+    res.cookie('refresh_token', newRefreshToken, { httpOnly: true, secure: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    return res.send({ message: 'Token refreshed' });
   }
 }

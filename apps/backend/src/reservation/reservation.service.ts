@@ -15,6 +15,7 @@ export class ReservationService {
       where: { userId: userId },
       include: {
         user: true,
+        slot: true,
       },
     });
   }
@@ -28,6 +29,7 @@ export class ReservationService {
       where: { id: id },
       include: {
         user: true,
+        slot: true,
       },
     });
 
@@ -55,10 +57,12 @@ export class ReservationService {
 
     const reservation = await this.prisma.reservation.create({
       data: {
-        ...createReservationDto,
+        slotId: createReservationDto.slotId,
         userId,
       },
     });
+
+    console.log('reservation', reservation);
 
     await this.availableSlotService.update(createReservationDto.slotId, { isBooked: true });
 
@@ -72,6 +76,7 @@ export class ReservationService {
 
     const reservation = await this.findOne(id, userId);
 
+    console.log('reservation', reservation);
     if (!reservation) {
       throw new Error('Reservation not found');
     }
@@ -79,14 +84,22 @@ export class ReservationService {
     if (reservation.userId !== userId) {
       throw new Error('You are not authorized to update this reservation');
     }
+    await this.availableSlotService.update(reservation.slotId, { isBooked: false });
 
-    return this.prisma.reservation.update({
+    const newReservation = this.prisma.reservation.update({
       where: { id: id },
-      data: updateReservationDto,
+      data: {
+        slotId: updateReservationDto.slotId,
+      },
       include: {
         user: true,
       },
     });
+
+    await this.availableSlotService.update(updateReservationDto.slotId, { isBooked: true });
+
+    return newReservation;
+
   }
 
   async cancel(id: string, userId: string): Promise<any> {
