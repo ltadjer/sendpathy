@@ -62,6 +62,8 @@ export class UserService {
             },
           },
         },
+        tags: true,
+        triggers: true,
       },
     });
   }
@@ -115,6 +117,8 @@ export class UserService {
             },
           },
         },
+        tags: true,
+        triggers: true,
       },
     });
   }
@@ -310,6 +314,32 @@ export class UserService {
       return false;
     }
     return true;
+  }
+
+  async associateTags(userId: string, tagIds: string[]) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        tags: {
+          set: tagIds.map(tagId => ({ id: tagId })),
+        },
+      },
+    });
+
+    return await this.findOne(userId);
+  }
+
+  async associateTriggers(userId: string, triggerIds: string[]) {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        triggers: {
+          set: triggerIds.map(triggerId => ({ id: triggerId })),
+        },
+      },
+    });
+
+    return await this.findOne(userId);
   }
 
 }

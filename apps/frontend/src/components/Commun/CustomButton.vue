@@ -65,7 +65,7 @@ ion-button.ion-shadow-in .gradient-text {
   font-weight: bold;
 }
 
-nav ion-button {
+ion-button {
   border-radius: 1rem;
 }
 </style>

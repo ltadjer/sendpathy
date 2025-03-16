@@ -68,12 +68,15 @@ export class AuthController {
       username: updatedUser.username,
       avatar: updatedUser.avatar,
       id: updatedUser.id,
+      nativeLanguage: updatedUser.nativeLanguage,
       accessCode: updatedUser.accessCode,
       friendshipsReceived: updatedUser.friendshipsReceived,
       friendshipsSent: updatedUser.friendshipsSent,
       biography: updatedUser.biography,
       age: updatedUser.age,
       createdAt: updatedUser.createdAt,
+      tags: updatedUser.tags,
+      triggers: updatedUser.triggers
     };
   }
 

@@ -123,6 +123,34 @@ export default  {
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  async updateUserTags(userId: string, tags: string[]) {
+    try {
+      const response = await api.patch(`/users/${userId}/tags`, { tagIds: tags });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async updateUserTriggers(userId: string, triggers: string[]) {
+    try {
+      const response = await api.patch(`/users/${userId}/triggers`, { triggerIds: triggers });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteUser(userId: string) {
+    try {
+      const response = await api.delete(`/users/${userId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
 }
 

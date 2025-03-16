@@ -14,6 +14,7 @@ import ReservationSummaryView from '@/views/reservation/ReservationSummaryView.v
 import { useAccountStore } from '@/stores/account';
 import ProfileView from '@/views/ProfileView.vue';
 import NotificationView from '@/views/NotificationView.vue';
+import SettingsView from '@/views/SettingsView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -45,6 +46,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'ReservationForm',
         component: NewReservationView,
         props: true
+      },
+      {
+        path: '/parametres',
+        name: 'Settings',
+        component: SettingsView,
       }
     ],
     meta: { requiresAuth: true }
