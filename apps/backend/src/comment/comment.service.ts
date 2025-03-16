@@ -1,22 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service';
+import { NotificationGateway } from '../notification/notification.gateway';
+import { NotificationType } from '@prisma/client';
 
 @Injectable()
 export class CommentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationGateway: NotificationGateway,
+  ) {}
 
   async addCommentToPost(postId: string, createCommentDto: any, userId: string) {
-    // Check if the post exists
-    const postExists = await this.prisma.post.findUnique({
-      where: { id: postId },
-    });
-
+    const postExists = await this.prisma.post.findUnique({ where: { id: postId } });
     if (!postExists) {
       throw new Error('Post not found');
     }
 
-    // Create the comment if the post exists
-    return await this.prisma.comment.create({
+    const comment = await this.prisma.comment.create({
       data: {
         ...createCommentDto,
         post: { connect: { id: postId } },
@@ -24,21 +24,22 @@ export class CommentService {
       },
       include: { user: true },
     });
+
+    if (postExists.userId !== userId) {
+      const message = `${comment.user.username} a commenté votre post`;
+      await this.notificationGateway.sendNotificationToUser(postExists.userId, NotificationType.COMMENT, message, userId);
+    }
+
+    return comment;
   }
 
   async addCommentToComment(parentCommentId: string, createCommentDto: any, userId: string) {
-    // Retrieve the parent comment to get the associated post ID
-    const parentComment = await this.prisma.comment.findUnique({
-      where: { id: parentCommentId },
-      include: { post: true },
-    });
-
+    const parentComment = await this.prisma.comment.findUnique({ where: { id: parentCommentId }, include: { post: true } });
     if (!parentComment) {
       throw new Error('Parent comment not found');
     }
 
-    // Create the comment with the associated post ID
-    return await this.prisma.comment.create({
+    const comment = await this.prisma.comment.create({
       data: {
         ...createCommentDto,
         parent: { connect: { id: parentCommentId } },
@@ -47,6 +48,13 @@ export class CommentService {
       },
       include: { user: true },
     });
+
+    if (parentComment.userId !== userId) {
+      const message = `${comment.user.username} a répondu à votre commentaire`;
+      await this.notificationGateway.sendNotificationToUser(parentComment.userId, NotificationType.COMMENT, message, userId);
+    }
+
+    return comment;
   }
 
   async removeCommentFromPost(postId: string, commentId: string) {

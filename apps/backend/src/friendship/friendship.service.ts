@@ -76,15 +76,27 @@ export class FriendshipService {
         const friendship = await this.prisma.friendship.findUnique({
             where: { id },
         });
-        console.log(friendship);
 
         if (!friendship) {
             throw new NotFoundException('Friendship not found.');
         }
 
-        return this.prisma.friendship.update({
+        const updatedFriendship = await this.prisma.friendship.update({
             where: { id },
             data: { status: 'ACCEPTED', startedAt: new Date() },
+            include: { requester: true, receiver: true },
         });
+
+        console.log(updatedFriendship);
+
+        const message = `${updatedFriendship.receiver.username} a accepté votre demande d'ami`;
+        await this.notificationGateway.sendNotificationToUser(
+          friendship.requesterId,
+          NotificationType.FRIEND_REQUEST,
+          message,
+          friendship.receiverId,
+        );
+
+        return updatedFriendship;
     }
 }

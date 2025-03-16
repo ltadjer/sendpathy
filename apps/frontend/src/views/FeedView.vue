@@ -12,7 +12,7 @@
         </ion-item>
         <ion-buttons slot="end">
             <ion-icon class="custom-icon ion-margin-end" :icon="notificationsOutline" @click="goToNotifications"></ion-icon>
-            <img alt="Logo" src="@/assets/logo.png" width="50px" />
+            <img alt="Logo" src="@/assets/logo.svg" width="70px" />
         </ion-buttons>
       </ion-toolbar>
     </ion-header>

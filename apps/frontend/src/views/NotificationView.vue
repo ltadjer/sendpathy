@@ -22,6 +22,9 @@
             <ion-button @click="acceptFriendRequest(notification)">Accepter</ion-button>
             <ion-button @click="ignoreFriendRequest(notification)">Ignorer</ion-button>
           </div>
+          <div v-else-if="notification.type === 'FRIEND_REQUEST' && isFriendshipAccepted(notification.sender.id) && !isFriend(notification.sender.id) && !isFriendshipPending(notification.sender.id) && isSent" class="notification-actions">
+            <ion-button @click="inviteBack(notification.sender.id)">Inviter en retour</ion-button>
+          </div>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -47,6 +50,7 @@ import {
 } from '@ionic/vue';
 import { arrowBackOutline } from 'ionicons/icons';
 import { useFriendshipStore } from '@/stores/friendship';
+import { useAccountStore } from '@/stores/account'
 
 export default defineComponent({
   components: {
@@ -63,12 +67,20 @@ export default defineComponent({
     IonAvatar,
     IonButton,
   },
+  data() {
+    return {
+      isSent: false,
+    };
+  },
   computed: {
     notifications() {
       return useNotificationStore().notifications;
     },
     friendships() {
       return useFriendshipStore().friendships;
+    },
+    currentUser() {
+      return useAccountStore().user;
     },
   },
   setup() {
@@ -85,11 +97,17 @@ export default defineComponent({
       await useNotificationStore().markAsRead(notificationId);
     },
     isFriendshipAccepted(senderId: string) {
-      const friendship = this.friendships.find(f => f.requesterId === senderId || f.receiverId === senderId);
-      return friendship && friendship.status === 'ACCEPTED';
+      const isReceiver = this.friendships.find(f => f.requesterId === senderId && f.receiverId === this.currentUser.id);
+      return isReceiver && isReceiver.status === 'ACCEPTED';
+    },
+    isFriend(userId: string) {
+      return this.friendships.some(f => (f.requesterId === userId && f.receiverId === userId) && f.status === 'ACCEPTED');
+    },
+    isFriendshipPending(userId: string) {
+      return this.friendships.some(f => f.requesterId === this.currentUser.id && f.receiverId === userId);
     },
     async acceptFriendRequest(notification) {
-      const friendship = this.friendships.find(f => f.requesterId === notification.sender.id);
+      const friendship = this.friendships.find(f => f.requesterId === notification.sender.id && f.receiverId === this.currentUser.id);
       if (friendship) {
         await useFriendshipStore().acceptFriendship(friendship.id);
         notification.message = `${notification.sender.username} a commencé à vous suivre`;
@@ -103,6 +121,11 @@ export default defineComponent({
         await useFriendshipStore().deleteOneFriendship(friendship.id);
       }
     },
+    async inviteBack(userId: string) {
+      await useFriendshipStore().createOneFriendship({ requesterId: this.currentUser.id, receiverId: userId, status: 'PENDING' });
+      this.isSent = true;
+      await useNotificationStore().fetchAllNotifications();
+    },
     formatDate(dateString: string) {
       const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
       return new Date(dateString).toLocaleDateString('fr-FR', options);
@@ -112,17 +135,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.header-page {
-  background: var(--ion-color-primary);
-}
-
-.notification-item {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
 .notification-item ion-avatar {
   margin-right: 10px;
 }
@@ -142,5 +154,11 @@ export default defineComponent({
 .notification-actions {
   display: flex;
   gap: 10px;
+}
+
+ion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 </style>
