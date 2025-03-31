@@ -152,11 +152,41 @@ export const useAccountStore = defineStore('account', {
       const toastStore = useToastStore();
       try {
         this.user = await AuthService.updateUser(this.user.id, updatedUser);
+        console.log('Updated user:', this.user);
         toastStore.showToast('Profil mis à jour avec succès', 'primary');
       } catch (error) {
         toastStore.showToast('Échec de la mise à jour du profil', 'danger');
         console.error('Failed to update user:', error);
       }
+    },
+
+    async updateUserTags(userId: string, tags: string[]) {
+      try {
+        const response = await AuthService.updateUserTags(userId, tags);
+        this.user = response;
+        return response;
+      } catch (error) {
+        console.error('Failed to update user tags:', error);
+      }
+    },
+
+    async updateUserTriggers(userId: string, triggers: string[]) {
+      try {
+        const response = await AuthService.updateUserTriggers(userId, triggers);
+        this.user = response;
+        return response;
+      } catch (error) {
+        console.error('Failed to update user triggers:', error);
+      }
+    },
+
+    async deleteUser(userId: string) {
+      try {
+        return await AuthService.deleteUser(userId);
+        // TODO: Redirect to login page after deleting user account
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+        }
     }
   }
 });

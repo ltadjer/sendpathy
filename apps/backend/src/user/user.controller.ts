@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Patch,
+  Put,
   UseGuards, NotFoundException
 } from '@nestjs/common'
 import { UserService } from './user.service';
@@ -121,6 +122,32 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found.' })
   async delete(@Param('id') id: string) {
     return await this.userService.delete(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/tags')
+  @ApiOperation({ summary: 'Update a user\'s tags' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user\'s tags have been successfully updated.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async updateTags(@Param('id') userId: string, @Body('tagIds') tagIds: string[]) {
+    console.log('tagIds', tagIds)
+    return await this.userService.associateTags(userId, tagIds);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/triggers')
+  @ApiOperation({ summary: 'Update a user\'s triggers' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user\'s triggers have been successfully updated.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async updateTriggers(@Param('id') userId: string, @Body('triggerIds') triggerIds: string[]) {
+    console.log('triggerIds', triggerIds)
+    return await this.userService.associateTriggers(userId, triggerIds);
   }
 
 }
