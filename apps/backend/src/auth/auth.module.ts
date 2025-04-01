@@ -10,7 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { UserModule } from 'src/user/user.module';
 import { CodeAuthMiddleware } from 'src/life-moment/middleware/code-auth.middleware';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 @Module({
   controllers: [AuthController],

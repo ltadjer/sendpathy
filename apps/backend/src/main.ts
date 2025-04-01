@@ -2,13 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
 import * as express from 'express';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser'; // Correct import
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(cookieParser());
+  app.use(cookieParser()); // Use cookieParser correctly
   app.use('/uploads', express.static('uploads'));
   // Enable CORS
   app.enableCors({
