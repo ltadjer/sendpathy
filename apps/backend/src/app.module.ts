@@ -9,9 +9,6 @@ import { MessageModule } from './message/message.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { FriendshipModule } from './friendship/friendship.module';
 import { CommentModule } from './comment/comment.module';
-import { LikeModule } from './like/like.module';
-import { TriggerModule } from './trigger/trigger.module';
-import { TagModule } from './tag/tag.module';
 import { LifeMomentModule } from './life-moment/life-moment.module';
 import { ContentModule } from './content/content.module';
 import { ReservationModule } from './reservation/reservation.module';
@@ -33,22 +30,15 @@ import { AvailableSlotController } from './available-slot/available-slot.control
 import { NotificationController } from './notification/notification.controller';
 import { AvailableSlotService } from './available-slot/available-slot.service';
 import { PostModule } from './post/post.module';
-import * as bcrypt from 'bcrypt';
-
-const authenticate = async (email: string, password: string, userService: UserService) => {
-  const user = await userService.findOneByEmail(email);
-
-  if (user && await bcrypt.compare(password, user.password) && user.role === 'THERAPIST') {
-    return user;
-  }
-
-  return null;
-};
+import { TagModule } from './tag/tag.module';
+import { LikeModule} from './like/like.module';
+import { AdminModule } from './admin/admin.module';
+import { TriggerModule } from './trigger/trigger.module';
 
 @Module({
   imports: [
     AuthModule,
-    UserModule, // Ensure UserModule is explicitly imported
+    UserModule,
     PrismaModule,
     MailerModule,
     PostModule,
@@ -63,28 +53,7 @@ const authenticate = async (email: string, password: string, userService: UserSe
     ContentModule,
     ReservationModule,
     NotificationModule,
-    import('@adminjs/nestjs').then(({ AdminModule }) =>
-      AdminModule.createAdminAsync({
-        imports: [UserModule], // Add this line
-        useFactory: (userService: UserService) => ({
-          adminJsOptions: {
-            rootPath: '/admin',
-            resources: [],
-          },
-          auth: {
-            authenticate: (email: string, password: string) => authenticate(email, password, userService),
-            cookieName: 'adminjs',
-            cookiePassword: 'secret',
-          },
-          sessionOptions: {
-            resave: true,
-            saveUninitialized: true,
-            secret: 'secret',
-          },
-        }),
-        inject: [UserService],
-      })
-    ),
+    AdminModule,
   ],
   controllers: [
     AppController,
@@ -109,5 +78,4 @@ const authenticate = async (email: string, password: string, userService: UserSe
     UserService,
   ],
 })
-
 export class AppModule {}
