@@ -10,6 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser()); // Use cookieParser correctly
   app.use('/uploads', express.static('uploads'));
+  app.use('/assets', express.static('assets'));
   // Enable CORS
   app.enableCors({
     origin: ['https://sendpathy.aaa', 'https://api.sendpathy.aaa'], // Allow requests from your frontend domain
