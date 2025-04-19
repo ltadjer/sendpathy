@@ -8,7 +8,7 @@ export class AvailableSlotService {
     return this.prisma.availableSlot.findMany();
   }
 
-  async createSlots(therapistId: string, startTime: Date, endTime: Date, interval: number): Promise<void> {
+  async createSlots(therapistId: string, startTime: Date, endTime: Date, interval: number) {
     const slots = [];
     let currentTime = new Date(startTime);
 
@@ -21,8 +21,8 @@ export class AvailableSlotService {
       });
       currentTime = nextTime;
     }
-
-    await this.prisma.availableSlot.createMany({ data: slots });
+    console.log('slots', slots);
+    return await this.prisma.availableSlot.createMany({ data: slots });
   }
 
   async findOne(id: string): Promise<any> {
@@ -38,5 +38,10 @@ export class AvailableSlotService {
     })
   }
 
+  async remove(id: string): Promise<void> {
+    await this.prisma.availableSlot.delete({
+      where: { id },
+    });
+  }
 
 }

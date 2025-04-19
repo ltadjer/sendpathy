@@ -1,0 +1,126 @@
+@import 'tailwind';
+@import 'vuestic';
+@import 'icon-fonts/index';
+
+:root {
+  /* Neumorphism shadows */
+  --neumorphism-out-shadow:
+    -5px -5px 10px 0px rgba(255, 255, 255, 0.8),
+    5px 5px 20px 0px rgba(214, 200, 223, 0.7);
+
+  --neumorphism-in-shadow:
+    inset 5px 5px 10px 0px rgba(214, 200, 223, 0.5),
+    inset -5px -5px 10px 0px rgba(255, 255, 255, 1);
+}
+body {
+  @apply text-regularMedium;
+
+  // TODO Move to some other place so that it's more elegant.
+  --va-checkbox-font-size: 0.875rem;
+  --va-card-box-shadow: none; // TODO Remove after https://github.com/epicmaxco/vuestic-ui/issues/3964
+  --va-card-padding: 1rem;
+  --va-font-family: 'Inter', sans-serif;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: monospace;
+  font-size: 1em;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-title {
+  @apply text-[32px] md:text-5xl font-bold leading-9 md:leading-[56px] max-sm:mt-6 mb-6 md:mb-4;
+}
+
+.h1 {
+  @apply text-[32px] md:text-5xl font-bold leading-9 md:leading-[56px] max-sm:mt-6 mb-6 md:mb-4;
+}
+
+.h3,
+.page-sub-title {
+  @apply text-2xl font-bold leading-[30px];
+}
+
+.h5 {
+  @apply font-bold leading-tight;
+}
+
+.block-title {
+  @apply text-2xl font-bold mb-2;
+}
+
+.pricing-plan-card-title {
+  @apply text-[28px] md:text-[32px] leading-10 font-bold;
+}
+
+.text-regular-small {
+  font-size: 0.8125rem;
+  line-height: 1rem;
+}
+
+.va-input-wrapper__container {
+  box-shadow: var(--neumorphism-in-shadow);
+}
+
+@import 'vue-cal/dist/vuecal.css';
+
+.vue-cal {
+  --primary-color: #9747ff;
+  --secondary-color: #fd7dfb;
+  --background-color: #f5f5fa;
+  --highlight-color: #2ecc71;
+
+  /* Application de l'ombre neumorphique */
+  --neumorphism-out-shadow: -5px -5px 10px 0px rgba(255, 255, 255, 0.8), 5px 5px 20px 0px rgba(214, 200, 223, 0.7);
+  --neumorphism-in-shadow: inset 5px 5px 10px 0px rgba(214, 200, 223, 0.5), inset -5px -5px 10px 0px rgba(255, 255, 255, 1);
+}
+
+
+.neumorphic-calendar {
+  background: #f5f5fa;
+  border-radius: 1rem;
+  box-shadow:
+    10px 10px 30px #dcdce3,
+    -10px -10px 30px #ffffff;
+  border: none;
+}
+
+.vuecal__header,
+.vuecal__body{
+  box-shadow: var(--neumorphism-out-shadow);
+}
+
+.vuecal__cell {
+  padding: .4rem !important;
+}
+.vuecal__cell--selected {
+  background-color: #9747ff10 !important;
+}
+
+.vuecal__event {
+  border-radius: 1rem !important;
+  padding: 4px 8px !important;
+  transition: all 0.3s ease;
+  box-shadow: var(--neumorphism-out-shadow);
+  color: #333 !important;
+  border: none !important;
+}
+
+.vuecal__event-time {
+  font-size: 0.65rem !important;
+}
+
+.vuecal__event.booked {
+  box-shadow: var(--neumorphism-in-shadow);
+  border: none !important;
+  border-radius: 0 !important;
+}
+

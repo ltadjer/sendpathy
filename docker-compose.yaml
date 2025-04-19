@@ -13,6 +13,9 @@ services:
       caddy_2: prisma.sendpathy.aaa
       caddy_2.tls: internal
       caddy_2.reverse_proxy: "{{upstreams 5555}}"
+      caddy_3: dashboard.sendpathy.aaa
+      caddy_3.tls: internal
+      caddy_3.reverse_proxy: "{{upstreams 5174}}"
 
     networks:
       - default

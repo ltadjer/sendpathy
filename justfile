@@ -10,11 +10,17 @@ install-back *args:
 install-front *args:
     {{PNPM}} -F "frontend" install {{args}}
 
+install-dashboard *args:
+    {{PNPM}} -F "dashboard" install {{args}}
+
 front *args:
     {{PNPM}} -F "frontend" {{args}}
 
 back *args:
     {{PNPM}} -F "backend" {{args}}
+
+dashboard *args:
+    {{PNPM}} -F "dashboard" {{args}}
 
 shell:
     docker compose exec -it node bash

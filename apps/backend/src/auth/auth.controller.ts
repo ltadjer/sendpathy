@@ -76,7 +76,9 @@ export class AuthController {
       age: updatedUser.age,
       createdAt: updatedUser.createdAt,
       tags: updatedUser.tags,
-      triggers: updatedUser.triggers
+      triggers: updatedUser.triggers,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
     };
   }
 
