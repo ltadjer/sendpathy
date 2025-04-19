@@ -1,6 +1,6 @@
-import { TriggerService } from './trigger.service'
+import { TriggerService } from './trigger.service.js'
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js'
 import { UseGuards, Get, Param, Post, Body, Patch, Delete, Controller } from '@nestjs/common';
 
 

@@ -1,11 +1,11 @@
 import { Controller, Post, Body, UseGuards, Get, Param, Patch, Delete } from '@nestjs/common';
-import { PostService } from './post.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from 'src/user/decorators/user.decorator';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { PostService } from './post.service.js';
+import { CreatePostDto } from './dto/create-post.dto.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js'
+import { User } from '../user/decorators/user.decorator.js';
+import { UpdatePostDto } from './dto/update-post.dto.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import slugify from 'slugify';
+import { generateSlug } from '../utils/slug.utils.js'
 
 @ApiTags('posts')
 @Controller('posts')
@@ -33,7 +33,7 @@ export class PostController {
   @ApiResponse({ status: 201, description: 'The post has been successfully created.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async create(@Body() createPostDto: any, @User() user: any) {
-    let slug = slugify(createPostDto.content, { lower: true });
+    let slug = generateSlug(createPostDto.content);
     slug = slug.substring(0, 50); // Limit the slug to 50 characters
     createPostDto.slug = slug;
     return this.postService.create(createPostDto, user.id);
@@ -48,7 +48,7 @@ export class PostController {
     @Param('id') id: string,
     @Body() updatePostDto: any,
   ){
-    let slug = slugify(updatePostDto.content, { lower: true });
+    let slug = generateSlug(updatePostDto.content);
     slug = slug.substring(0, 50); // Limit the slug to 50 characters
     updatePostDto.slug = slug;
     return this.postService.update(id, updatePostDto);

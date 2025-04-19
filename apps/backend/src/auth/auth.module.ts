@@ -1,15 +1,15 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { UserService } from 'src/user/user.service';
+import { AuthController } from './auth.controller.js';
+import { AuthService } from './auth.service.js';
+import { UserService } from '../user/user.service.js';
 import { JwtModule } from '@nestjs/jwt';
-import { PrismaModule } from 'src/prisma/prisma.module'; 
+import { PrismaModule } from '../prisma/prisma.module.js';
 import { PassportModule } from '@nestjs/passport';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { MailerModule } from 'src/mailer/mailer.module';
-import { UserModule } from 'src/user/user.module';
-import { CodeAuthMiddleware } from 'src/life-moment/middleware/code-auth.middleware';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { JwtStrategy } from './strategies/jwt.strategy.js';
+import { MailerModule } from '../mailer/mailer.module.js';
+import { UserModule } from '../user/user.module.js';
+import { CodeAuthMiddleware } from '../life-moment/middleware/code-auth.middleware.js';
 import cookieParser from 'cookie-parser';
 
 @Module({

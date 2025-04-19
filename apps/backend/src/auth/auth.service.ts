@@ -7,10 +7,10 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { UserService } from 'src/user/user.service';
-import { MailerService } from 'src/mailer/mailer.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { CreateTherapistDto } from 'src/user/dto/create-therapist.dto';
+import { UserService } from '../user/user.service.js';
+import { MailerService } from '../mailer/mailer.service.js';
+import { CreateUserDto } from '../user/dto/create-user.dto.js';
+import { CreateTherapistDto } from '../user/dto/create-therapist.dto.js';
 
 @Injectable()
 export class AuthService {

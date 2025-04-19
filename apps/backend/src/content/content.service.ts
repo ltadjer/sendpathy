@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { saveFileToServer } from './utils/file.utils';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { saveFileToServer } from './utils/file.utils.js';
 
 @Injectable()
 export class ContentService {

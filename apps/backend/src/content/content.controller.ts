@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, Param, Patch, Delete, UseGuards } from '@nestjs/common';
-import { ContentService } from './content.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ContentService } from './content.service.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('contents')

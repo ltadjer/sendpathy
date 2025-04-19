@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ReservationService } from './reservation.service';
-import { ReservationController } from './reservation.controller'
-import { PrismaModule } from '../prisma/prisma.module'
-import { AvailableSlotModule } from '../available-slot/available-slot.module'
-import { AvailableSlotService } from '../available-slot/available-slot.service'
+import { ReservationService } from './reservation.service.js';
+import { ReservationController } from './reservation.controller.js'
+import { PrismaModule } from '../prisma/prisma.module.js'
+import { AvailableSlotModule } from '../available-slot/available-slot.module.js'
+import { AvailableSlotService } from '../available-slot/available-slot.service.js'
 
 @Module({
   controllers: [ReservationController],

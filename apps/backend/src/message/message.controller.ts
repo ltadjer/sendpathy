@@ -1,10 +1,10 @@
 import { Controller, Post, Body, UseGuards, Get, Param, Patch, Delete } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from 'src/user/decorators/user.decorator';
+import { CreateMessageDto } from './dto/create-message.dto.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { User } from '../user/decorators/user.decorator.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { MessageService } from './message.service';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { MessageService } from './message.service.js';
+import { UpdateMessageDto } from './dto/update-message.dto.js';
 
 @ApiTags('messages')
 @Controller('messages')

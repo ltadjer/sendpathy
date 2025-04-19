@@ -1,8 +1,8 @@
 import { Injectable, ForbiddenException, NotFoundException, ConflictException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
-import { MessageService } from 'src/message/message.service';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { CreateConversationDto } from './dto/create-conversation.dto.js';
+import { UpdateConversationDto } from './dto/update-conversation.dto.js';
+import { MessageService } from '../message/message.service.js';
 
 @Injectable()
 export class ConversationService {

@@ -1,9 +1,9 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { NotificationService } from './notification.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { NotificationService } from './notification.service.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { UseGuards } from '@nestjs/common';
-import { CustomSocket } from '../message/dto/custom-socket';
+import { CustomSocket } from '../message/dto/custom-socket.js';
 import { NotificationType } from '@prisma/client';
 
 @WebSocketGateway({ namespace: 'notifications' })

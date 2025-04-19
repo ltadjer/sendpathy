@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Patch, UseGuards } from '@nestjs/common';
-import { AvailableSlotService } from './available-slot.service';
-import { User } from '../user/decorators/user.decorator'
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { AvailableSlotService } from './available-slot.service.js';
+import { User } from '../user/decorators/user.decorator.js'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('available-slots')

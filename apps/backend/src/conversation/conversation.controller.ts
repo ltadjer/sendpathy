@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
-import { ConversationService } from './conversation.service';
-import { CreateConversationDto } from './dto/create-conversation.dto';
-import { UpdateConversationDto } from './dto/update-conversation.dto';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from 'src/user/decorators/user.decorator';
-import {MessageService} from "../message/message.service";
+import { ConversationService } from './conversation.service.js';
+import { CreateConversationDto } from './dto/create-conversation.dto.js';
+import { UpdateConversationDto } from './dto/update-conversation.dto.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { User } from '../user/decorators/user.decorator.js';
+import {MessageService} from "../message/message.service.js";
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('conversations')

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LikeController } from './like.controller';
+import { LikeController } from './like.controller.js';
 
 describe('LikeController', () => {
   let controller: LikeController;

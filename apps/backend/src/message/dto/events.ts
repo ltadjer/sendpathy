@@ -1,4 +1,4 @@
-import { CreateMessageDto } from "./create-message.dto";
+import { CreateMessageDto } from "./create-message.dto.js";
 
 /**
  * Interface defining the events sent from the server to the client.

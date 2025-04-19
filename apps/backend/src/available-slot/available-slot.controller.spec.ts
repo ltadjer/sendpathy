@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AvailableSlotController } from './available-slot.controller';
+import { AvailableSlotController } from './available-slot.controller.js';
 
 describe('AvailableSlotController', () => {
   let controller: AvailableSlotController;

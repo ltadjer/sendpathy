@@ -1,9 +1,9 @@
-import { LifeMomentService } from './life-moment.service';
+import { LifeMomentService } from './life-moment.service.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from 'src/user/decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js'
+import { User } from '../user/decorators/user.decorator.js';
 import { Controller, Post, Body, Get, Param, Patch, Delete, UseGuards } from '@nestjs/common';
-import slugify from 'slugify';
+import { generateSlug} from '../utils/slug.utils.js'
 
 @ApiTags('life-moments')
 @Controller('life-moments')
@@ -46,7 +46,7 @@ export class LifeMomentController {
       });
     }
 
-    let slug = slugify(updateLifeMomentDto.content, { lower: true });
+    let slug = generateSlug(updateLifeMomentDto.content);
     slug = slug.substring(0, 50); // Limit the slug to 50 characters
     updateLifeMomentDto.slug = slug;
     return this.lifeMomentService.update(id, updateLifeMomentDto, user.id);
@@ -64,7 +64,7 @@ export class LifeMomentController {
       };
     });
 
-    let slug = slugify(createLifeMomentDto.content, { lower: true });
+    let slug = generateSlug(createLifeMomentDto.content);
     slug = slug.substring(0, 50); // Limit the slug to 50 characters
     createLifeMomentDto.slug = slug;
     return this.lifeMomentService.create(createLifeMomentDto, user.id);

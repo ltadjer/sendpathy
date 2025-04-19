@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from '../user/user.module';
-import { PrismaService } from '../prisma/prisma.service';
-import { UserService } from '../user/user.service';
+import { UserModule } from '../user/user.module.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { UserService } from '../user/user.service.js';
 import * as bcrypt from 'bcrypt';
 import * as path from 'path';
 import { Components } from './components.js';

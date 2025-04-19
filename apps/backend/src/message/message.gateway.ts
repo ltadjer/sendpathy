@@ -1,11 +1,11 @@
 import { Injectable, Logger, UseGuards, Inject, forwardRef, UnauthorizedException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, MessageBody, ConnectedSocket } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
-import { MessageService } from './message.service';
-import { CustomSocket } from './dto/custom-socket';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { CreateMessageDto } from './dto/create-message.dto.js';
+import { UpdateMessageDto } from './dto/update-message.dto.js';
+import { MessageService } from './message.service.js';
+import { CustomSocket } from './dto/custom-socket.js';
 
 @WebSocketGateway({ namespace: 'events' })
 @UseGuards(JwtAuthGuard)

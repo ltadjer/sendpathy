@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service'
-import { AvailableSlotService } from '../available-slot/available-slot.service'
+import { PrismaService } from '../prisma/prisma.service.js'
+import { AvailableSlotService } from '../available-slot/available-slot.service.js'
 
 @Injectable()
 export class ReservationService {

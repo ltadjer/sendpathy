@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { ContentService } from '../content/content.service';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { ContentService } from '../content/content.service.js';
 
 @Injectable()
 export class LifeMomentService {

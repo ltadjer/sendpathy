@@ -1,7 +1,7 @@
 import { Controller, Post, Body, UseGuards, Get, Param, Patch, Delete } from '@nestjs/common';
-import { TagService } from './tag.service'
+import { TagService } from './tag.service.js'
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard'
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js'
 
 @ApiTags('tags')
 @Controller('tags')

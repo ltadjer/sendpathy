@@ -9,12 +9,12 @@ import {
   Put,
   UseGuards, NotFoundException
 } from '@nestjs/common'
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserService } from './user.service.js';
+import { CreateUserDto } from './dto/create-user.dto.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from './decorators/user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
+import { User } from './decorators/user.decorator.js';
 
 @ApiTags('users')
 @Controller('users')

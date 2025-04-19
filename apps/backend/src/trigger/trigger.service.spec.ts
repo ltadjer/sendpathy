@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TriggerService } from './trigger.service';
+import { TriggerService } from './trigger.service.js';
 
 describe('TriggerService', () => {
   let service: TriggerService;

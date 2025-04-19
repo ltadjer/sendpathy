@@ -1,10 +1,10 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateFriendshipDto } from './dto/create-friendship.dto';
-import { UpdateFriendshipDto } from './dto/update-friendship.dto';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { CreateFriendshipDto } from './dto/create-friendship.dto.js';
+import { UpdateFriendshipDto } from './dto/update-friendship.dto.js';
 import { NotificationType } from '@prisma/client';
-import { NotificationService } from '../notification/notification.service';
-import { NotificationGateway } from '../notification/notification.gateway';
+import { NotificationService } from '../notification/notification.service.js';
+import { NotificationGateway } from '../notification/notification.gateway.js';
 @Injectable()
 export class FriendshipService {
     constructor(

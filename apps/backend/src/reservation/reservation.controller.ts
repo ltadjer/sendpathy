@@ -1,7 +1,7 @@
-import { ReservationService } from './reservation.service';
+import { ReservationService } from './reservation.service.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { User } from '../user/decorators/user.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from '../user/decorators/user.decorator.js';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { Get, Param, Post, Body, Patch, Delete, Query, Controller, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 
 @ApiTags('reservations')

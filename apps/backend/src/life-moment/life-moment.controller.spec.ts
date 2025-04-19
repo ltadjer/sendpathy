@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LifeMomentController } from './life-moment.controller';
+import { LifeMomentController } from './life-moment.controller.js';
 
 describe('LifeMomentController', () => {
   let controller: LifeMomentController;

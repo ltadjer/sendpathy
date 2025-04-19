@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AvailableSlotService } from './available-slot.service';
+import { AvailableSlotService } from './available-slot.service.js';
 
 describe('AvailableSlotService', () => {
   let service: AvailableSlotService;

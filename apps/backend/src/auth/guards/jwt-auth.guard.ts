@@ -1,6 +1,6 @@
 import { Injectable, ExecutionContext, CanActivate, UnauthorizedException } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { CustomSocket } from '../../message/dto/custom-socket';
+import { CustomSocket } from '../../message/dto/custom-socket.js';
 import { verify } from 'jsonwebtoken';
 
 @Injectable()

@@ -1,8 +1,8 @@
 import { Controller, Post, Body, UseGuards, Get, Param, Patch, Delete } from '@nestjs/common';
-import { LikeService } from './like.service'
-import { User } from 'src/user/decorators/user.decorator';
+import { LikeService } from './like.service.js'
+import { User } from '../user/decorators/user.decorator.js';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 
 @ApiTags('likes')
 @Controller('likes')

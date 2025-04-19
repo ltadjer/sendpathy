@@ -1,15 +1,15 @@
 import { Controller, Post, Body, Get, Query, Res, UseGuards, Req } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './auth.service.js';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { CreateTherapistDto } from 'src/user/dto/create-therapist.dto';
-import slugify from 'slugify';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { UserService } from '../user/user.service';
-import { User } from '../user/decorators/user.decorator';
+import { CreateUserDto } from '../user/dto/create-user.dto.js';
+import { LoginDto } from './dto/login.dto.js';
+import { CreateTherapistDto } from '../user/dto/create-therapist.dto.js';
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js'
+import { UserService } from '../user/user.service.js';
+import { User } from '../user/decorators/user.decorator.js';
+import { generateSlug} from '../utils/slug.utils.js'
+
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -42,7 +42,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid data.' })
   @ApiBody({ type: CreateUserDto })
   async register(@Body() createUserDto: any) {
-    createUserDto.slug = slugify(createUserDto.username, { lower: true });
+    createUserDto.slug = generateSlug(createUserDto.username);
     return await this.authService.register(createUserDto);
   }
 
@@ -91,7 +91,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid data.' })
   @ApiBody({ type: CreateTherapistDto })
   async registerTherapist(@Body() createTherapistDto: CreateTherapistDto) {
-    createTherapistDto.slug = slugify(`${createTherapistDto.firstName} ${createTherapistDto.lastName}`, { lower: true });
+    createTherapistDto.slug = generateSlug(`${createTherapistDto.firstName} ${createTherapistDto.lastName}`);
     createTherapistDto.role = 'THERAPIST';
     return await this.authService.register(createTherapistDto);
   }

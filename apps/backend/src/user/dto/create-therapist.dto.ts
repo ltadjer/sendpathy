@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserDto } from './user.dto';
+import { UserDto } from './user.dto.js';
 
 export class CreateTherapistDto extends UserDto {
   @ApiProperty({ description: 'First name of the therapist' })
