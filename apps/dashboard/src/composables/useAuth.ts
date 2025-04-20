@@ -1,5 +1,4 @@
-import { ref } from 'vue'
-import { login, logout, getProfile, requestPasswordReset as apiRequestPasswordReset, resetPassword as apiResetPassword } from '../services/auth'
+import { register, login, logout, getProfile, requestPasswordReset as apiRequestPasswordReset, resetPassword as apiResetPassword } from '../services/auth'
 import { useUserStore } from '../stores/user-store'
 import { useRouter } from 'vue-router'
 
@@ -7,6 +6,15 @@ export const useAuth = () => {
   const userStore = useUserStore()
   const router = useRouter()
 
+  const registerUser = async (data: any) => {
+    try {
+      await register(data)
+      // faut dabord confirmer l'email avant de se connecter
+    } catch (error) {
+      console.error('Error during registration:', error)
+      throw error
+    }
+  }
   const loginUser = async (email: string, password: string) => {
     await login(email, password)
     await fetchUser()
@@ -54,5 +62,6 @@ export const useAuth = () => {
     fetchUser,
     requestPasswordReset,
     resetPassword,
+    registerUser,
   }
 }

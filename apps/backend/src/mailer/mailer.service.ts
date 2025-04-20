@@ -12,7 +12,7 @@ export class MailerService {
     this.brevoClient = new SibApiV3Sdk.TransactionalEmailsApi();
   }
 
-  async sendConfirmationEmail(email: string, token: string): Promise<boolean> {
+  async sendConfirmationEmail(email: string, token: string, role: string): Promise<boolean> {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.to = [{ email: email }];
     sendSmtpEmail.sender = { email: 'sendpathy@gmail.com', name: 'Sendpathy' };

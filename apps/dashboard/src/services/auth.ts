@@ -1,5 +1,8 @@
 import api from './api'
 
+export const register = (data: any) =>
+  api.post('/auth/register/therapist', data)
+
 export const login = (email: string, password: string) =>
   api.post('/auth/dashboard/login', { email, password })
 

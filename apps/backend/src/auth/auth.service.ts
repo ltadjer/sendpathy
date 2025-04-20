@@ -137,6 +137,7 @@ export class AuthService {
     const emailSent = await this.mailerService.sendConfirmationEmail(
       data.email,
       newUser.confirmationToken,
+      newUser.role,
     );
     if (!emailSent) {
       throw new Error('Failed to send confirmation email');
