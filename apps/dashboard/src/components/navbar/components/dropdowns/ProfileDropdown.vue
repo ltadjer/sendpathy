@@ -3,12 +3,15 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
 import { useAuth } from '../../../../composables/useAuth'
+import { useUserStore } from '../../../../stores/user-store'
 
 const { colors, setHSLAColor } = useColors()
 const hoverColor = computed(() => setHSLAColor(colors.focus, { a: 0.1 }))
 
 const { t } = useI18n()
 const { logoutUser } = useAuth()
+
+const store = useUserStore()
 
 type ProfileListItem = {
   name: string
@@ -110,12 +113,9 @@ const handleItemClick = async (item: ProfileListItem) => {
   <div class="profile-dropdown-wrapper">
     <VaDropdown v-model="isShown" :offset="[9, 0]" class="profile-dropdown" stick-to-edges>
       <template #anchor>
-        <VaButton preset="secondary" color="textPrimary">
-          <span class="profile-dropdown__anchor min-w-max">
-            <slot />
-            <VaAvatar :size="32" color="warning"> 😍 </VaAvatar>
-          </span>
-        </VaButton>
+        <div class="shadow-neumorphism rounded-full p-2">
+          <VaAvatar :size="36" color="warning" :src="store.user.avatar" class="shadow-neumorphism-in" />
+        </div>
       </template>
       <VaDropdownContent
         class="profile-dropdown__content md:w-60 px-0 py-4 w-full"

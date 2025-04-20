@@ -1,15 +1,12 @@
 export const filterRoutesByRole = (routes: INavigationRoute[], userRole: string): INavigationRoute[] => {
   return routes
     .filter(route => {
-      // Si la route n'a pas de restriction de rôle, elle est accessible
       if (!route.meta?.roles) {
         return true
       }
-      // Sinon, vérifiez si le rôle de l'utilisateur est autorisé
       return route.meta.roles.includes(userRole)
     })
     .map(route => {
-      // Si la route a des enfants, appliquez le filtre récursivement
       if (route.children) {
         return {
           ...route,

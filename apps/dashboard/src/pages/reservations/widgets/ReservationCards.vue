@@ -82,6 +82,6 @@ defineEmits<{
     </VaCard>
   </VaInnerLoading>
   <div v-else class="p-4 flex justify-center items-center text-[var(--va-secondary)]">
-    No reservations
+    Aucune consultation trouvée
   </div>
 </template>

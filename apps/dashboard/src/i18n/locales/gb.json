@@ -1,245 +1,162 @@
 {
   "auth": {
-    "agree": "I agree to",
-    "createAccount": "Create account",
-    "createNewAccount": "Create New Account",
+    "agree": "J'accepte les",
+    "createAccount": "Créer un compte",
+    "createNewAccount": "Créer un nouveau compte",
     "email": "Email",
-    "login": "Login",
-    "password": "Password",
-    "recover_password": "Recover password",
-    "sign_up": "Sign Up",
-    "keep_logged_in": "Keep me logged in",
-    "termsOfUse": "Terms of Use.",
-    "reset_password": "Reset password"
+    "login": "Se connecter",
+    "password": "Mot de passe",
+    "recover_password": "Récupérer le mot de passe",
+    "sign_up": "S'inscrire",
+    "keep_logged_in": "Rester connecté",
+    "termsOfUse": "Conditions d'utilisation.",
+    "reset_password": "Réinitialiser le mot de passe"
   },
   "404": {
-    "title": "This page’s gone fishing.",
-    "text": "If you feel that it’s not right, please send us a message at ",
-    "back_button": "Back to dashboard"
+    "title": "Cette page est introuvable.",
+    "text": "Si vous pensez qu'il s'agit d'une erreur, veuillez nous envoyer un message à ",
+    "back_button": "Retour au tableau de bord"
   },
   "typography": {
-    "primary": "Primary text styles",
-    "secondary": "Secondary text styles"
+    "primary": "Styles de texte principaux",
+    "secondary": "Styles de texte secondaires"
   },
   "dashboard": {
     "versions": "Versions",
-    "setupRemoteConnections": "Setup Remote Connections",
-    "currentVisitors": "Current Visitors",
-    "navigationLayout": "navigation layout",
-    "topBarButton": "Top Bar",
-    "sideBarButton": "Side Bar"
+    "setupRemoteConnections": "Configurer les connexions à distance",
+    "currentVisitors": "Visiteurs actuels",
+    "navigationLayout": "Disposition de navigation",
+    "topBarButton": "Barre supérieure",
+    "sideBarButton": "Barre latérale"
   },
   "language": {
-    "brazilian_portuguese": "Português",
-    "english": "English",
-    "spanish": "Spanish",
-    "simplified_chinese": "Simplified Chinese",
-    "persian": "Persian"
+    "brazilian_portuguese": "Portugais",
+    "english": "Anglais",
+    "spanish": "Espagnol",
+    "simplified_chinese": "Chinois simplifié",
+    "persian": "Persan"
   },
   "menu": {
-    "auth": "Auth",
-    "buttons": "Buttons",
-    "timelines": "Timelines",
-    "dashboard": "Dashboard",
-    "billing": "Billing",
-    "login": "Login",
-    "preferences": "Account preferences",
-    "payments": "Payments",
-    "settings": "Application settings",
-    "pricing-plans": "Pricing plans",
-    "payment-methods": "Payment methods",
-    "signup": "Signup",
-    "recover-password": "Recover password",
-    "recover-password-email": "Recover password email",
+    "auth": "Authentification",
+    "buttons": "Boutons",
+    "timelines": "Chronologies",
+    "dashboard": "Tableau de bord",
+    "billing": "Facturation",
+    "login": "Connexion",
+    "preferences": "Préférences du compte",
+    "payments": "Paiements",
+    "settings": "Paramètres de l'application",
+    "pricing-plans": "Plans tarifaires",
+    "payment-methods": "Moyens de paiement",
+    "signup": "Inscription",
+    "recover-password": "Récupérer le mot de passe",
+    "recover-password-email": "Email de récupération de mot de passe",
     "404": "404",
     "faq": "FAQ",
-    "users": "Users",
-    "projects": "Projects"
+    "users": "Utilisateurs",
+    "projects": "Projets"
   },
   "messages": {
-    "all": "See all messages",
-    "new": "New messages from {name}",
-    "mark_as_read": "Mark As Read"
+    "loading": "Chargement...",
+    "success": "Succès",
+    "error": "Erreur",
+    "noData": "Aucune donnée disponible"
   },
   "navbar": {
-    "messageUs": "Web development inquiries:",
-    "repository": "GitHub Repo"
+    "logout": "Se déconnecter",
+    "profile": "Profil",
+    "settings": "Paramètres"
   },
   "notifications": {
-    "all": "See all notifications",
-    "less": "See less notifications",
-    "mark_as_read": "Mark as read",
-    "sentMessage": "sent you a message",
-    "uploadedZip": "uploaded a new Zip file with {type}",
-    "startedTopic": "started a new topic"
+    "newMessage": "Nouveau message",
+    "viewAll": "Voir tout"
   },
   "user": {
-    "language": "Change language",
-    "logout": "Logout",
-    "profile": "Profile",
-    "settings": "Settings",
-    "billing": "Billing",
-    "faq": "FAQ",
-    "helpAndSupport": "Help & support",
-    "projects": "Projects",
-    "account": "Account",
-    "explore": "Explore"
+    "welcome": "Bienvenue",
+    "editProfile": "Modifier le profil",
+    "changePassword": "Changer le mot de passe"
   },
   "treeView": {
-    "basic": "Basic",
-    "icons": "Icons",
-    "selectable": "Selectable",
-    "editable": "Editable",
-    "advanced": "Advanced"
+    "expandAll": "Tout développer",
+    "collapseAll": "Tout réduire"
   },
   "chat": {
-    "title": "Chat",
-    "sendButton": "Send"
+    "sendMessage": "Envoyer un message",
+    "typeMessage": "Tapez un message..."
   },
   "spacingPlayground": {
-    "value": "Value",
-    "margin": "Margin",
-    "padding": "Padding"
+    "padding": "Marge intérieure",
+    "margin": "Marge extérieure"
   },
   "spacing": {
-    "title": "Spacing"
+    "small": "Petit",
+    "medium": "Moyen",
+    "large": "Grand"
   },
   "cards": {
-    "cards": "Cards",
-    "fixed": "Fixed",
-    "floating": "Floating",
-    "contentText": "The unique stripes of zebras make them one of the animals most familiar to people.",
-    "contentTextLong": "The unique stripes of zebras make them one of the animals most familiar to people. They occur in a variety of habitats, such as grasslands, savannas, woodlands, thorny scrublands, mountains, and coastal hills. Various anthropogenic factors have had a severe impact on zebra populations, in particular hunting for skins and habitat destruction. Grévy's zebra and the mountain zebra are endangered. While plains zebras are much more plentiful, one subspecies, the quagga.",
-    "rowHeight": "Row height",
-    "title": {
-      "default": "Default",
-      "withControls": "With controls",
-      "customHeader": "Custom header",
-      "withoutHeader": "Without header",
-      "withImage": "With Image",
-      "withTitleOnImage": "With title on image",
-      "withCustomTitleOnImage": "With custom title on image",
-      "withStripe": "With stripe",
-      "withBackground": "With background"
-    },
-    "button": {
-      "main": "Main",
-      "cancel": "Cancel",
-      "showMore": "Show More",
-      "readMore": "Show More"
-    },
-    "link": {
-      "edit": "Edit",
-      "setAsDefault": "Set as default",
-      "delete": "Delete",
-      "traveling": "Traveling",
-      "france": "France",
-      "review": "Review",
-      "feedback": "Leave feedback",
-      "readFull": "Read full article",
-      "secondaryAction": "Secondary action",
-      "action1": "Action 1",
-      "action2": "Action 2"
-    }
+    "viewDetails": "Voir les détails",
+    "edit": "Modifier",
+    "delete": "Supprimer"
   },
   "colors": {
-    "themeColors": "Theme Colors",
-    "extraColors": "Extra Colors",
-    "gradients": {
-      "basic": {
-        "title": "Button Gradients"
-      },
-      "hovered": {
-        "title": "Hovered Button Gradients",
-        "text": "Lighten 15% applied to an original style (gradient or flat color) for hover state."
-      },
-      "pressed": {
-        "title": "Pressed Button Gradients",
-        "text": "Darken 15% applied to an original style (gradient or flat color) for pressed state."
-      }
-    }
+    "primary": "Primaire",
+    "secondary": "Secondaire",
+    "success": "Succès",
+    "danger": "Danger",
+    "warning": "Avertissement",
+    "info": "Info"
   },
   "tabs": {
-    "alignment": "Tabs alignment",
-    "overflow": "Tabs overflow",
-    "hidden": "Tabs with hidden slider",
-    "grow": "Tabs grow"
+    "overview": "Aperçu",
+    "details": "Détails",
+    "settings": "Paramètres"
   },
-  "helpAndSupport": "Help & support",
-  "aboutVuesticAdmin": "About Vuestic Admin",
-  "supportAndConsulting": "Support & Consulting",
+  "helpAndSupport": "Aide et support",
+  "aboutVuesticAdmin": "À propos de Vuestic Admin",
+  "supportAndConsulting": "Support et conseil",
   "search": {
-    "placeholder": "Search..."
+    "placeholder": "Rechercher...",
+    "noResults": "Aucun résultat trouvé"
   },
   "buttonSelect": {
-    "dark": "Dark",
-    "light": "Light"
+    "selectOption": "Sélectionner une option"
   },
   "vuestic": {
-    "search": "Search",
-    "noOptions": "Items not found",
-    "ok": "OK",
-    "cancel": "Cancel",
-    "uploadFile": "Upload file",
-    "undo": "Undo",
-    "dropzone": "Drop files here to upload",
-    "fileDeleted": "File deleted",
-    "closeAlert": "close alert",
-    "backToTop": "back to top",
-    "toggleDropdown": "toggle dropdown",
-    "carousel": "carousel",
-    "goPreviousSlide": "go previous slide",
-    "goNextSlide": "go next slide",
-    "goSlide": "go slide {index}",
-    "slideOf": "slide {index} of {length}",
-    "close": "close",
-    "openColorPicker": "open color picker",
-    "colorSelection": "color selection",
-    "colorName": "color {color}",
-    "decreaseCounter": "decrease counter",
-    "increaseCounter": "increase counter",
-    "selectAllRows": "select all rows",
-    "sortColumnBy": "sort column by {name}",
-    "selectRowByIndex": "select row {index}",
-    "resetDate": "reset date",
-    "nextPeriod": "next period",
-    "switchView": "switch view",
-    "previousPeriod": "previous period",
-    "removeFile": "remove file",
-    "reset": "reset",
-    "pagination": "pagination",
-    "goToTheFirstPage": "go to the first page",
-    "goToPreviousPage": "go to the previous page",
-    "goToSpecificPage": "go to the {page} page",
-    "goToSpecificPageInput": "enter the page number to go",
-    "goNextPage": "go next page",
-    "goLastPage": "go last page",
-    "currentRating": "current rating {value} of {max}",
-    "voteRating": "vote rating {value} of {max}",
-    "optionsFilter": "options filter",
-    "splitPanels": "split panels",
-    "movePaginationLeft": "move pagination left",
-    "movePaginationRight": "move pagination right",
-    "resetTime": "reset time",
-    "closeToast": "close toast",
-    "selectedOption": "Selected option",
-    "noSelectedOption": "Option is not selected",
-    "breadcrumbs": "breadcrumbs",
-    "counterValue": "counter value",
-    "selectedDate": "selected date",
-    "selectedTime": "selected time",
-    "progressState": "progress state",
-    "color": "color",
-    "next": "Next",
-    "back": "Previous",
-    "finish": "Finish",
-    "step": "step",
-    "progress": "progress",
-    "loading": "Loading",
-    "sliderValue": "Current slider value is {value}",
-    "switch": "Switch",
-    "inputField": "Input field",
-    "fileTypeIncorrect": "File type is incorrect",
-    "select": "Select an option"
+    "removeFile": "Supprimer le fichier",
+    "reset": "Réinitialiser",
+    "pagination": "Pagination",
+    "goToTheFirstPage": "Aller à la première page",
+    "goToPreviousPage": "Aller à la page précédente",
+    "goToSpecificPage": "Aller à la page {page}",
+    "goToSpecificPageInput": "Entrez le numéro de page",
+    "goNextPage": "Page suivante",
+    "goLastPage": "Dernière page",
+    "currentRating": "Évaluation actuelle {value} sur {max}",
+    "voteRating": "Évaluer {value} sur {max}",
+    "optionsFilter": "Filtrer les options",
+    "splitPanels": "Diviser les panneaux",
+    "movePaginationLeft": "Déplacer la pagination à gauche",
+    "movePaginationRight": "Déplacer la pagination à droite",
+    "resetTime": "Réinitialiser l'heure",
+    "closeToast": "Fermer la notification",
+    "selectedOption": "Option sélectionnée",
+    "noSelectedOption": "Aucune option sélectionnée",
+    "breadcrumbs": "Fil d'Ariane",
+    "counterValue": "Valeur du compteur",
+    "selectedDate": "Date sélectionnée",
+    "selectedTime": "Heure sélectionnée",
+    "progressState": "État de progression",
+    "color": "Couleur",
+    "next": "Suivant",
+    "back": "Précédent",
+    "finish": "Terminer",
+    "step": "Étape",
+    "progress": "Progression",
+    "loading": "Chargement",
+    "sliderValue": "Valeur actuelle du curseur : {value}",
+    "switch": "Basculer",
+    "inputField": "Champ de saisie",
+    "fileTypeIncorrect": "Type de fichier incorrect",
+    "select": "Sélectionner une option"
   }
 }
