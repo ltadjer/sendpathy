@@ -60,6 +60,7 @@ export class AuthService {
       accessCode: user.accessCode,
       avatar: user.avatar,
       username: user.username,
+      role: user.role,
       id: user.id,
     };
   }
@@ -167,10 +168,15 @@ export class AuthService {
    * @throws Error si l'envoi de l'email de réinitialisation échoue.
    */
   async requestPasswordReset(email: string) {
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) {
+      throw new Error('User not found');
+    }
     const resetToken = await this.userService.requestPasswordReset(email);
     const emailSent = await this.mailerService.sendPasswordResetEmail(
       email,
       resetToken,
+      user.role
     );
     if (!emailSent) {
       throw new Error('Failed to send password reset email');

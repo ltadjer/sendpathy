@@ -1,9 +1,9 @@
 <template>
   <VaForm ref="form" @submit.prevent="submit">
-    <h1 class="font-semibold text-4xl mb-4">Log in</h1>
+    <h1 class="font-semibold text-4xl mb-4">Se connecter</h1>
     <p class="text-base mb-4 leading-5">
-      New to Vuestic?
-      <RouterLink :to="{ name: 'signup' }" class="font-semibold text-primary">Sign up</RouterLink>
+      Vous n'avez pas de compte?&nbsp;
+      <RouterLink :to="{ name: 'signup' }" class="font-semibold text-primary">S'inscrire</RouterLink>
     </p>
 
     <VaInput
@@ -34,14 +34,13 @@
     </VaValue>
 
     <div class="auth-layout__options flex flex-col sm:flex-row items-start sm:items-center justify-between">
-      <VaCheckbox v-model="formData.keepLoggedIn" class="mb-2 sm:mb-0" label="Keep me signed in on this device" />
       <RouterLink :to="{ name: 'recover-password' }" class="mt-2 sm:mt-0 sm:ml-1 font-semibold text-primary">
-        Forgot password?
+        Mot de passe oublié?
       </RouterLink>
     </div>
 
     <div class="flex justify-center mt-4">
-      <VaButton class="w-full" @click="submit">Login</VaButton>
+      <VaButton class="w-full" @click="submit">Connexion</VaButton>
     </div>
   </VaForm>
 </template>
@@ -70,10 +69,10 @@ const submit = async () => {
 
   try {
     await loginUser(formData.email, formData.password)
-    init({ message: "You've successfully logged in", color: 'success' })
-    push({ name: 'slots' })
+    init({ message: "Vous vous êtes connecté avec succès", color: 'success' })
+    push({ name: 'dashboard' })
   } catch (err) {
-    init({ message: 'Login failed. Please check your credentials.', color: 'danger' })
+    init({ message: 'Échec de la connexion. Veuillez vérifier vos identifiants.', color: 'danger' })
   }
 }
 </script>

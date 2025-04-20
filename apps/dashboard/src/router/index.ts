@@ -21,38 +21,43 @@ const routes: Array<RouteRecordRaw> = [
         name: 'dashboard',
         path: 'dashboard',
         component: () => import('../pages/admin/dashboard/Dashboard.vue'),
+        meta: { requiresAuth: true, roles: ['ADMIN', 'THERAPIST'] },
       },
       {
         name: 'reservations',
         path: 'reservations',
         component: () => import('../pages/reservations/Reservations.vue'),
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true, roles: ['THERAPIST'] },
       },
       {
         name: 'slots',
         path: 'slots',
         component: () => import('../pages/slots/Slots.vue'),
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true, roles: ['THERAPIST'] },
       },
       {
         name: 'settings',
         path: 'settings',
         component: () => import('../pages/settings/Settings.vue'),
+        meta: { requiresAuth: true, roles: ['THERAPIST', 'ADMIN'] },
       },
       {
         name: 'preferences',
         path: 'preferences',
         component: () => import('../pages/preferences/Preferences.vue'),
+        meta: { requiresAuth: true, roles: ['THERAPIST', 'ADMIN'] },
       },
       {
         name: 'users',
         path: 'users',
         component: () => import('../pages/users/UsersPage.vue'),
+        meta: { requiresAuth: true, roles: ['ADMIN'] },
       },
       {
         name: 'projects',
         path: 'projects',
         component: () => import('../pages/projects/ProjectsPage.vue'),
+        meta: { requiresAuth: true, roles: ['ADMIN'] },
       },
       {
         name: 'payments',
@@ -63,23 +68,28 @@ const routes: Array<RouteRecordRaw> = [
             name: 'payment-methods',
             path: 'payment-methods',
             component: () => import('../pages/payments/PaymentsPage.vue'),
+            meta: { requiresAuth: true, roles: ['ADMIN'] },
           },
           {
             name: 'billing',
             path: 'billing',
             component: () => import('../pages/billing/BillingPage.vue'),
+            meta: { requiresAuth: true, roles: ['ADMIN'] },
           },
           {
             name: 'pricing-plans',
             path: 'pricing-plans',
             component: () => import('../pages/pricing-plans/PricingPlans.vue'),
+            meta: { requiresAuth: true, roles: ['ADMIN'] },
           },
         ],
+        meta: { requiresAuth: true, roles: ['ADMIN'] },
       },
       {
         name: 'faq',
         path: '/faq',
         component: () => import('../pages/faq/FaqPage.vue'),
+        meta: { requiresAuth: true, roles: ['THERAPIST', 'ADMIN'] },
       },
     ],
   },
@@ -101,6 +111,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'recover-password',
         path: 'recover-password',
         component: () => import('../pages/auth/RecoverPassword.vue'),
+      },
+      {
+        name: 'reset-password',
+        path: '/auth/reset-password',
+        component: () => import('../pages/auth/ResetPassword.vue'),
       },
       {
         name: 'recover-password-email',
@@ -126,7 +141,6 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition
     }
-    // For some reason using documentation example doesn't scroll on page navigation.
     if (to.hash) {
       return { el: to.hash, behavior: 'smooth' }
     } else {
@@ -144,9 +158,16 @@ router.beforeEach(async (to, from, next) => {
     await userStore.fetchUser()
   }
 
+  const userRole = userStore.user?.role
+  console.log('User role:', userRole)
   // Redirect to login if the route requires authentication and the user is not logged in
   if (to.meta.requiresAuth && !userStore.isLoggedIn()) {
     return next({ name: 'login' })
+  }
+
+  // Check if the user's role is allowed to access the route
+  if (to.meta.roles && !to.meta.roles.includes(userRole)) {
+    return next({ name: '404' }) // Redirect to a 404 page or another appropriate page
   }
 
   // Prevent logged-in users from accessing auth pages (e.g., login, signup)
