@@ -178,11 +178,12 @@ export class UserService {
    * @returns Les informations de l'utilisateur mis à jour.
    */
   async update(id: string, updateUserDto: UpdateUserDto) {
-    console.log('updateUserDto', updateUserDto)
-    console.log('id', await this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    }))
+    // si c'est un mot de passe, le hacher
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt();
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+    }
+
     await this.prisma.user.update({
       where: { id },
       data: updateUserDto,

@@ -139,12 +139,22 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
 
-  if (to.meta.requiresAuth && !userStore.isLoggedIn()) {
-    next({ name: 'login' })
-  } else {
-    next()
+  // Fetch user if not already fetched
+  if (!userStore.user) {
+    await userStore.fetchUser()
   }
-})
 
+  // Redirect to login if the route requires authentication and the user is not logged in
+  if (to.meta.requiresAuth && !userStore.isLoggedIn()) {
+    return next({ name: 'login' })
+  }
+
+  // Prevent logged-in users from accessing auth pages (e.g., login, signup)
+  if ((to.name === 'login' || to.name === 'signup') && userStore.isLoggedIn()) {
+    return next({ name: 'dashboard' }) // Redirect to a default page like the dashboard
+  }
+
+  next()
+})
 
 export default router

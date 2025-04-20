@@ -60,6 +60,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
+import { useUserStore } from '../../../stores/user-store'
 
 import { buttonStyles } from '../styles'
 
@@ -70,27 +71,35 @@ const repeatNewPassword = ref<string>()
 const { validate } = useForm('form')
 const { init } = useToast()
 
+const store = useUserStore()
+
 const emits = defineEmits(['cancel'])
 
-const submit = () => {
+const submit = async () => {
   if (validate()) {
-    init({ message: "You've successfully changed your password", color: 'success' })
-    emits('cancel')
+    try {
+      await store.updateUser(store.user.id, { password: newPassword.value })
+      init({ message: "Vous avez changé votre mot de passe avec succès.", color: 'success' })
+      emits('cancel')
+    } catch (error) {
+      init({ message: 'Échec de la mise à jour du mot de passe. Veuillez réessayer.', color: 'danger' })
+      console.error(error)
+    }
   }
 }
 
-const oldPasswordRules = [(v: string) => !!v || 'Old password field is required']
+const oldPasswordRules = [(v: string) => !!v || 'Le champ de l\'ancien mot de passe est requis.']
 
 const newPasswordRules = [
-  (v: string) => !!v || 'New password field is required',
-  (v: string) => v?.length >= 8 || 'Must be at least 8 characters long',
-  (v: string) => new Set(v).size >= 6 || 'Must contain at least 6 unique characters',
-  (v: string) => v !== oldPassowrd.value || 'New password cannot be the same',
+  (v: string) => !!v || 'Le champ du nouveau mot de passe est requis.',
+  (v: string) => v?.length >= 8 || 'Doit contenir au moins 8 caractères.',
+  (v: string) => new Set(v).size >= 6 || 'Le nouveau mot de passe ne peut pas être identique à l\'ancien.',
+  (v: string) => v !== oldPassowrd.value || 'Le nouveau mot de passe ne peut pas être identique à l\'ancien.',
 ]
 
 const repeatNewPasswordRules = [
-  (v: string) => !!v || 'Repeat new password field is required',
-  (v: string) => v === newPassword.value || 'Confirm password does not match new password',
+  (v: string) => !!v || 'Le champ de confirmation du nouveau mot de passe est requis.',
+  (v: string) => v === newPassword.value || 'La confirmation du mot de passe ne correspond pas au nouveau mot de passe.',
 ]
 </script>
 

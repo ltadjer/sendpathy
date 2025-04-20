@@ -8,3 +8,6 @@ export const getProfile = () =>
 
 export const logout = () =>
   api.post('/auth/logout')
+
+export const updateProfile = (id: string, data: any) =>
+  api.patch(`/users/${id}`, data)

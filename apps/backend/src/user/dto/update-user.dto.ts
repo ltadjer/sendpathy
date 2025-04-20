@@ -11,4 +11,13 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
 
   @ApiProperty({ description: 'Access code for the user', required: false })
   accessCode?: string;
+
+  @ApiProperty({ description: 'Avatar URL of the user', required: false })
+  avatar?: string;
+
+  @ApiProperty({ description: 'Username of the user', required: false })
+  username?: string;
+
+  @ApiProperty({ description: 'Password of the user', required: false })
+  password?: string;
 }

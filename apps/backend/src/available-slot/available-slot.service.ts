@@ -10,36 +10,60 @@ export class AvailableSlotService {
 
   async createSlots(therapistId: string, startTime: Date, endTime: Date, interval: number) {
     const slots = [];
-    let currentTime = new Date(startTime);
+    const startHour = startTime.getHours();
+    const startMinute = startTime.getMinutes();
+    const endHour = endTime.getHours();
+    const endMinute = endTime.getMinutes();
 
-    while (currentTime < endTime) {
-      const nextTime = new Date(currentTime.getTime() + interval * 60000);
-      slots.push({
-        therapistId,
-        startTime: currentTime,
-        endTime: nextTime,
-      });
-      currentTime = nextTime;
+    let currentDate = new Date(startTime);
+
+    while (currentDate < endTime) {
+      // Set the start of the daily time range
+      const dailyStart = new Date(currentDate);
+      dailyStart.setHours(startHour, startMinute, 0, 0);
+
+      // Set the end of the daily time range
+      const dailyEnd = new Date(currentDate);
+      dailyEnd.setHours(endHour, endMinute, 0, 0);
+
+      let currentTime = new Date(dailyStart);
+
+      // Generate slots within the daily time range
+      while (currentTime < dailyEnd) {
+        const nextTime = new Date(currentTime.getTime() + interval * 60000);
+        if (nextTime <= dailyEnd) {
+          slots.push({
+            therapistId,
+            startTime: currentTime,
+            endTime: nextTime,
+          });
+        }
+        currentTime = nextTime;
+      }
+
+      // Move to the next day
+      currentDate.setDate(currentDate.getDate() + 1);
     }
+
     console.log('slots', slots);
     return await this.prisma.availableSlot.createMany({ data: slots });
   }
 
   async findOne(id: string): Promise<any> {
-    return this.prisma.availableSlot.findUnique({
+    return await this.prisma.availableSlot.findUnique({
       where: { id },
     });
   }
 
   async update(id: string, data: any): Promise<any> {
-    return this.prisma.availableSlot.update({
+    return await this.prisma.availableSlot.update({
       where: { id },
       data,
     })
   }
 
   async remove(id: string): Promise<void> {
-    await this.prisma.availableSlot.delete({
+    await await this.prisma.availableSlot.delete({
       where: { id },
     });
   }

@@ -1,8 +1,11 @@
 <template>
+  <div class="shadow-neumorphism rounded-full p-2">
   <VaAvatar
     size="large"
     :src="store.user?.avatar ? store.user.avatar : ''"
+    class="shadow-neumorphism-in"
   ></VaAvatar>
+  </div>
   <div class="flex flex-col justify-center">
     <h2 class="text-[28px] md:text-[32px] leading-10 font-bold">
       {{ store.user?.firstName || '' }} {{ store.user?.lastName || '' }}
