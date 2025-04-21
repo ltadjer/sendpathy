@@ -386,7 +386,7 @@ importers:
         specifier: ^8.3.3
         version: 8.4.1
       '@ionic/vue':
-        specifier: ^8.3.3
+        specifier: ^8.4.1
         version: 8.4.1
       '@ionic/vue-router':
         specifier: ^8.3.4

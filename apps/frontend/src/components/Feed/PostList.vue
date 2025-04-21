@@ -52,7 +52,7 @@
                   side="top"
                   alignment="end">
                   <ion-list>
-                    <ion-item class="ion-input-spacing" lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click.stop="deleteOnePost(post.id)">Supprimer</ion-item>
+                    <ion-item lines="none" :button="true" :detail="false" v-if="post.user.id === currentUser.id" @click.stop="deleteOnePost(post.id)">Supprimer</ion-item>
                     <ion-item lines="none" :button="true" :detail="false" @click="reportPost(post.id)">Signaler</ion-item>
                   </ion-list>
                 </ion-popover>
@@ -62,6 +62,7 @@
             <ion-row>
               <ion-col size="auto">
                 <ion-icon class="custom-icon" @click.stop="openCommentModal(post.id)" :icon="chatbubbleOutline"></ion-icon>
+                <span v-if="post.comments">{{ post.comments.length }}</span>
               </ion-col>
               <ion-col size="auto">
                 <ion-icon class="custom-icon" @click.stop="toggleLike(post)" :icon="post.isLiked ? heart : heartOutline"></ion-icon>
@@ -208,11 +209,10 @@ ion-item:not(ion-popover ion-item) {
 }
 
 ion-popover ion-list {
-  padding: 4px !important;
   box-shadow: var(--neumorphism-out-shadow) !important;
 }
 
-ion-popover ion-item:hover {
+ion-popover ion-item button:hover {
   --box-shadow: var(--neumorphism-in-shadow) !important;
   color: var(--ion-color-secondary) !important;
   font-weight: bold;

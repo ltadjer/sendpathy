@@ -76,7 +76,7 @@ export class MessageService {
             data: {
                 ...createMessageDto,
                 senderId: senderId,
-                conversationId: conversation.id, // Link the message to the conversation
+                conversationId: conversation.id,
             },
             include: {
                 sender: true,

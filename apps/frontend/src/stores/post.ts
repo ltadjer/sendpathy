@@ -129,8 +129,9 @@ export const usePostStore = defineStore('post', {
     async addCommentToComment(parentCommentId: string, formData: any) {
       try {
         const response = await commentService.addCommentToComment(parentCommentId, formData);
-        this.posts.forEach(post => {
+        this.posts = this.posts.map(post => {
           post.comments = this.addCommentRecursive(post.comments, parentCommentId, response.data);
+          return post;
         });
       } catch (error) {
         console.error('Failed to add comment to comment:', error);
@@ -140,7 +141,7 @@ export const usePostStore = defineStore('post', {
     addCommentRecursive(comments: any[], parentCommentId: string, newComment: any): any[] {
       return comments.map(comment => {
         if (comment.id === parentCommentId) {
-          comment.replies.push(newComment);
+          comment.replies = [...(comment.replies || []), newComment];
         } else if (comment.replies && comment.replies.length > 0) {
           comment.replies = this.addCommentRecursive(comment.replies, parentCommentId, newComment);
         }

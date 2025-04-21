@@ -232,6 +232,7 @@ ion-checkbox::part(mark) {
 ion-button {
     --background: var(--ion-color-primary) !important;
     --box-shadow: var(--neumorphism-out-shadow) !important;
+    --color: #555555 !important;
     --border-radius: 1rem !important;
     background: transparent;
     border: none;
@@ -281,6 +282,9 @@ ion-icon {
     color: #FD7DFB;
 }
 
+ion-item-option {
+    color: #555555;
+}
 .gradient-text,
 ion-item-option:hover .item-option-text,
 ion-item-option:active .item-option-text,
@@ -313,6 +317,7 @@ ion-item-option:focus .item-option-text {
 
 ion-chip {
     box-shadow: var(--neumorphism-out-shadow);
+    background: var(--ion-color-primary);
 }
 ion-list {
     --background: none !important;

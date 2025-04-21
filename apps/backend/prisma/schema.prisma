@@ -130,7 +130,7 @@ model Comment {
   parentId String? // Optional field to reference the parent comment
 
   // Relation to the post the comment belongs to
-  post    Post      @relation(fields: [postId], references: [id])
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   // Relation to the user who created the comment
   user    User      @relation(fields: [userId], references: [id])
   // Self-referential relation to the parent comment

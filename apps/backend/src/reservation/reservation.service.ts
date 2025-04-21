@@ -102,6 +102,17 @@ export class ReservationService {
 
   }
 
+  async cancel(id: string, userId: string): Promise<any> {
+    const reservation = await this.findOne(id, userId);
+
+    if (!reservation || reservation.userId !== userId) {
+      throw new Error('Reservation not found or unauthorized');
+    }
+
+    await this.prisma.reservation.delete({ where: { id } });
+
+    await this.availableSlotService.update(reservation.slotId, { isBooked: false });
+  }
 
   async updateReservationStatus(id: string, isCancelled: boolean): Promise<any> {
     const reservation = await this.prisma.reservation.findUnique({

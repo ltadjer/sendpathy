@@ -95,7 +95,7 @@
 <script lang="ts">
 import { defineComponent, ref, PropType } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonAvatar, IonButtons, IonButton, IonLabel, IonInput, IonModal, IonFooter, IonIcon, IonGrid,
-  IonRow, IonCol, IonText, IonSegment, IonSegmentButton, IonBackButton } from '@ionic/vue';
+  IonRow, IonCol, IonText, IonSegment, IonSegmentButton, IonBackButton, useIonRouter } from '@ionic/vue';
 import { arrowBackOutline, closeOutline } from 'ionicons/icons';
 import { usePostStore } from '@/stores/post';
 import { useLifeMomentStore } from '@/stores/life-moment';
@@ -104,7 +104,7 @@ import LifeMomentList from '@/components/LifeMoment/LifeMomentList.vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 import ProfileEditModal from '@/components/Profile/ProfileEditModal.vue';
 import ProfileFriendshipsModal from '@/components/Profile/ProfileFriendshipsModal.vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useAccountStore } from '@/stores/account';
 import { useFriendshipStore } from '@/stores/friendship';
 import { useConversationStore } from '@/stores/conversation';
@@ -136,9 +136,15 @@ export default defineComponent({
     ProfileEditModal,
     ProfileFriendshipsModal
   },
+  props: {
+    userId: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
-      selectedSegment: 'posts', // Default value
+      selectedSegment: 'posts',
       isModalOpen: false,
       isFriendshipsModalOpen: false,
       initialSegment: 'followers',
@@ -152,12 +158,12 @@ export default defineComponent({
     };
   },
   setup() {
-    const router = useRouter();
-    const route = useRoute();
-    const userId = route.params.userId;
-    return { arrowBackOutline, closeOutline, router, userId };
+    const router = useIonRouter();
+
+    return { arrowBackOutline, closeOutline, router };
   },
   async created() {
+    this.user = await useAccountStore().findOneById(this.userId);
     await usePostStore().fetchAllPosts();
     if (this.isCurrentUser) {
       await useLifeMomentStore().fetchLifeMoments();

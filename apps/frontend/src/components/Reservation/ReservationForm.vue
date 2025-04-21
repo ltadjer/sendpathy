@@ -1,11 +1,12 @@
 <template>
   <ion-list class="ion-padding">
-    <ion-title>
+    <ion-list-header>
       <h1 class="gradient-text">Échangeons</h1>
-    </ion-title>
+    </ion-list-header>
     <ion-grid>
       <ion-row>
-        <ion-col class="ion-text-center">
+        <ion-col>
+          <h4>Choisir le psychologue</h4>
           <ion-item lines="none" class="ion-margin-bottom">
             <ion-label>Psychologue</ion-label>
             <ion-button expand="block" @click="presentAlert">
@@ -18,19 +19,32 @@
 
       <ion-row>
         <ion-col>
+          <h4>Choisir la date de la consultation</h4>
           <ion-accordion-group class="ion-shadow-out rounded-accordion">
-            <ion-accordion class="ion-shadow-out ion-margin-bottom" v-for="(slots, date) in availableSlotsByDate" :key="date">
-              <ion-item lines="none" slot="header" class="ion-no-shadow">
-                <ion-label>{{ date }}</ion-label>
-              </ion-item>
-              <ion-list slot="content">
-                <ion-chip v-for="slot in slots" :key="slot.id" @click="selectSlot(slot)"
-                          :class="{ 'ion-shadow-in': selectedSlot === slot.id }">
-                  <span class="gradient-text">{{ formatTime(slot.startTime) }}</span>
-                </ion-chip>
-              </ion-list>
-            </ion-accordion>
-          </ion-accordion-group>
+              <ion-accordion
+                class="ion-shadow-out ion-margin-bottom"
+                v-for="(slots, date, index) in paginatedSlots"
+                :key="date"
+              >
+                <ion-item lines="none" slot="header" class="ion-no-shadow">
+                  <ion-label>{{ date }}</ion-label>
+                </ion-item>
+                <ion-list slot="content">
+                  <ion-chip
+                    v-for="slot in slots"
+                    :key="slot.id"
+                    @click="selectSlot(slot)"
+                    :class="{ 'ion-shadow-in': selectedSlot === slot.id }"
+                  >
+                    <span class="gradient-text">{{ formatTime(slot.startTime) }}</span>
+                  </ion-chip>
+                </ion-list>
+              </ion-accordion>
+            </ion-accordion-group>
+
+            <div class="ion-text-center ion-margin-top" v-if="hasMoreDates">
+              <ion-button expand="block" @click="loadMoreDates">Voir plus de dates</ion-button>
+            </div>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -54,8 +68,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import {
-  IonList, IonTitle, IonGrid, IonRow, IonCol, IonItem, IonLabel,
-  IonButton, IonAccordionGroup, IonAccordion, IonChip, IonAlert
+  IonList, IonListHeader, IonGrid, IonRow, IonCol, IonItem, IonLabel,
+  IonButton, IonAccordionGroup, IonAccordion, IonChip, IonAlert, IonIcon
 } from '@ionic/vue';
 import CustomButton from '@/components/Commun/CustomButton.vue';
 import { useToastStore } from '@/stores/toast';
@@ -74,11 +88,13 @@ export default defineComponent({
   },
   components: {
     CustomButton,
-    IonList, IonTitle, IonGrid, IonRow, IonCol, IonItem, IonLabel,
-    IonButton, IonAccordionGroup, IonAccordion, IonChip, IonAlert
+    IonList, IonListHeader, IonGrid, IonRow, IonCol, IonItem, IonLabel,
+    IonButton, IonAccordionGroup, IonAccordion, IonChip, IonAlert, IonIcon
   },
   data() {
     return {
+      itemsPerPage: 4,
+      currentPage: 1,
       isAlertOpen: false,
       selectedTherapistName: '',
       alertInputs: [],
@@ -114,6 +130,25 @@ export default defineComponent({
       }
     }
   },
+  computed: {
+    paginatedSlots() {
+      const dates = Object.keys(this.availableSlotsByDate);
+      const start = 0;
+      const end = this.currentPage * this.itemsPerPage;
+      const paginatedDates = dates.slice(start, end);
+
+      return paginatedDates.reduce((result, date) => {
+        result[date] = this.availableSlotsByDate[date];
+        return result;
+      }, {});
+    },
+    hasMoreDates() {
+      return (
+        Object.keys(this.availableSlotsByDate).length >
+        this.currentPage * this.itemsPerPage
+      );
+    },
+  },
   methods: {
     presentAlert() {
       this.isAlertOpen = true;
@@ -133,6 +168,9 @@ export default defineComponent({
     selectSlot(slot) {
       this.$emit('update:selectedSlot', slot.id);
     },
+    loadMoreDates() {
+      this.currentPage++;
+    },
     async submitReservation() {
       if (!this.selectedSlot || !this.selectedTherapist) {
         useToastStore().showToast('Veuillez sélectionner un créneau et un psychologue');
@@ -149,6 +187,7 @@ export default defineComponent({
           slotId: this.selectedSlot,
           therapistId: this.selectedTherapist,
         });
+        await useReservationStore().fetchAllReservations();
         useToastStore().showToast('Réservation créée avec succès');
       }
       this.$emit('reservation-submitted');

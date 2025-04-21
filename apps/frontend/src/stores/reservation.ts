@@ -56,6 +56,7 @@ export const useReservationStore = defineStore('reservation', {
 
     async deleteOneReservation(reservationId) {
       try {
+        console.log('Deleting reservation with ID:', reservationId);
         await ReservationService.deleteOneReservation(reservationId);
         this.reservations = this.reservations.filter((l) => l.id !== reservationId);
       } catch (error) {

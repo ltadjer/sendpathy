@@ -1,6 +1,6 @@
 <template>
   <ion-modal :is-open="isOpen" @ionModalDidDismiss="closeModal">
-    <ion-header>
+    <ion-header :translucent="true" class="ion-padding">
       <ion-toolbar>
         <ion-title>{{ modalTitle }}</ion-title>
         <ion-buttons slot="end">

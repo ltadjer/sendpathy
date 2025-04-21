@@ -53,6 +53,19 @@ export class ReservationController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a reservation by ID' })
+  @ApiResponse({ status: 200, description: 'The reservation has been successfully deleted.' })
+  @ApiResponse({ status: 404, description: 'Reservation not found.' })
+  async cancel(@Param('id') id: string, @User() user: any) {
+    try {
+      return await this.reservationService.cancel(id, user.id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/update-status')
   @ApiOperation({ summary: 'Update reservation status by ID' })
   @ApiResponse({ status: 200, description: 'The reservation status has been successfully updated.' })

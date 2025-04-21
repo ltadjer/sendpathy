@@ -21,14 +21,14 @@
         </ion-toolbar>
       </ion-header>
     </ion-header>
-    <access-code-modal
-      :is-open="isAccessCodeModalOpen"
-      :has-access-code="hasAccessCode"
-      @update:isOpen="(value) => isAccessCodeModalOpen = value"
-      @access-code-set="fetchLifeMoments"
-      @access-code-validated="fetchLifeMoments">
-    </access-code-modal>
     <ion-content>
+      <access-code-modal
+        :is-open="isAccessCodeModalOpen"
+        :has-access-code="hasAccessCode"
+        @update:isOpen="(value) => isAccessCodeModalOpen = value"
+        @access-code-set="fetchLifeMoments"
+        @access-code-validated="fetchLifeMoments">
+      </access-code-modal>
       <life-moment-list v-if="!isAccessCodeModalOpen && lifeMoments" :life-moments="lifeMoments" :current-user="currentUser" />
     </ion-content>
   </ion-page>

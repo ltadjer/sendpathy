@@ -46,9 +46,15 @@
         </ion-item>
       </template>
     </ion-list>
+
+    <ion-note v-if="!isFriend" class="ion-shadow-in ion-padding">
+      Vous ne pouvez plus envoyer de messages à cette personne.
+    </ion-note>
+
   </ion-content>
 
   <MessageForm
+    v-if="isFriend"
     @newMessage="addMessage"
     @editMessage="editMessage"
     :conversation-id="conversationId"
@@ -123,6 +129,21 @@ export default defineComponent({
       }
 
       return groups;
+    },
+    isFriend() {
+      if (!this.currentUser || !Array.isArray(this.currentUser.friendshipsReceived) || !Array.isArray(this.currentUser.friendshipsSent)) {
+        return false;
+      }
+
+      const isReceivedFriend = this.currentUser.friendshipsReceived.some(friendship =>
+        friendship.requesterId === this.receiver?.id && friendship.status === 'ACCEPTED'
+      );
+
+      const isSentFriend = this.currentUser.friendshipsSent.some(friendship =>
+        friendship.receiverId === this.receiver?.id && friendship.status === 'ACCEPTED'
+      );
+
+      return isReceivedFriend || isSentFriend;
     }
   },
   setup() {
@@ -215,11 +236,11 @@ export default defineComponent({
   display: flex;
   flex-direction: column-reverse;
   overflow-x: hidden;
+  text-align: center;
 }
 
-/* Style pour chaque groupe de messages */
-.message-group {
-  margin-bottom: 1rem;
+ion-note {
+  border-radius: 1rem;
 }
 
 /* Séparateur de date */
