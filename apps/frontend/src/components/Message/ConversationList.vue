@@ -50,16 +50,15 @@ export default defineComponent({
       type: Array,
       required: true,
     },
+    searchTerm: {
+      type: String,
+      default: '',
+    },
   },
   components: {
     IonAvatar, IonButtons, IonButton, IonLabel, IonNote, IonBadge,
     IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonSearchbar,
     IonItemSliding, IonItemOptions, IonItemOption
-  },
-  data() {
-    return {
-      searchTerm: '',
-    };
   },
   computed: {
     filteredConversations() {
@@ -85,6 +84,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+ion-list {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+}
+
 .conversation-item ion-label {
   width: calc(100% - 60px);
 }

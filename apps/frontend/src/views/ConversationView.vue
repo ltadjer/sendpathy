@@ -20,7 +20,7 @@
         <ion-searchbar class="ion-margin-top ion-no-padding" v-model="searchTerm" placeholder="Rechercher"></ion-searchbar>
       </ion-header>
     </ion-header>
-    <ConversationList :conversations="conversations" :current-user="currentUser" />
+    <ConversationList :conversations="conversations" :current-user="currentUser" :search-term="searchTerm" />
   </ion-page>
 </template>
 
@@ -28,9 +28,8 @@
 import { defineComponent } from 'vue';
 import ConversationList from '@/components/Message/ConversationList.vue';
 import { IonPage, IonButton, IonButtons, IonTitle, IonSearchbar, IonToolbar, IonItem, IonHeader, IonAvatar } from '@ionic/vue';
-import { useAccountStore } from '@/stores/account'
-import conversationService from '@/services/conversation.service'
-import { useConversationStore } from '@/stores/conversation'
+import { useAccountStore } from '@/stores/account';
+import { useConversationStore } from '@/stores/conversation';
 
 export default defineComponent({
   name: 'ConversationView',
@@ -39,12 +38,22 @@ export default defineComponent({
     ConversationList,
     IonPage
   },
+  data() {
+    return {
+      searchTerm: '',
+    };
+  },
   computed: {
     conversations() {
       return useConversationStore().conversations;
     },
     currentUser() {
       return useAccountStore().user;
+    },
+    filteredConversations() {
+      return this.conversations.filter(conversation =>
+        conversation.user?.username.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
     },
   },
   methods: {

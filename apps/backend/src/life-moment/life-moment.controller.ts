@@ -35,7 +35,6 @@ export class LifeMomentController {
     console.log('user', user);
     if (updateLifeMomentDto.contents && updateLifeMomentDto.contents.length > 0) {
       updateLifeMomentDto.contents = updateLifeMomentDto.contents.map(content => {
-        // faire ça seulement si le content est nouveau (pas de id)
         if (!content.id && content.base64Content) {
           return {
             ...content,

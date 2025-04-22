@@ -90,6 +90,15 @@ export default  {
     }
   },
 
+  async updateAccessCode(accessCode: string) {
+    try {
+      await api.patch('/users/access-code', { accessCode });
+    } catch (error) {
+      console.error('Error updating access code:', error);
+      throw error;
+    }
+  },
+
   async setAccessCode(accessCode: string) {
     try {
       const response = await api.post(`/users/access-code`, { accessCode: accessCode });

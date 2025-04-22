@@ -43,14 +43,11 @@
         </ion-row>
       </ion-grid>
 
-      <!-- Image positionnée en bas -->
       <img alt="img" src="/img/fond-sendpathy.svg" class="background-image" />
     </ion-content>
 
-    <!-- Add a comment or reply -->
     <ion-footer class="add-comment-fixed">
       <ion-grid>
-        <!-- Input pour commenter ou répondre -->
         <ion-row class="ion-align-items-center ion-justify-content-center">
           <ion-col size="10">
             <ion-item lines="none" class="ion-no-shadow">
@@ -166,9 +163,7 @@ export default defineComponent({
     setReplyTarget(comment) {
       this.replyTarget = comment;
     },
-    clearReplyTarget() {
-      this.replyTarget = null;
-    },
+
     async submitCommentOrReply() {
       if (this.isSubmitting || this.newComment.trim() === '') return;
 

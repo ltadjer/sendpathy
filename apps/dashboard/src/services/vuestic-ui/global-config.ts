@@ -19,7 +19,7 @@ export default defineVuesticConfig({
   components: {
     VaModal: {
       color: 'background-element',
-      class: 'shadow-neumorphism rounded-lg',
+      class: 'shadow-neumorphism !rounded-lg',
     },
     VaButton: {
       background: 'background-element',
@@ -46,6 +46,9 @@ export default defineVuesticConfig({
     },
     VaForm: {
       class: 'shadow-neumorphism rounded-lg p-4',
+    },
+    VaSidebar: {
+      class: 'shadow-neumorphism rounded-lg m-4',
     }
   },
 })

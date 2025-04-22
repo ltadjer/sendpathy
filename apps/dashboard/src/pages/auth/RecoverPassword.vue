@@ -1,34 +1,39 @@
 <template>
   <VaForm ref="passwordForm" @submit.prevent="submit">
-    <h1 class="font-semibold text-4xl mb-4">Forgot your password?</h1>
+    <h1 class="font-semibold text-4xl mb-4">Mot de passe oublié ?</h1>
     <p class="text-base mb-4 leading-5">
-      If you've forgotten your password, don't worry. Simply enter your email address below, and we'll send you an email
-      with a temporary password. Restoring access to your account has never been easier.
+      Si vous avez oublié votre mot de passe, ne vous inquiétez pas. Entrez simplement votre adresse e-mail ci-dessous, et nous vous enverrons un e-mail avec un lien pour changer votre mot de passe.
     </p>
     <VaInput
       v-model="email"
-      :rules="[(v) => !!v || 'Email field is required']"
+      :rules="[(v) => !!v || 'Le champ e-mail est requis']"
       class="mb-4"
-      label="Enter your email"
+      label="Entrez votre e-mail"
       type="email"
     />
-    <VaButton class="w-full mb-2" @click="submit">Send password</VaButton>
-    <VaButton :to="{ name: 'login' }" class="w-full" preset="secondary" @click="submit">Go back</VaButton>
+    <VaButton class="w-full mb-2" @click="submit">Envoyer le mot de passe</VaButton>
+    <VaButton :to="{ name: 'login' }" class="w-full" preset="secondary" @click="submit">Retour</VaButton>
   </VaForm>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { useForm } from 'vuestic-ui'
-import { useRouter } from 'vue-router'
+import { useForm, useToast } from 'vuestic-ui'
+import { useAuth } from '../../composables/useAuth'
 
+const { requestPasswordReset } = useAuth()
 const email = ref('')
 const form = useForm('passwordForm')
-const router = useRouter()
+const { init } = useToast()
 
-const submit = () => {
+const submit = async () => {
   if (form.validate()) {
-    router.push({ name: 'recover-password-email' })
+    try {
+      await requestPasswordReset(email.value)
+      init({ message: 'E-mail de réinitialisation du mot de passe envoyé avec succès.', color: 'success' })
+    } catch (error) {
+      init({ message: 'Échec de l\'envoi de l\'e-mail de réinitialisation du mot de passe.', color: 'danger' })
+    }
   }
 }
 </script>

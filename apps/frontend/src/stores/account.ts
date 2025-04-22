@@ -85,6 +85,19 @@ export const useAccountStore = defineStore('account', {
       }
     },
 
+    async updateAccessCode(code: string) {
+      const toastStore = useToastStore();
+      try {
+        const response = await AuthService.updateAccessCode(code);
+        this.user.accessCode = response;
+        toastStore.showToast('Code d\'accès mis à jour avec succès', 'primary');
+        return response;
+      } catch (error) {
+        toastStore.showToast('Échec de la mise à jour du code d\'accès', 'danger');
+        console.error('Failed to update access code:', error);
+      }
+    },
+
     async setAccessCode(code: string) {
       try {
         const response = await AuthService.setAccessCode(code);

@@ -1,10 +1,9 @@
-import { Controller, Post, Body, Get, Query, Res, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Res, UseGuards, Req, UnauthorizedException } from '@nestjs/common'
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { CreateTherapistDto } from 'src/user/dto/create-therapist.dto';
 import slugify from 'slugify';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -15,11 +14,6 @@ import { User } from '../user/decorators/user.decorator';
 export class AuthController {
   constructor(private authService: AuthService, private userService: UserService) {}
 
-  /**
-   * Logs in a user and returns JWT tokens.
-   * @param req - The login request data.
-   * @param res
-   */
   @Post('login')
   @ApiOperation({ summary: 'Login a user' })
   @ApiResponse({ status: 200, description: 'User logged in successfully.' })
@@ -29,7 +23,34 @@ export class AuthController {
     res.cookie('access_token', user.access_token, { httpOnly: true, secure: true});
     res.cookie('refresh_token', user.refresh_token, { httpOnly: true, secure: true});
     // ne pas envoyer les tokens, mais le reste des données de l'utilisateur
-    return res.send({ email: user.email, avatar: user.avatar, username: user.username, id: user.id, accessCode: user.accessCode });
+    return res.send({ email: user.email, avatar: user.avatar, username: user.username, id: user.id, accessCode: user.accessCode, role: user.role });
+  }
+
+  @Post('dashboard/login')
+  @ApiOperation({ summary: 'Login for dashboard users (THERAPIST and ADMIN)' })
+  @ApiResponse({ status: 200, description: 'Login successful.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async loginForDashboard(
+    @Body() req: LoginDto,
+    @Res() res: Response // Ensure @Res() is used here
+  ) {
+    const user = await this.authService.login(req.email, req.password);
+
+    if (!user || (user.role !== 'THERAPIST' && user.role !== 'ADMIN')) {
+      throw new UnauthorizedException('Access denied');
+    }
+
+    res.cookie('access_token', user.access_token, { httpOnly: true, secure: true });
+    res.cookie('refresh_token', user.refresh_token, { httpOnly: true, secure: true });
+
+    return res.send({
+      email: user.email,
+      avatar: user.avatar,
+      username: user.username,
+      id: user.id,
+      accessCode: user.accessCode,
+      role: user.role,
+    });
   }
   /**
    * Registers a new user.
@@ -46,7 +67,6 @@ export class AuthController {
     return await this.authService.register(createUserDto);
   }
 
- //TODO: Add a route to logout a user
   @Post('logout')
   @ApiOperation({ summary: 'Logout a user' })
   @ApiResponse({ status: 200, description: 'User logged out successfully.' })
@@ -79,6 +99,7 @@ export class AuthController {
       triggers: updatedUser.triggers,
       firstName: updatedUser.firstName,
       lastName: updatedUser.lastName,
+      role: updatedUser.role,
     };
   }
 

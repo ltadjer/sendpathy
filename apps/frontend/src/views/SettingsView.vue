@@ -42,6 +42,23 @@
           </ion-item>
         </ion-item-group>
 
+        <ion-item-group>
+          <ion-item-divider>
+            <ion-label> <span class="gradient-text">Code d'accès du journal</span></ion-label>
+          </ion-item-divider>
+          <ion-item lines="none">
+            <ion-label>Code d'accès</ion-label>
+            <ion-icon :icon="pencilOutline" slot="end" @click="editField('accessCode')"></ion-icon>
+            <ion-input
+              v-if="editingField === 'accessCode'"
+              v-model="accessCode"
+              type="password"
+              @focusout="saveAccessCode"
+            ></ion-input>
+            <ion-label v-else>********</ion-label>
+          </ion-item>
+        </ion-item-group>
+
         <!-- Preferences -->
         <ion-item-group>
           <ion-item-divider>
@@ -123,6 +140,7 @@
           </ion-item>
         </ion-item-group>
       </ion-list>
+      <ToastMessage />
     </ion-content>
   </ion-page>
 </template>
@@ -154,12 +172,15 @@ import {
   IonBackButton,
   IonItemGroup,
 } from '@ionic/vue';
+import ToastMessage from '@/components/Commun/ToastMessage.vue'
 
 export default defineComponent({
   name: 'SettingsView',
   components: {
+    ToastMessage,
     CustomButton,
-    IonButtons, IonBackButton,
+    IonButtons,
+    IonBackButton,
     IonPage,
     IonHeader,
     IonToolbar,
@@ -179,6 +200,7 @@ export default defineComponent({
   },
   data() {
     return {
+      accessCode: '',
       notifications: {
         posts: true,
         privateMessages: true,
@@ -235,7 +257,7 @@ export default defineComponent({
     editField(field) {
       this.editingField = field;
     },
-    async saveField(field) {
+    async saveField() {
       this.editingField = '';
       const updatedUser = {
         username: this.currentUser.username,
@@ -245,6 +267,15 @@ export default defineComponent({
       };
 
       await useAccountStore().updateUser(updatedUser);
+    },
+    async saveAccessCode() {
+      this.editingField = '';
+      try {
+        await useAccountStore().updateAccessCode(this.accessCode);
+        console.log('Access code updated successfully');
+      } catch (error) {
+        console.error('Failed to update access code:', error);
+      }
     },
     async updateTags(event) {
       const selectedTags = event.target.value;

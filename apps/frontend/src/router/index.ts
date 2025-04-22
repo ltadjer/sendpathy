@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/user/:userId',
         name: 'UserProfile',
         component: ProfileView,
-        props: route => ({ user: route.params.user })
+        props: true
       },
       {
         path: '/reservations/nouvelle-reservation/:reservationId?',

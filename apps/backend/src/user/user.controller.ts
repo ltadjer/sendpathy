@@ -67,9 +67,20 @@ export class UserController {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const result = await this.userService.validateAccessCode(existingUser.id, accessCode)
-    console.log(result)
-    return result
+    return await this.userService.validateAccessCode(existingUser.id, accessCode)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('access-code')
+  @ApiOperation({ summary: 'Update the access code for the current user' })
+  @ApiResponse({ status: 200, description: 'Access code updated successfully.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async updateAccessCode(@User() user: any, @Body('accessCode') accessCode: string) {
+    const existingUser = await this.userService.findOneByEmail(user.email);
+    if (!existingUser) {
+      throw new NotFoundException('User not found');
+    }
+    return await this.userService.updateAccessCode(existingUser.id, accessCode);
   }
 
   @UseGuards(JwtAuthGuard)

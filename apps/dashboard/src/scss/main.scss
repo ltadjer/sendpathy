@@ -68,6 +68,11 @@ pre {
 
 .va-input-wrapper__container {
   box-shadow: var(--neumorphism-in-shadow);
+  border-radius: 0.5rem;
+}
+
+.va-input-wrapper__field {
+  border-radius: 0.5rem;
 }
 
 @import 'vue-cal/dist/vuecal.css';
@@ -122,4 +127,9 @@ pre {
   box-shadow: var(--neumorphism-in-shadow);
   border: none !important;
 }
+
+.vuecal__no-event {
+  display: none !important;
+}
+
 

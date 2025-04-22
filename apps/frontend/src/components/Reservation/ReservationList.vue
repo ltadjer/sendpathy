@@ -59,13 +59,13 @@
               <ion-grid>
                 <ion-row>
                   <ion-col size="6">
-                    <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="updateReservation(reservation.id)">
+                    <ion-button expand="block"  @click="updateReservation(reservation.id)">
                       <span class="gradient-text">Déplacer le RDV</span>
                     </ion-button>
                   </ion-col>
                   <ion-col size="6">
-                    <ion-button expand="block" fill="clear" class="ion-no-shadow" @click="deleteOneReservation(reservation.id)">
-                      <span class="gradient-text">Annuler le RDV</span>
+                    <ion-button expand="block" @click="deleteOneReservation(reservation.id)">
+                      <span>Annuler le RDV</span>
                     </ion-button>
                   </ion-col>
                 </ion-row>
@@ -75,18 +75,30 @@
         </ion-col>
       </ion-row>
     </ion-grid>
+
+    <!-- Confirmation Alert -->
+    <ion-alert
+      :is-open="isAlertOpen"
+      header="Confirmation"
+      message="Êtes-vous sûr de vouloir annuler cette réservation ?"
+      :buttons="[
+        { text: 'Annuler', role: 'cancel', handler: () => (isAlertOpen = false) },
+        { text: 'Confirmer', handler: confirmDelete }
+      ]"
+    ></ion-alert>
   </ion-content>
 </template>
+
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar, IonAvatar, IonButtons, IonButton, IonCard, IonCardTitle, IonCardSubtitle, IonCardContent, IonCardHeader, IonGrid, IonRow, IonCol, IonIcon, IonSegment, IonSegmentButton } from '@ionic/vue';
+import { defineComponent, ref } from 'vue';
+import { IonContent, IonHeader, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar, IonAvatar, IonButtons, IonButton, IonCard, IonCardTitle, IonCardSubtitle, IonCardContent, IonCardHeader, IonGrid, IonRow, IonCol, IonIcon, IonSegment, IonSegmentButton, IonAlert } from '@ionic/vue';
 import { enterOutline } from 'ionicons/icons';
 import { formatTime } from '@/utils/date';
-import { useReservationStore } from '@/stores/reservation'
+import { useReservationStore } from '@/stores/reservation';
 
 export default defineComponent({
   name: 'ReservationList',
-  components: { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonAvatar, IonButtons, IonButton, IonCard, IonCardTitle, IonCardSubtitle, IonCardContent, IonCardHeader, IonGrid, IonRow, IonCol, IonIcon, IonSegment, IonSegmentButton },
+  components: { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonAvatar, IonButtons, IonButton, IonCard, IonCardTitle, IonCardSubtitle, IonCardContent, IonCardHeader, IonGrid, IonRow, IonCol, IonIcon, IonSegment, IonSegmentButton, IonAlert },
 
   props: {
     currentUser: {
@@ -105,22 +117,23 @@ export default defineComponent({
 
   data() {
     return {
-      selectedSegment: 'upcoming', // Valeur par défaut (A venir)
+      selectedSegment: 'upcoming',
+      isAlertOpen: false,
+      reservationToDelete: null,
     };
   },
 
   computed: {
-    // Filtrage des réservations en fonction de la sélection du segment
     filteredReservations() {
-      if (!this.reservations) return []; // Si reservations est undefined, on retourne un tableau vide.
+      if (!this.reservations) return [];
 
       const currentDate = new Date();
       return this.reservations.filter(reservation => {
         const reservationDate = new Date(reservation.slot.startTime);
         if (this.selectedSegment === 'upcoming') {
-          return reservationDate >= currentDate; // Réservations à venir
+          return reservationDate >= currentDate;
         } else {
-          return reservationDate < currentDate; // Réservations passées
+          return reservationDate < currentDate;
         }
       });
     }
@@ -140,8 +153,16 @@ export default defineComponent({
     async updateReservation(reservationId) {
       this.$router.push({ name: 'ReservationForm', params: { reservationId } });
     },
-    async deleteOneReservation(reservationId) {
-      await useReservationStore().deleteOneReservation(reservationId);
+    deleteOneReservation(reservationId) {
+      this.reservationToDelete = reservationId;
+      this.isAlertOpen = true;
+    },
+    async confirmDelete() {
+      if (this.reservationToDelete) {
+        await useReservationStore().deleteOneReservation(this.reservationToDelete);
+        this.reservationToDelete = null;
+      }
+      this.isAlertOpen = false;
     }
   }
 });
@@ -149,8 +170,7 @@ export default defineComponent({
 
 <style scoped>
 ion-card {
-  margin: 0;
-  margin-bottom: 1rem;
+  margin: 0 0 1rem;
 }
 
 ion-card-title {

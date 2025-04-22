@@ -57,23 +57,32 @@
         </ion-tab-bar>
         <post-form-modal v-if="isPostFormModalOpen" @close="closePostFormModal" :current-user="currentUser"/>
         <life-moment-form-modal v-if="isLifeMomentModalOpen" @close="closeLifeMomentModal"/>
+        <friendships-modal
+          :is-open="isFriendshipsModalOpen"
+          :friends-list="friendsList"
+          @close="closeFriendshipsModal"
+          @select="handleFriendSelection"
+        />
       </ion-tabs>
     </div>
-
   </ion-page>
 </template>
 <script lang="ts">
-import { IonPage, IonAvatar, IonItem, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, IonButton } from '@ionic/vue';
+import { IonPage, IonAvatar, IonItem, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonContent, IonList, IonLabel } from '@ionic/vue';
 import { settingsOutline, homeOutline, chatbubblesOutline, journalOutline, todayOutline, add, logOutOutline } from 'ionicons/icons';
 import PostFormModal from '@/components/Feed/PostFormModal.vue';
 import LifeMomentFormModal from '@/components/LifeMoment/LifeMomentFormModal.vue';
 import { useAccountStore } from '@/stores/account';
 import { defineComponent } from 'vue';
 import CustomButton from '@/components/Commun/CustomButton.vue'
+import { useConversationStore } from '@/stores/conversation';
+import FriendshipsModal from '@/components/Message/FriendshipsModal.vue'
 
 export default defineComponent({
   name: 'MainHeader',
-  components: { CustomButton, IonPage, IonAvatar, IonItem, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, PostFormModal, LifeMomentFormModal, IonButton },
+  components: {
+    FriendshipsModal, CustomButton, IonPage, IonAvatar, IonItem, IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonFab, IonFabButton, PostFormModal, LifeMomentFormModal, IonButton,
+    IonModal, IonHeader, IonToolbar, IonTitle, IonButtons, IonContent, IonList, IonLabel },
   data() {
     return {
       homeOutline,
@@ -84,7 +93,8 @@ export default defineComponent({
       add,
       logOutOutline,
       isPostFormModalOpen: false,
-      isLifeMomentModalOpen: false
+      isLifeMomentModalOpen: false,
+      isFriendshipsModalOpen: false,
     };
   },
   computed: {
@@ -97,6 +107,19 @@ export default defineComponent({
     isDesktop() {
       return window.innerWidth > 992;
     },
+    friendsList() {
+      const received = this.currentUser?.friendshipsReceived
+        ?.filter(friendship => friendship.status === 'ACCEPTED')
+        .map(friendship => friendship.requester) || [];
+
+      const sent = this.currentUser?.friendshipsSent
+        ?.filter(friendship => friendship.status === 'ACCEPTED')
+        .map(friendship => friendship.receiver) || [];
+
+      return received.filter(friend =>
+        sent.some(sentFriend => sentFriend.id === friend.id)
+      );
+    },
   },
   methods: {
     openFormModal() {
@@ -106,7 +129,30 @@ export default defineComponent({
         this.$router.push('/reservations/nouvelle-reservation/');
       } else if (this.$route.path === '/feed') {
         this.isPostFormModalOpen = true;
+      } else if (this.$route.path === '/conversations') {
+        this.isFriendshipsModalOpen = true;
       }
+    },
+    closeFriendshipsModal() {
+      this.isFriendshipsModalOpen = false;
+    },
+    async handleFriendSelection(friend) {
+      const conversationStore = useConversationStore();
+      const existingConversation = conversationStore.conversations.find(
+        conversation => conversation.user?.id === friend.id
+      );
+
+      if (existingConversation) {
+        this.$router.push(`/conversations/${existingConversation.id}`);
+      } else {
+        const newConversation = await conversationStore.createOneConversation({
+          userIds: [this.currentUser.id, friend.id],
+          conversationType: 'PRIVATE',
+        });
+        this.$router.push(`/conversations/${newConversation.id}`);
+      }
+
+      this.closeFriendshipsModal();
     },
     closePostFormModal() {
       this.isPostFormModalOpen = false;
