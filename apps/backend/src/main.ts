@@ -12,7 +12,11 @@ async function bootstrap() {
   app.use('/uploads', express.static('uploads'));
   // Enable CORS
   app.enableCors({
-    origin: ['https://sendpathy.aaa', 'https://api.sendpathy.aaa', 'https://dashboard.sendpathy.aaa'],
+    origin: [
+      process.env.VITE_FRONTEND_URL,
+      process.env.VITE_API_URL,
+      'http://localhost:5173',
+    ],
     methods: ['GET,HEAD,PUT,PATCH,POST,DELETE'],
     credentials: true,
   });

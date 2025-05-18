@@ -12,26 +12,38 @@ export class MailerService {
     this.brevoClient = new SibApiV3Sdk.TransactionalEmailsApi();
   }
 
-  async sendConfirmationEmail(email: string, token: string, role: string): Promise<boolean> {
+  async sendConfirmationEmail(
+    email: string,
+    token: string,
+    role: string,
+  ): Promise<boolean> {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.to = [{ email: email }];
     sendSmtpEmail.sender = { email: 'sendpathy@gmail.com', name: 'Sendpathy' };
     sendSmtpEmail.subject = 'Confirmation de votre inscription';
-    sendSmtpEmail.htmlContent = `<html><body><h1>Merci pour votre inscription!</h1><p>Veuillez confirmer votre adresse email en cliquant sur le lien suivant: <a href="https://api.sendpathy.aaa/api/auth/confirm-email?token=${token}">Confirmer</a></p></body></html>`;
+    sendSmtpEmail.htmlContent = `<html><body><h1>Merci pour votre inscription!</h1><p>Veuillez confirmer votre adresse email en cliquant sur le lien suivant: <a href="${process.env.VITE_API_URL}/auth/confirm-email?token=${token}">Confirmer</a></p></body></html>`;
 
     try {
       const response = await this.brevoClient.sendTransacEmail(sendSmtpEmail);
       return true;
     } catch (error) {
-      console.error('Erreur lors de l\'envoi de l\'email de confirmation:', error);
+      console.error(
+        "Erreur lors de l'envoi de l'email de confirmation:",
+        error,
+      );
       return false;
     }
   }
 
-  async sendPasswordResetEmail(email: string, token: string, role: string): Promise<boolean> {
-    const baseUrl = role === 'USER'
-      ? 'https://sendpathy.aaa/reset-password'
-      : 'https://dashboard.sendpathy.aaa/auth/reset-password';
+  async sendPasswordResetEmail(
+    email: string,
+    token: string,
+    role: string,
+  ): Promise<boolean> {
+    const baseUrl =
+      role === 'USER'
+        ? process.env.VITE_FRONTEND_URL + '/reset-password'
+        : 'https://dashboard.sendpathy.aaa/auth/reset-password';
 
     const resetUrl = `${baseUrl}?token=${token}`;
 
@@ -42,11 +54,13 @@ export class MailerService {
     sendSmtpEmail.htmlContent = `<html><body><h1>Réinitialisation de votre mot de passe</h1><p>Veuillez réinitialiser votre mot de passe en cliquant sur le lien suivant: <a href="${resetUrl}">Réinitialiser</a></p></body></html>`;
 
     try {
-      const response = await this.brevoClient.sendTransacEmail(sendSmtpEmail);
-      console.log('Email sent successfully:', response);
+      await this.brevoClient.sendTransacEmail(sendSmtpEmail);
       return true;
     } catch (error) {
-      console.error('Erreur lors de l\'envoi de l\'email de réinitialisation:', error);
+      console.error(
+        "Erreur lors de l'envoi de l'email de réinitialisation:",
+        error,
+      );
       return false;
     }
   }
